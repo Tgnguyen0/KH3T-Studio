@@ -41,7 +41,7 @@ function App() {
         >
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/policy" element={<Policy />} />
+          {/*<Route path="/policy" element={<Policy />} />*/}
           <Route path="/product" element={<Product />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/compare" element={<ComparePage />} />

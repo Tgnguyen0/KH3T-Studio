@@ -337,7 +337,7 @@ const About = () => {
                     />
                 </section> */}
             </div>
-            <ChatBot/>
+           <ChatBot/>
             <Contact/>
         </div>
     );

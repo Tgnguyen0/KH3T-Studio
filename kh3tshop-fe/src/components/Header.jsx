@@ -237,7 +237,7 @@ export default function Header() {
               About Us
             </Link>
             <Link
-              to="/policy"
+              //to="/policy"
               className={`font-bold text-lg transition ${
                 isActive("/policy")
                   ? "text-red-500"
