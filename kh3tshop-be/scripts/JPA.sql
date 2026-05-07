@@ -992,10 +992,6 @@ VALUES
     (8, 'ORD20251110008', '2025-11-10 16:00:00', 'PENDING', 'Người nhận: Anh Long', 8, 8, 'BANK_TRANSFER');
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 039721822e30517f20ce238f969282c3d1ed56a3
 -- Order Details (lấy ví dụ 2-3 sản phẩm mỗi order, giữ giá đúng bảng product)
 INSERT INTO order_detail (
     order_detail_id,
