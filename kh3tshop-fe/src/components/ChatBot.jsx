@@ -195,23 +195,23 @@ const ChatBot = () => {
                       </div>
                     )}
                     {msg.compareIds && msg.compareIds.length >= 2 && (
-<div className="mt-3 space-y-2">
-<a
-href={`/compare?ids=${msg.compareIds.join(',')}`}
-target="_blank"
-rel="noopener noreferrer"
-className="block p-4 bg-red-50 rounded-xl border border-red-200 hover:border-red-400 hover:shadow-lg transition-all transform hover:scale-105"
->
-<div className="flex items-center justify-between">
-<div>
-<p className="font-semibold text-red-700">So sánh {msg.compareIds.length} sản phẩm</p>
-<p className="text-xs text-gray-600 mt-1">Bảng so sánh sẽ hiển thị chi tiết form, chất liệu, giá, size...</p>
-</div>
-<span className="text-2xl ml-3">→</span>
-</div>
-</a>
-</div>
-)}
+                      <div className="mt-3 space-y-2">
+                        <a
+                        href={`/compare?ids=${msg.compareIds.join(',')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block p-4 bg-red-50 rounded-xl border border-red-200 hover:border-red-400 hover:shadow-lg transition-all transform hover:scale-105"
+                        >
+                          <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold text-red-700">So sánh {msg.compareIds.length} sản phẩm</p>
+                            <p className="text-xs text-gray-600 mt-1">Bảng so sánh sẽ hiển thị chi tiết form, chất liệu, giá, size...</p>
+                          </div>
+                          <span className="text-2xl ml-3">→</span>
+                          </div>
+                        </a>
+                      </div>
+                    )}
 
                   </div>
                 )}
