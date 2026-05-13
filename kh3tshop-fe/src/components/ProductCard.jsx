@@ -98,7 +98,7 @@ const ProductCard = ({
             {isSoldOut && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                 <div className="bg-red-600 text-white px-6 py-2 rounded-full text-base font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12">
-                  SOLD OUT
+                  HẾT HÀNG
                 </div>
               </div>
             )}
@@ -121,7 +121,7 @@ const ProductCard = ({
           {/* NEW BADGE - GÓC PHẢI CARD */}
           {!isHot && isNew && !isSoldOut && (
             <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
-              ✨ NEW
+              ✨ MỚI
             </div>
           )}
 
@@ -240,7 +240,7 @@ const ProductCard = ({
           {isSoldOut && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <div className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12">
-                SOLD OUT
+                HẾT HÀNG
               </div>
             </div>
           )}
@@ -262,7 +262,7 @@ const ProductCard = ({
           {/* NEW BADGE */}
           {!isHot && isNew && !isSoldOut && (
             <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
-              ✨ NEW
+              ✨ MỚI
             </div>
           )}
 

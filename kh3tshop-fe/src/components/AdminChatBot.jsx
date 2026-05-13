@@ -18,7 +18,7 @@ const AdminChatBot = () => {
 
   // ================== LOCALSTORAGE CHO ADMIN - F5 KHÔNG MẤT CHAT ==================
 useEffect(() => {
-  const saved = localStorage.getItem("kh3t_admin_chat_history");
+  const saved = localStorage.getItem("kredo_admin_chat_history");
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -28,7 +28,7 @@ useEffect(() => {
       }
     } catch (e) {
       console.error("Lỗi parse admin chat history:", e);
-      localStorage.removeItem("kh3t_admin_chat_history");
+      localStorage.removeItem("kredo_admin_chat_history");
     }
   }
 
@@ -36,13 +36,13 @@ useEffect(() => {
   setMessages([
     {
       sender: "bot",
-      text: "Chào sếp! Em là trợ lý CEO của KH3T Shop đây ạ. Sếp cần báo cáo gì hôm nay?"
+      text: "Chào sếp! Em là trợ lý CEO của KREDO Studio đây ạ. Sếp cần báo cáo gì hôm nay?",
     }
   ]);
 }, []); // Chỉ chạy 1 lần khi mount
 useEffect(() => {
   if (messages.length > 0) {
-    localStorage.setItem("kh3t_admin_chat_history", JSON.stringify(messages));
+    localStorage.setItem("kredo_admin_chat_history", JSON.stringify(messages));
   }
 }, [messages]);
 

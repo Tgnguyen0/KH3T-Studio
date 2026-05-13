@@ -1,44 +1,29 @@
-import React from "react";
-import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
+import { MoveLeft, UserPlus, CheckCircle2, ArrowRight, User, Phone, Mail, Lock, Calendar } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  // Define Regex for reuse
   const REGEX = {
-    // RFC 5322 standard Email
     email: /^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/,
-    // Vietnamese phone number (10 digits)
     phoneNumber: /^(0[3|5|7|8|9])+([0-9]{8})$/,
-    // Password: at least 8 characters (Note: Your regex below currently checks for numbers only, you might want to update it to match the description)
-    password: /^(0-9){8,}$/,
   };
 
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
     email: "",
-    gender: "Male", // Default value
+    gender: "MALE",
     dateOfBirth: "",
     username: "",
     password: "",
     password_confirmed: "",
   });
 
-  // New state to track validation status of each field
-  // null: untouched, true: valid, false: invalid
-  const [validationStatus, setValidationStatus] = useState({
-    fullName: null,
-    phoneNumber: null,
-    email: null,
-    username: null,
-    password: null,
-    password_confirmed: null,
-  });
+  const [validationStatus, setValidationStatus] = useState({});
 
-  // Handle validation when user leaves the input field (onBlur)
   const handleValidation = (e) => {
     const { name, value } = e.target;
     let isValid = false;
@@ -48,10 +33,8 @@ const Register = () => {
     } else {
       switch (name) {
         case "fullName":
-          isValid = value.trim().length > 0;
-          break;
         case "username":
-          isValid = value.trim().length > 0;
+          isValid = value.trim().length >= 3;
           break;
         case "email":
           isValid = REGEX.email.test(value);
@@ -60,70 +43,33 @@ const Register = () => {
           isValid = REGEX.phoneNumber.test(value);
           break;
         case "password":
-          isValid = value.length > 8;
-          // When password changes, re-check the confirmed password
-          if (formData.password_confirmed) {
-            setValidationStatus((prev) => ({
-              ...prev,
-              password_confirmed: value === formData.password_confirmed,
-            }));
-          }
+          isValid = value.length >= 8;
           break;
         case "password_confirmed":
           isValid = formData.password === value;
           break;
         default:
+          isValid = true;
           break;
       }
     }
-
     setValidationStatus((prev) => ({ ...prev, [name]: isValid }));
   };
 
-  // Helper function to determine border class
-  const getBorderClass = (fieldName) => {
-    if (validationStatus[fieldName] === true) {
-      return "border-green-500 focus:border-green-500"; // Valid
-    }
-    if (validationStatus[fieldName] === false) {
-      return "border-red-400 focus:border-red-400"; // Invalid
-    }
-    return "border-gray-200 focus:border-red-400"; // Default
-  };
-
-  // Helper function to display icon
-  const renderIcon = (fieldName) => {
-    if (validationStatus[fieldName] === true) {
-      return (
-        <span className="absolute right-3 top-3 text-green-500 text-xl font-bold">
-          ✓
-        </span>
-      );
-    }
-    // Show * if invalid or untouched
-    return <span className="absolute right-3 top-3 text-red-500">*</span>;
-  };
-
-  // Handle changes in input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const loadingToast = toast.loading("Đang khởi tạo tài khoản...");
 
-    // Check if confirmed password matches
     if (formData.password !== formData.password_confirmed) {
-      toast.warning("Passwords do not match");
+      toast.warning("Mật khẩu không khớp", { id: loadingToast });
       return;
     }
 
-    // JSON data structure
     const accountData = {
       username: formData.username,
       password: formData.password,
@@ -131,7 +77,7 @@ const Register = () => {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
         email: formData.email,
-        gender: formData.gender.toUpperCase(),
+        gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
       },
     };
@@ -139,226 +85,224 @@ const Register = () => {
     try {
       const response = await fetch("http://localhost:8080/accounts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(accountData),
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Account created successfully", result);
-        toast.success("Registration successful");
+        toast.success("Đăng ký thành công! Chào mừng bạn đến với KREDO.", { id: loadingToast });
+        navigate("/login");
       } else {
         const errorData = await response.json();
-        console.error("Error creating account:", errorData);
-        toast.error(
-          `Registration failed: ${errorData.message || "Please try again."}`
-        );
+        toast.error(`Đăng ký thất bại: ${errorData.message || "Vui lòng thử lại."}`, { id: loadingToast });
       }
     } catch (error) {
-      console.error("Network or unknown error:", error);
-      toast.error(
-        "An error occurred. Please check your network connection and try again."
-      );
+      toast.error("Đã xảy ra lỗi kết nối.", { id: loadingToast });
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-5xl w-full grid md:grid-cols-2">
-        {/* Left side - Form */}
-        <div className="p-8 md:p-12">
-          <h2 className="font-bold text-4xl mb-2">Sign Up</h2>
-          <p className="text-gray-500 mb-8">Enter user information</p>
+    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-0 sm:p-6 md:p-12 font-sans selection:bg-black selection:text-white">
+      <div className="bg-white rounded-none sm:rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden max-w-6xl w-full grid lg:grid-cols-12 min-h-[85vh]">
+        
+        {/* Left Section - Branding */}
+        <div className="hidden lg:flex lg:col-span-4 flex-col justify-between p-16 bg-primary text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          
+          <Link to="/" className="flex items-center gap-2 relative z-10">
+             <span className="text-3xl font-black tracking-tighter uppercase">
+               Kredo<span className="text-accent">.</span>
+             </span>
+          </Link>
 
-          <form className="grid gap-4" onSubmit={handleSubmit}>
-            <div className="relative">
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "fullName"
-                )}`}
-                placeholder="Họ và tên..."
-                required
-              />
-              {renderIcon("fullName")}
-            </div>
+          <div className="relative z-10">
+            <h1 className="text-6xl font-black tracking-tighter leading-none uppercase mb-8">
+              Tham gia <br /> <span className="text-accent">KREDO.</span>
+            </h1>
+            <p className="text-white/40 text-sm font-medium max-w-xs leading-relaxed uppercase tracking-widest">
+              Ghi danh để nhận những ưu đãi đặc quyền và cập nhật xu hướng mới nhất.
+            </p>
+          </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "phoneNumber"
-                )}`}
-                placeholder="Số điện thoại..."
-                required
-              />
-              {renderIcon("phoneNumber")}
-            </div>
+          <div className="flex gap-12 relative z-10 border-t border-white/10 pt-12">
+             <div>
+                <span className="block text-2xl font-black mb-1">10K+</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Members</span>
+             </div>
+             <div>
+                <span className="block text-2xl font-black mb-1">2026</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Season</span>
+             </div>
+          </div>
+        </div>
 
-            <div className="relative">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "email"
-                )}`}
-                placeholder="Email..."
-                required
-              />
-              {renderIcon("email")}
-            </div>
+        {/* Right Section - Form */}
+        <div className="lg:col-span-8 p-8 sm:p-16 flex flex-col justify-center relative bg-white">
+          <div className="mb-12 flex justify-between items-start">
+             <div>
+                <span className="inline-block px-4 py-1.5 bg-secondary text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+                  KREDO Studio / Registration
+                </span>
+                <h2 className="text-4xl font-black text-primary tracking-tighter uppercase">Tạo tài khoản</h2>
+             </div>
+             <Link to="/login" className="text-accent text-[10px] font-black uppercase tracking-widest hover:underline pt-2">
+                Đã có tài khoản?
+             </Link>
+          </div>
 
-            <div className="grid gap-2">
-              <label className="font-semibold text-sm text-gray-700">
-                Giới tính:
-              </label>
-              <div className="flex gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="MALE"
-                    className="accent-red-500 w-4 h-4"
-                    checked={formData.gender == "MALE"}
-                    onChange={handleChange}
-                    defaultChecked
-                    required
-                  />
-                  <span className="text-gray-700">Nam</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="FEMALE"
-                    className="accent-red-500 w-4 h-4"
-                    checked={formData.gender == "FEMALE"}
-                    onChange={handleChange}
-                    required
-                  />
-                  <span className="text-gray-700">Nữ</span>
-                </label>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+            {/* Full Name */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Họ và tên</label>
+              <div className="relative">
+                <User className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="text"
+                  name="fullName"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="Nguyễn Văn A"
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
               </div>
             </div>
 
-            <div className="relative">
-              <input
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleChange}
-                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400 transition text-gray-600"
-                required
-              />
+            {/* Phone Number */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Số điện thoại</label>
+              <div className="relative">
+                <Phone className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="0987..."
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "username"
-                )}`}
-                placeholder="Username..."
-                required
-              />
-              {renderIcon("username")}
+            {/* Email */}
+            <div className="group md:col-span-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="kredo@example.com"
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
+            {/* Gender */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Giới tính</label>
+              <select 
+                name="gender" 
+                className="w-full bg-transparent border-b-2 border-primary/5 px-0 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer"
                 onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "password"
-                )}`}
-                placeholder="Mật khẩu..."
-                required
-              />
-              {renderIcon("password")}
-            </div>
-
-            <div className="relative">
-              <input
-                type="password"
-                name="password_confirmed"
-                value={formData.password_confirmed}
-                onChange={handleChange}
-                onBlur={handleValidation}
-                className={`w-full border-2 rounded-lg px-4 py-3 focus:outline-none transition ${getBorderClass(
-                  "password_confirmed"
-                )}`}
-                placeholder="Nhập lại mật khẩu..."
-                required
-              />
-              {renderIcon("password_confirmed")}
-            </div>
-
-            <div className="flex gap-3 mt-4">
-              <button
-                type="button"
-                className="px-6 py-3 rounded-lg bg-white border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition"
-                onClick={() => {
-                  navigate("/login");
-                }}
               >
-                Sign In
-              </button>
-              <button
-                type="button"
-                className="px-6 py-3 rounded-lg bg-gray-300 text-gray-700 font-semibold hover:bg-gray-400 transition"
-              >
-                Sign Up
-              </button>
+                <option value="MALE">Nam</option>
+                <option value="FEMALE">Nữ</option>
+                <option value="OTHER">Khác</option>
+              </select>
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-4 rounded-lg bg-black text-white font-bold text-lg hover:bg-gray-800 transition mt-2"
-            >
-              REGISTER
-            </button>
+            {/* DOB */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Ngày sinh</label>
+              <div className="relative">
+                <Calendar className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-            <button
-              type="button"
-              className="w-full py-3 rounded-lg bg-white border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition"
-              onClick={() => {
-                navigate("/");
-              }}
-            >
-              Quay lại
-            </button>
+            {/* Account Info Splitter */}
+            <div className="md:col-span-2 pt-4">
+               <div className="h-[1px] w-full bg-primary/5"></div>
+            </div>
+
+            {/* Username */}
+            <div className="group md:col-span-2">
+               <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Tên đăng nhập</label>
+               <div className="relative">
+                <User className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="text"
+                  name="username"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="Chọn tài khoản của bạn..."
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Mật khẩu</label>
+              <div className="relative">
+                <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="••••••••"
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">Xác nhận mật khẩu</label>
+              <div className="relative">
+                <Lock className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={16} />
+                <input
+                  type="password"
+                  name="password_confirmed"
+                  required
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-6 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="••••••••"
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                />
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="md:col-span-2 pt-8">
+               <button
+                type="submit"
+                className="group w-full py-6 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-accent transition-all duration-500 shadow-2xl shadow-primary/20 flex items-center justify-center gap-3"
+              >
+                Tạo tài khoản KREDO
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </form>
-        </div>
 
-        {/* Right side - Image */}
-        <div className="hidden md:flex items-center justify-center bg-gradient-to-br from-red-400 to-red-500 p-12">
-          <div className="relative">
-            <div className="absolute inset-0 bg-red-300 rounded-full blur-3xl opacity-50"></div>
-            <img
-              src="https://i.postimg.cc/J0TgG6NZ/Thiet-ke-chua-co-ten-(6).png"
-              alt="Profile"
-              className="relative rounded-full w-80 h-80 object-cover border-8 border-white shadow-2xl"
-            />
+          <div className="mt-12 text-center">
+             <Link to="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/30 hover:text-primary transition-colors">
+                <MoveLeft size={14} /> Quay lại trang chủ
+             </Link>
           </div>
         </div>
       </div>

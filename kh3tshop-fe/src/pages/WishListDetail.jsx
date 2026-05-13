@@ -101,10 +101,10 @@ export default function WishlistDetail() {
     try {
       await api.del(`/wishlists/${id}/items/${productToDelete.id}`);
       setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
-      toast.success(`"${productToDelete.name}" removed from wishlist`);
+      toast.success(`"${productToDelete.name}" đã được xóa khỏi danh sách yêu thích`);
       closeDeleteModal();
     } catch (err) {
-      toast.error("Failed to remove item");
+      toast.error("Không thể xóa sản phẩm");
     }
   };
 
@@ -117,14 +117,14 @@ export default function WishlistDetail() {
           className="flex items-center gap-2 text-gray-600 hover:text-black transition font-medium"
         >
           <ArrowLeft size={22} />
-          Back
+          Quay lại
         </button>
 
         <div className="text-right">
           <h1 className="text-3xl font-bold text-gray-900">
-            {products.length} {products.length === 1 ? "product" : "products"}
+            {products.length} sản phẩm
           </h1>
-          <p className="text-sm text-gray-500 mt-1">In your wishlist</p>
+          <p className="text-sm text-gray-500 mt-1">Trong danh sách yêu thích của bạn</p>
         </div>
       </div>
 
@@ -145,14 +145,14 @@ export default function WishlistDetail() {
         <>
           {products.length === 0 ? (
             <div className="text-center py-24 bg-gray-50 rounded-3xl">
-              <div className="text-7xl mb-6">Empty</div>
-              <p className="text-xl text-gray-600 font-medium">Your wishlist is empty</p>
+              <div className="text-7xl mb-6">Trống</div>
+              <p className="text-xl text-gray-600 font-medium">Danh sách yêu thích của bạn đang trống</p>
               <button
                 onClick={() => navigate("/product")} // hoặc /product
                 className="mt-8 px-8 py-3.5 bg-black hover:bg-gray-900 text-white font-medium rounded-full transition inline-flex items-center shadow-lg"
               >
                 <Plus size={22} className="mr-2" />
-                Continue Shopping
+                Tiếp tục mua sắm
               </button>
             </div>
           ) : (
@@ -191,29 +191,29 @@ export default function WishlistDetail() {
           <div className="absolute inset-0 bg-black/50" onClick={closeDeleteModal} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-red-600">Remove from wishlist?</h2>
+              <h2 className="text-xl font-bold text-red-600">Xóa khỏi danh sách yêu thích?</h2>
               <button onClick={closeDeleteModal} className="p-2 hover:bg-gray-100 rounded-lg">
                 <X size={20} />
               </button>
             </div>
             <div className="p-6">
               <p className="text-gray-700">
-                Remove <strong className="text-black">"{productToDelete?.name}"</strong> from this wishlist?
+                Xóa <strong className="text-black">"{productToDelete?.name}"</strong> khỏi danh sách yêu thích này?
               </p>
-              <p className="text-sm text-gray-500 mt-3">You can add it back anytime.</p>
+              <p className="text-sm text-gray-500 mt-3">Bạn có thể thêm lại bất cứ lúc nào.</p>
             </div>
             <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
               <button
                 onClick={closeDeleteModal}
                 className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium transition"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={handleRemoveItem}
                 className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
               >
-                Remove
+                Xóa
               </button>
             </div>
           </div>

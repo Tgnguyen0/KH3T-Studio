@@ -1,22 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { useState } from "react";
-const ForgotPassword = () => {
+import { toast } from "sonner";
+import { Mail, ArrowRight, MoveLeft, KeyRound } from "lucide-react";
 
+const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
     if (!email) {
-      alert("Please enter your email!");
+      toast.warning("Vui lòng nhập email của bạn!");
       return;
     }
 
-    setLoading(true)
+    setLoading(true);
+    const loadingToast = toast.loading("Đang gửi yêu cầu...");
 
     try {
-
       const response = await fetch("http://localhost:8080/auth/forgot-password", {
         method: "POST",
         headers: {
@@ -30,90 +32,113 @@ const ForgotPassword = () => {
         sessionStorage.setItem("resetToken", data.result.token);
         sessionStorage.setItem("otp", data.result.otp);
 
-        alert("OTP has been sent to your email. Please check!");
-
+        toast.success("Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra!", { id: loadingToast });
         navigate("/reset_password");
       } else {
-        alert(data.message || "Email does not exist or system error!");
+        toast.error(data.message || "Email không tồn tại hoặc lỗi hệ thống!", { id: loadingToast });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Unable to connect to Server!");
+      toast.error("Không thể kết nối đến máy chủ!", { id: loadingToast });
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-100 rounded-3xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2">
-        {/* Left side - Form */}
-        <div className="p-8 md:p-12">
-          <h2 className="font-bold text-4xl mb-3">Forget Password?</h2>
-          <p className="text-gray-600 mb-8 text-sm">
-            Enter your email to receive a password reset link
-          </p>
+    <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center p-0 sm:p-6 md:p-12 font-sans selection:bg-black selection:text-white">
+      <div className="bg-white rounded-none sm:rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden max-w-6xl w-full grid md:grid-cols-2 min-h-[70vh]">
+        
+        {/* Left Side - Form */}
+        <div className="p-8 sm:p-16 flex flex-col justify-center relative">
+          <div className="mb-12">
+            <span className="inline-block px-4 py-1.5 bg-secondary text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+              KREDO Studio / Recovery
+            </span>
+            <h2 className="text-5xl sm:text-6xl font-black tracking-tighter text-primary uppercase leading-tight">
+              Quên <br/> <span className="text-accent">Mật khẩu.</span>
+            </h2>
+            <p className="text-primary/40 mt-6 font-medium uppercase text-[10px] tracking-[0.15em] max-w-xs leading-relaxed">
+              Đừng lo lắng, chúng tôi sẽ giúp bạn lấy lại quyền truy cập vào tài khoản của mình.
+            </p>
+          </div>
 
-          <div className="grid gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <label className="text-gray-700 font-medium">Email:</label>
-              </div>
+          <form className="space-y-8" onSubmit={handleForgotPassword}>
+            <div className="group">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-primary/30 mb-3 group-focus-within:text-accent transition-colors">
+                Địa chỉ Email
+              </label>
               <div className="relative">
+                <Mail className="absolute left-0 top-1/2 -translate-y-1/2 text-primary/20 group-focus-within:text-primary transition-colors" size={18} />
                 <input
                   type="email"
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400 transition"
-                  placeholder="Nhập email của bạn..."
+                  className="w-full bg-transparent border-b-2 border-primary/5 px-8 py-4 text-sm font-bold focus:outline-none focus:border-primary transition-all placeholder:text-primary/10"
+                  placeholder="name@example.com"
+                  required
                 />
-                <span className="absolute right-3 top-3 text-red-500">*</span>
               </div>
             </div>
 
-            <div className="flex gap-3 items-center mt-2 flex-wrap sm:flex-nowrap">
+            <div className="pt-6 space-y-6">
               <button
-                type="button"
-                className="px-6 py-2 rounded-lg bg-white border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition whitespace-nowrap"
-                onClick={() => { navigate("/login") }}
+                type="submit"
+                disabled={loading}
+                className="group w-full py-6 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-accent transition-all duration-500 shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Sign In
+                {loading ? "Đang gửi yêu cầu..." : "Gửi mã xác thực"}
+                {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
               </button>
-              <button
-                type="button"
-                className="px-6 py-2 rounded-lg bg-white border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition whitespace-nowrap"
-                onClick={() => { navigate("/register") }}
-              >
-                Sign Up
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center px-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="text-[10px] font-black uppercase tracking-widest text-primary/30 hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  <MoveLeft size={14} /> Quay lại đăng nhập
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  className="text-[10px] font-black uppercase tracking-widest text-primary/30 hover:text-accent transition-colors"
+                >
+                  Tạo tài khoản mới
+                </button>
+              </div>
             </div>
+          </form>
 
-            <button
-              type="button"
-              onClick={handleForgotPassword}
-              disabled={loading}
-              className={`w-full py-4 rounded-lg text-white font-bold text-lg transition mt-4 ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-black hover:bg-gray-800"}`}
-            >
-              {loading ? "ĐANG GỬI..." : "GỬI MÃ XÁC NHẬN"}
-            </button>
-
+          <div className="mt-16 pt-8 border-t border-primary/5 flex items-center gap-4">
+             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-accent">
+                <KeyRound size={18} />
+             </div>
+             <p className="text-[9px] font-bold text-primary/40 uppercase tracking-widest leading-relaxed">
+                Hệ thống sẽ gửi một mã OTP 6 chữ số <br/> tới email của bạn để xác minh.
+             </p>
           </div>
         </div>
 
-        {/* Right side - Image */}
-        <div className="hidden md:flex items-center justify-center bg-gradient-to-br from-red-400 to-red-500 p-12">
-          <div className="relative">
-            <div className="absolute inset-0 bg-red-300 rounded-full blur-3xl opacity-50"></div>
-            <img
-              src="https://i.postimg.cc/J0TgG6NZ/Thiet-ke-chua-co-ten-(6).png"
-              alt="Profile"
-              className="relative rounded-full w-80 h-80 object-cover border-8 border-white shadow-2xl"
-            />
+        {/* Right Side - Visual */}
+        <div className="hidden md:block relative bg-[#F3F3F3]">
+          <img
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920&auto=format&fit=crop"
+            alt="KREDO Fashion"
+            className="w-full h-full object-cover grayscale opacity-90 mix-blend-multiply"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent"></div>
+          <div className="absolute inset-0 flex items-center justify-center p-12">
+             <div className="border border-white/20 p-12 backdrop-blur-sm bg-white/5 rounded-[2rem] text-center max-w-sm">
+                <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.5em] mb-4 block">Security First</span>
+                <h3 className="text-white text-3xl font-black uppercase tracking-tighter leading-tight mb-4">
+                   Bảo vệ <br/> Tài khoản.
+                </h3>
+                <p className="text-white/60 text-[10px] font-medium uppercase tracking-[0.1em] leading-relaxed">
+                   Chúng tôi cam kết bảo mật thông tin và dữ liệu của bạn ở mức cao nhất.
+                </p>
+             </div>
           </div>
         </div>
       </div>

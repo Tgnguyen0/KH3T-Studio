@@ -51,7 +51,7 @@ const ComparePage = () => {
                 const fetchedProducts = await fetchProductsByIds(productIds);
                 setProducts(fetchedProducts);
             } catch (err) {
-                setError("Failed to fetch product data.");
+                setError("Không thể tải dữ liệu sản phẩm.");
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -63,19 +63,19 @@ const ComparePage = () => {
     const handleClearComparison = () => {
         clearCompareList();
         setProducts([]); // Xóa sản phẩm khỏi state
-        toast.success("Comparison list cleared successfully!");
+        toast.success("Đã xóa danh sách so sánh thành công!");
     };
 
     // --- Data mapping for comparison table (Đã tối ưu hóa và thêm Ảnh) ---
     const comparisonFeatures = [
         // Các thông tin cơ bản
-        { key: 'costPrice', label: 'Sale Price', render: (p) => <span className="text-xl font-bold text-red-600">{formatPrice(p.costPrice)}</span> },
-        { key: 'price', label: 'Original Price', render: (p) => <span className="text-gray-500 line-through">{formatPrice(p.price)}</span> },
-        { key: 'rating', label: 'Customer Rating', render: (p) => <div className="flex items-center justify-center text-yellow-500"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span className="ml-1 text-gray-800">{p.rating || 'N/A'}</span></div> },
+        { key: 'costPrice', label: 'Giá khuyến mãi', render: (p) => <span className="text-xl font-bold text-red-600">{formatPrice(p.costPrice)}</span> },
+        { key: 'price', label: 'Giá gốc', render: (p) => <span className="text-gray-500 line-through">{formatPrice(p.price)}</span> },
+        { key: 'rating', label: 'Đánh giá', render: (p) => <div className="flex items-center justify-center text-yellow-500"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span className="ml-1 text-gray-800">{p.rating || 'Chưa có'}</span></div> },
         // Size Available (chỉ hiển thị size còn hàng)
         {
             key: 'availableSizes',
-            label: 'Available Sizes',
+            label: 'Kích cỡ còn hàng',
             render: (p) => {
                 const availableSizes = p.sizeDetails
                     ? p.sizeDetails
@@ -98,7 +98,7 @@ const ComparePage = () => {
                                 </span>
                             ))
                         ) : (
-                            <span className="text-red-500 italic font-medium">Out of Stock</span>
+                            <span className="text-red-500 italic font-medium">Hết hàng</span>
                         )}
                     </div>
                 );
@@ -106,17 +106,17 @@ const ComparePage = () => {
         },
 
         // Thông số kỹ thuật
-        { key: 'form', label: 'Form/Fit', render: (p) => p.form || 'N/A' },
-        { key: 'material', label: 'Material', render: (p) => p.material || 'N/A' },
-        { key: 'unit', label: 'Unit', render: (p) => p.unit || 'N/A' },
+        { key: 'form', label: 'Kiểu dáng', render: (p) => p.form || 'Chưa có' },
+        { key: 'material', label: 'Chất liệu', render: (p) => p.material || 'Chưa có' },
+        { key: 'unit', label: 'Đơn vị', render: (p) => p.unit || 'Chưa có' },
 
         // Mô tả sản phẩm (Hiển thị đầy đủ)
-        { key: 'description', label: 'Description', render: (p) => <div className="text-sm text-left max-w-xs mx-auto p-2 text-gray-700 whitespace-normal">{p.description}</div> },
+        { key: 'description', label: 'Mô tả', render: (p) => <div className="text-sm text-left max-w-xs mx-auto p-2 text-gray-700 whitespace-normal">{p.description}</div> },
 
         // THÊM: Ảnh Mặt Trước
         {
             key: 'imageUrlFront',
-            label: 'Image (Front)',
+            label: 'Ảnh (Trước)',
             render: (p) => (
                 <img
                     src={p.imageUrlFront}
@@ -128,7 +128,7 @@ const ComparePage = () => {
         // THÊM: Ảnh Mặt Sau
         {
             key: 'imageUrlBack',
-            label: 'Image (Back)',
+            label: 'Ảnh (Sau)',
             render: (p) => (
                 <img
                     src={p.imageUrlBack}
@@ -148,10 +148,10 @@ const ComparePage = () => {
         return (
             <div className="text-center py-20 bg-gray-50 min-h-screen">
                 <h3 className="text-2xl font-bold text-red-600 mb-4">
-                    {error || (productIds.length === 0 ? "No products selected for comparison." : "Products not found or list is empty.")}
+                    {error || (productIds.length === 0 ? "Chưa có sản phẩm nào được chọn để so sánh." : "Không tìm thấy sản phẩm hoặc danh sách trống.")}
                 </h3>
                 <Link to="/" className="text-blue-600 hover:underline flex items-center justify-center">
-                    <ArrowLeft size={18} className="mr-1" /> Back to Home
+                    <ArrowLeft size={18} className="mr-1" /> Quay lại Trang chủ
                 </Link>
             </div>
         );
@@ -162,13 +162,13 @@ const ComparePage = () => {
             <div className="max-w-full mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-extrabold text-gray-900">
-                        Product Comparison ({products.length} Items)
+                        So sánh sản phẩm ({products.length} mặt hàng)
                     </h1>
                     <button
                         onClick={handleClearComparison}
                         className="flex items-center px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
                     >
-                        <Trash2 size={18} className="mr-2" /> Clear Comparison
+                        <Trash2 size={18} className="mr-2" /> Xóa danh sách so sánh
                     </button>
                 </div>
 
@@ -179,7 +179,7 @@ const ComparePage = () => {
                         <tr className="bg-gray-100 border-b">
                             {/* Cột Thuộc tính (Cột cố định bên trái) */}
                             <th className="sticky left-0 z-20 bg-gray-200 px-6 py-4 text-left text-sm font-semibold text-gray-700 w-48 shadow-md">
-                                Feature
+                                Thuộc tính
                             </th>
                             {/* Các cột Sản phẩm */}
                             {products.map((p, index) => (

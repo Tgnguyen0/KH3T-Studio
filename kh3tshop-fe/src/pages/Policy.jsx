@@ -1,360 +1,216 @@
-import React from "react";
-// Đã xóa import Accordion: import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"; (Đã bị loại bỏ để dọn dẹp)
-import { Package, Shield, Truck, RefreshCw, AlertCircle, Mail, Phone, MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  ShieldCheck, 
+  Truck, 
+  RefreshCw, 
+  Clock, 
+  AlertCircle, 
+  ChevronRight,
+  MessageSquare,
+  HelpCircle,
+  FileText
+} from "lucide-react";
 import ChatBot from "../components/ChatBot"; 
 import Contact from "../components/Contact";
-const Policy = () => {
-  const headerImage = "https://i.postimg.cc/nLLky3D0/Frame-1000004547.png";
 
-  const conditions = [
-    {
-      icon: <Package className="w-8 h-8" />,
-      title: "Condition of Item",
-      description: "Items must be unused, unwashed, and free of any odors (body odor, perfume, chemicals, etc.)."
-    },
-    {
-      icon: <Shield className="w-8 h-8" />,
-      title: "Tags and Labels",
-      description: "Tags and labels must remain intact, not be torn, removed, or altered."
-    },
-    {
-      icon: <Package className="w-8 h-8" />,
-      title: "Original Packaging",
-      description: "The item must be returned with all original packaging and accessories in the same condition it was received."
-    }
+const Policy = () => {
+  const [activeTab, setActiveTab] = useState("return");
+
+  const returnConditions = [
+    "Sản phẩm phải còn nguyên tem mác, bao bì gốc và chưa qua sử dụng.",
+    "Không có dấu hiệu giặt ủi, mùi lạ (nước hoa, cơ thể) hoặc hư hỏng do tác động bên ngoài.",
+    "Áp dụng cho tất cả sản phẩm nguyên giá (không áp dụng hàng giảm giá sâu hoặc xả kho)."
   ];
 
-  const freeReturnCases = [
+  const returnSteps = [
     {
-      title: "Manufacturer Defects",
-      description: "Items with verifiable manufacturer defects (e.g., torn seams, dye/print issues, poor workmanship).",
-      icon: <AlertCircle className="w-6 h-6" />
+      title: "Kiểm tra điều kiện",
+      desc: "Đảm bảo sản phẩm của bạn đáp ứng các tiêu chuẩn đổi trả của KREDO."
     },
     {
-      title: "Incorrect Item Sent",
-      description: "Items sent incorrectly (wrong size, color, or product) compared to the original order.",
-      icon: <RefreshCw className="w-6 h-6" />
+      title: "Liên hệ hỗ trợ",
+      desc: "Gửi yêu cầu qua Zalo hoặc Hotline kèm mã đơn hàng và lý do cụ thể."
     },
     {
-      title: "Out of Stock for Exchange",
-      description: "If a size exchange is requested, but the item is confirmed to be out of stock.",
-      icon: <Package className="w-6 h-6" />
+      title: "Đóng gói & Gửi hàng",
+      desc: "Bọc kỹ sản phẩm trong hộp/túi gốc và gửi về địa chỉ kho của chúng tôi."
+    },
+    {
+      title: "Xác nhận & Hoàn tất",
+      desc: "KREDO sẽ kiểm tra sản phẩm và tiến hành đổi size hoặc hoàn tiền trong 3-5 ngày."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
-        {/* Hero Image at Top */}
-        <div className="mb-20 rounded-2xl overflow-hidden shadow-2xl">
-          <img
-            src={headerImage}
-            alt="KH3T Policy Header"
-            className="w-full h-[300px] object-cover mx-auto"
-          />
-        </div>
-
-        {/* Page Header */}
-        <header className="text-center mb-20 animate-fade-in">
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-foreground tracking-tighter">
-            Return & Exchange Policy
+    <div className="min-h-screen bg-white text-primary selection:bg-accent selection:text-white">
+      {/* Hero Section */}
+      <section className="pt-20 pb-32 px-4 border-b border-secondary">
+        <div className="max-w-4xl mx-auto text-center">
+          <span className="inline-block px-4 py-1.5 bg-secondary text-[10px] font-black uppercase tracking-[0.2em] mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            KREDO Studio / Guidelines
+          </span>
+          <h1 className="text-6xl sm:text-8xl font-black tracking-tighter uppercase mb-12 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
+            Chính sách <br/> <span className="text-accent">Dịch vụ.</span>
           </h1>
-          <p className="text-xl text-muted-foreground mt-4 max-w-4xl mx-auto leading-relaxed">
-            At KH3T Studio, we aim to provide a diverse and trendy fashion shopping experience. If you encounter any issues with your purchase, we are here to help.
+          <p className="text-lg sm:text-xl text-primary/60 max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            Chúng tôi tin rằng sự minh bạch là nền tảng của niềm tin. Tại KREDO, mọi quy trình đều được thiết kế để bảo vệ quyền lợi tối đa cho khách hàng.
           </p>
-        </header>
-
-        {/* Eligibility Period Section */}
-        <section className="mb-40 py-20 bg-[#F5F4F0] animate-fade-in">
-          <div className="relative max-w-3xl mx-auto">
-            <div className="p-8 bg-foreground rounded-xl shadow-2xl text-center transform transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:-translate-y-1">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white">15</span>
-                </div>
-              </div>
-              <h2 className="text-3xl font-bold text-background mb-3">Eligibility Period</h2>
-              <p className="text-lg text-background/80">
-                15 days from the date the customer receives the product (based on delivery carrier confirmation).
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Mandatory Conditions Section */}
-        <section className="mb-40">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">Mandatory Return/Exchange Conditions</h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            For a return or exchange to be accepted, the item must meet all of the following conditions:
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {conditions.map((condition, index) => (
-              <div
-                key={index}
-                className="group relative p-6 bg-muted rounded-xl shadow-lg border-t-4 border-foreground
-                          transition-all duration-500 hover:bg-black hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 cursor-pointer animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="flex justify-center mb-4 text-red-500 group-hover:text-white transition-colors duration-300">
-                  {condition.icon}
-                </div>
-                <h3 className="text-xl font-bold text-foreground text-center mb-3 group-hover:text-white transition-colors duration-300">
-                  {condition.title}
-                </h3>
-                <p className="text-muted-foreground text-center group-hover:text-white/80 transition-colors duration-300">
-                  {condition.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Important Note */}
-          <div className="mt-12 p-6 bg-accent rounded-xl shadow-lg border-l-4 border-red-500 max-w-4xl mx-auto 
-                transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 animate-fade-in
-                /* CÁC THAY ĐỔI ĐÃ ÁP DỤNG */
-                hover:bg-green-500 
-                hover:text-white 
-                hover:border-white">
-    <div className="flex items-start gap-4">
-        {/* Thêm lớp hover:text-white để đổi màu Icon */}
-        <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1 hover:text-white hidden" />
-        <div>
-            <h3 className="text-lg font-bold text-accent-foreground mb-2 hover:text-white">📝 IMPORTANT NOTE</h3>
-            <p className="text-accent-foreground/90 hover:text-white/90">
-                KH3T Studio strongly recommends recording an unboxing video upon receiving the package to serve as valid proof for any future claims.
-            </p>
         </div>
-    </div>
-</div>
-        </section>
+      </section>
 
-        {/* Free Return Cases Section */}
-        <section className="mb-40 py-20 bg-[#F5F4F0] animate-fade-in">
-          <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
-            Eligible Return/Exchange Cases
-          </h2>
-          <p className="text-center text-green-600 font-semibold mb-12 text-lg">
-            ✓ Free Return Shipping One-Way
-          </p>
-          
-          <div className="space-y-6 max-w-4xl mx-auto">
-            {freeReturnCases.map((item, index) => (
-              <div
-                key={index}
-                className="group p-6 bg-muted rounded-xl shadow-lg border-l-4 border-foreground/70
-                          transition-all duration-500 hover:bg-black hover:border-red-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] cursor-pointer animate-fade-in"
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="text-red-500 group-hover:text-white transition-colors duration-300 mt-1">
-                    {item.icon}
+      {/* Main Content */}
+      <section className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+            
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-4 space-y-2 sticky top-32 h-fit">
+              {[
+                { id: "return", label: "Đổi trả & Hoàn tiền", icon: <RefreshCw size={18} /> },
+                { id: "shipping", label: "Vận chuyển & Giao hàng", icon: <Truck size={18} /> },
+                { id: "security", label: "Bảo mật thông tin", icon: <ShieldCheck size={18} /> },
+                { id: "faq", label: "Câu hỏi thường gặp", icon: <HelpCircle size={18} /> }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center justify-between px-6 py-5 rounded-2xl transition-all duration-300 group ${
+                    activeTab === tab.id 
+                    ? "bg-primary text-white shadow-2xl shadow-primary/20 scale-105" 
+                    : "bg-secondary/50 text-primary/60 hover:bg-secondary hover:text-primary"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {tab.icon}
+                    <span className="text-sm font-black uppercase tracking-widest">{tab.label}</span>
                   </div>
+                  <ChevronRight size={16} className={`transition-transform duration-300 ${activeTab === tab.id ? "translate-x-1" : "group-hover:translate-x-1"}`} />
+                </button>
+              ))}
+            </div>
+
+            {/* Content Area */}
+            <div className="lg:col-span-8 animate-in fade-in duration-700">
+              {activeTab === "return" && (
+                <div className="space-y-16">
                   <div>
-                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-white transition-colors duration-300">
-                      {item.title}
+                    <h2 className="text-4xl font-black uppercase tracking-tighter mb-8">Quy định đổi trả</h2>
+                    <div className="grid gap-4">
+                      {returnConditions.map((item, idx) => (
+                        <div key={idx} className="flex gap-4 p-6 bg-secondary/30 rounded-3xl border border-primary/5 hover:border-accent/20 transition-colors">
+                          <AlertCircle size={20} className="text-accent shrink-0" />
+                          <p className="text-sm font-medium leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
+                      <Clock className="text-accent" />
+                      Thời hạn 15 ngày
                     </h3>
-                    <p className="text-muted-foreground group-hover:text-white/80 transition-colors duration-300">
-                      {item.description}
-                    </p>
+                    <div className="p-8 bg-primary text-white rounded-[2rem] shadow-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                      <p className="text-lg font-medium leading-relaxed relative z-10">
+                        KREDO chấp nhận đổi trả sản phẩm trong vòng <span className="text-accent font-black text-2xl">15 ngày</span> kể từ khi khách hàng nhận được hàng. Đây là cam kết cao nhất để bạn hoàn toàn yên tâm khi trải nghiệm các thiết kế của chúng tôi.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-2xl font-black uppercase tracking-tighter mb-8">Các bước thực hiện</h3>
+                    <div className="grid gap-8">
+                      {returnSteps.map((step, idx) => (
+                        <div key={idx} className="relative pl-12 group">
+                          <div className="absolute left-0 top-0 w-8 h-8 rounded-full border-2 border-primary/10 flex items-center justify-center text-[10px] font-black group-hover:border-accent group-hover:text-accent transition-colors duration-300">
+                            0{idx + 1}
+                          </div>
+                          <h4 className="text-sm font-black uppercase tracking-widest mb-2">{step.title}</h4>
+                          <p className="text-sm text-primary/60 leading-relaxed">{step.desc}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
 
-          <p className="text-center text-muted-foreground mt-8 italic">
-            KH3T Studio will cover all shipping costs incurred for the return or exchange in these cases.
-          </p>
-          </div>
-        </section>
+              {activeTab === "shipping" && (
+                <div className="space-y-12">
+                  <h2 className="text-4xl font-black uppercase tracking-tighter mb-8">Vận chuyển</h2>
+                  <div className="p-10 border-2 border-dashed border-primary/10 rounded-[3rem]">
+                    <div className="flex flex-col items-center text-center space-y-6">
+                      <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center">
+                        <Truck size={32} className="text-accent" />
+                      </div>
+                      <h3 className="text-2xl font-black uppercase tracking-tighter">Miễn phí vận chuyển</h3>
+                      <p className="text-primary/60 leading-relaxed">
+                        KREDO miễn phí vận chuyển cho tất cả đơn hàng trên toàn quốc có giá trị từ <span className="text-primary font-black">1.000.000đ</span>. Thời gian giao hàng trung bình từ 2-4 ngày làm việc.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-        {/* Customer Paid Shipping Section */}
-        <section className="mb-40">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
-            Cases Subject to Customer-Paid Shipping Fees
-          </h2>
-          
-          <div className="max-w-3xl mx-auto">
-            <div className="p-6 bg-accent rounded-xl shadow-lg border-l-4 border-accent-foreground transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 animate-fade-in">
-              <div className="flex items-start gap-4">
-                <Truck className="w-6 h-6 text-accent-foreground flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="text-xl font-bold text-accent-foreground mb-2">Size Exchange</h3>
-                  <p className="text-accent-foreground/90">
-                    Size exchange if the item does not fit (subject to availability).
+              {activeTab === "security" && (
+                <div className="space-y-8">
+                  <h2 className="text-4xl font-black uppercase tracking-tighter mb-8 text-accent">An toàn dữ liệu</h2>
+                  <p className="text-lg text-primary/70 leading-relaxed">
+                    Mọi thông tin cá nhân và lịch sử giao dịch của bạn tại KREDO đều được mã hóa và bảo mật tuyệt đối theo tiêu chuẩn SSL quốc tế. Chúng tôi cam kết không bao giờ chia sẻ dữ liệu của bạn cho bên thứ ba.
                   </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Request Template Section - ĐÃ CHUYỂN THÀNH HIỂN THỊ TĨNH */}
-        <section className="mb-40 py-20 bg-[#F5F4F0] animate-fade-in">
-          <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
-            Customer Return/Exchange Request Form
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            To ensure the fastest support, please copy and fill in the following template with all required details, then send it via Email or contact our Hotline.
-          </p>
-          
-          <div className="max-w-4xl mx-auto">
-            {/* THAY THẾ TOÀN BỘ CẤU TRÚC ACCORDION BẰNG DIV TĨNH */}
-            <div className="w-full">
-              {/* HEADER (THAY CHO AccordionTrigger) */}
-              <div className="p-8 bg-foreground rounded-t-xl shadow-2xl transition-all duration-300">
-                <h3 className="text-2xl font-bold text-background flex items-center gap-3">
-                  <Package className="w-7 h-7" />
-                  KH3T STUDIO RETURN/EXCHANGE REQUEST TEMPLATE
-                </h3>
-              </div>
-
-              {/* CONTENT (THAY CHO AccordionContent) */}
-              <div className="p-0">
-                <div className="bg-muted p-8 rounded-b-xl shadow-2xl border-t-2 border-background/10">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                        <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                          <span className="text-red-500">•</span> Customer Full Name:
-                        </p>
-                        <p className="text-muted-foreground text-sm pl-4">[Enter your full name]</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                        <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                          <span className="text-red-500">•</span> Contact Phone Number:
-                        </p>
-                        <p className="text-muted-foreground text-sm pl-4">[Enter Phone Number]</p>
-                      </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-6 bg-secondary/50 rounded-2xl">
+                      <ShieldCheck size={24} className="mb-4 text-accent" />
+                      <h4 className="text-xs font-black uppercase tracking-widest mb-2">Mã hóa SSL</h4>
+                      <p className="text-[10px] text-primary/40">Giao dịch an toàn 100%</p>
                     </div>
-                    
-                    <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                      <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                        <span className="text-red-500">•</span> Order Number:
-                      </p>
-                      <p className="text-muted-foreground text-sm pl-4">[Example: KH3T-20250101]</p>
-                    </div>
-                    
-                    <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                      <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                        <span className="text-red-500">•</span> Product Name:
-                      </p>
-                      <p className="text-muted-foreground text-sm pl-4">[Example: Basic Round Neck T-Shirt - White]</p>
-                    </div>
-                    
-                    <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                      <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                        <span className="text-red-500">•</span> Reason for Request:
-                      </p>
-                      <p className="text-muted-foreground text-sm pl-4">Select one: Size Exchange / Manufacturer Defect / Wrong Item Sent / Return for Refund.</p>
-                    </div>
-                    
-                    <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                      <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                        <span className="text-red-500">•</span> Detailed Issue/Request:
-                      </p>
-                      <p className="text-muted-foreground text-sm pl-4">[Describe the issue in detail. E.g., The shirt has a torn seam on the shoulder; Wrong size L sent instead of M; Requesting to exchange size M for size L.]</p>
-                    </div>
-                    
-                    <div className="p-4 bg-background rounded-lg shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
-                      <p className="font-bold text-foreground text-sm mb-2 flex items-center gap-2">
-                        <span className="text-red-500">•</span> Attachments:
-                      </p>
-                      <p className="text-muted-foreground text-sm pl-4">[Attach photos of the product fault and the Unboxing Video (if available).]</p>
+                    <div className="p-6 bg-secondary/50 rounded-2xl">
+                      <FileText size={24} className="mb-4 text-accent" />
+                      <h4 className="text-xs font-black uppercase tracking-widest mb-2">Quyền riêng tư</h4>
+                      <p className="text-[10px] text-primary/40">Kiểm soát dữ liệu cá nhân</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        </section>
+              )}
 
-        {/* Contact Information Section */}
-        <section className="mb-40">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
-            Contact Information
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-3xl mx-auto">
-            For all questions, return/exchange inquiries, or complaints, please contact our Customer Service team via the channels below:
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="group p-6 bg-muted rounded-xl shadow-lg text-center transition-all duration-500 hover:bg-black hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 animate-fade-in">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Mail className="w-8 h-8 text-white" />
+              {activeTab === "faq" && (
+                <div className="space-y-6">
+                  <h2 className="text-4xl font-black uppercase tracking-tighter mb-8">Hỏi đáp</h2>
+                  {[
+                    { q: "Tôi có thể đổi sản phẩm lấy tiền mặt không?", a: "KREDO hỗ trợ hoàn tiền qua chuyển khoản ngân hàng nếu sản phẩm lỗi hoặc không đúng mẫu mã đã đặt." },
+                    { q: "Làm sao để theo dõi đơn hàng?", a: "Bạn có thể vào mục 'Đơn hàng của tôi' trong tài khoản cá nhân để xem trạng thái vận chuyển thời gian thực." },
+                    { q: "KREDO có ship COD không?", a: "Chúng tôi hỗ trợ thanh toán khi nhận hàng (COD) trên toàn quốc." }
+                  ].map((item, idx) => (
+                    <div key={idx} className="p-8 bg-secondary/20 rounded-3xl hover:bg-secondary/40 transition-colors cursor-help">
+                      <h4 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-3">
+                        <MessageSquare size={16} className="text-accent" />
+                        {item.q}
+                      </h4>
+                      <p className="text-sm text-primary/60 leading-relaxed pl-7">{item.a}</p>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-white transition-colors duration-300">
-                Support Email
-              </h3>
-              <p className="text-muted-foreground group-hover:text-white/80 transition-colors duration-300">
-                support@kh3tstudio.com
-              </p>
-            </div>
-
-            <div className="group p-6 bg-muted rounded-xl shadow-lg text-center transition-all duration-500 hover:bg-black hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                  <Phone className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-white transition-colors duration-300">
-                Hotline/Zalo
-              </h3>
-              <p className="text-muted-foreground group-hover:text-white/80 transition-colors duration-300">
-                +84 901 234 567
-              </p>
-            </div>
-
-            {/* Đã sửa cấu trúc thẻ để nội dung hiển thị đúng */}
-            <div className="group p-6 bg-muted rounded-xl shadow-lg text-center transition-all duration-500 hover:bg-black hover:shadow-2xl hover:scale-[1.05] hover:-translate-y-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <MapPin className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-white transition-colors duration-300">
-                Return Warehouse
-              </h3>
-              <p className="text-muted-foreground group-hover:text-white/80 transition-colors duration-300">
-                [Detailed address for returns]
-              </p>
+              )}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Commitment Section */}
-        <section className="mb-20 py-20 bg-[#F5F4F0] animate-fade-in">
-          <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
-            Commitment & Right to Refuse
-          </h2>
-          
-          <div className="max-w-4xl mx-auto space-y-6">
-            <div className="p-6 bg-accent rounded-xl shadow-lg border-l-4 border-green-500 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 animate-fade-in">
-              <h3 className="text-xl font-bold text-accent-foreground mb-2">Our Commitment</h3>
-              <p className="text-accent-foreground/90">
-                We are committed to providing fast and reliable support upon receiving your inquiry.
-              </p>
-            </div>
-
-            <div className="p-6 bg-accent rounded-xl shadow-lg border-l-4 border-red-500 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <h3 className="text-xl font-bold text-accent-foreground mb-2">Right to Refuse</h3>
-              <p className="text-accent-foreground/90">
-                KH3T Studio reserves the right to reject returns that do not meet the mandatory conditions listed above.
-              </p>
-            </div>
+      {/* Footer Support */}
+      <section className="py-24 px-4 bg-secondary/30">
+        <div className="max-w-4xl mx-auto text-center space-y-12">
+          <h2 className="text-3xl font-black uppercase tracking-tighter">Vẫn còn thắc mắc?</h2>
+          <div className="flex flex-wrap justify-center gap-6">
+            <a href="tel:+84901234567" className="px-10 py-5 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all font-black uppercase text-xs tracking-widest">
+              Hotline: 0901 234 567
+            </a>
+            <a href="mailto:support@kredo.vn" className="px-10 py-5 bg-primary text-white rounded-2xl shadow-xl hover:shadow-2xl transition-all font-black uppercase text-xs tracking-widest">
+              Gửi Email cho chúng tôi
+            </a>
           </div>
-          </div>
-        </section>
+        </div>
+      </section>
 
-      </div>
       <ChatBot/>
       <Contact/>
     </div>

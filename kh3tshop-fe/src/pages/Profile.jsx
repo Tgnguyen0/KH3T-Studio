@@ -129,7 +129,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
 
             setAddresses(list);
         } catch {
-            toast.error("Failed to load addresses");
+            toast.error("Không thể tải địa chỉ");
             setAddresses([]);
         } finally {
             setAddressLoading(false);
@@ -184,7 +184,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
 
         // Validation for Edit Address Form (optional but recommended)
         if (!editForm.delivery_address.trim() || !editForm.province.trim()) {
-            toast.error("Address and Province are required.");
+            toast.error("Vui lòng nhập địa chỉ và Tỉnh/Thành phố.");
             return;
         }
 
@@ -193,13 +193,13 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
         try {
             await api.put("/addresses/update", editForm);
 
-            toast.success("Address updated successfully!");
+            toast.success("Cập nhật địa chỉ thành công!");
             handleCancelEdit();
             await fetchAddresses();
 
         } catch (error) {
-            console.error("Error updating address:", error);
-            toast.error("Failed to update address: " + (error.message || "Unknown error"));
+            console.error("Lỗi cập nhật địa chỉ:", error);
+            toast.error("Cập nhật địa chỉ thất bại: " + (error.message || "Lỗi không xác định"));
         } finally {
             // Reset loading state
             setCurrentActionId(null);
@@ -211,14 +211,14 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
 
         // Validation for Add Address Form
         if (!newAddress.delivery_address.trim() || !newAddress.province.trim()) {
-            toast.error("Address and Province are required.");
+            toast.error("Vui lòng nhập địa chỉ và Tỉnh/Thành phố.");
             return;
         }
 
         setCurrentActionId("ADD_NEW");
         try {
             await api.post("/addresses/add", newAddress);
-            toast.success("Address added!");
+            toast.success("Đã thêm địa chỉ!");
             setShowAddForm(false);
 
             setNewAddress({
@@ -230,7 +230,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
 
             fetchAddresses();
         } catch {
-            toast.error("Failed to add address");
+            toast.error("Thêm địa chỉ thất bại");
         } finally {
             setCurrentActionId(null);
         }
@@ -241,19 +241,19 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
         const addressId = parseInt(id, 10);
 
         if (isNaN(addressId) || addressId <= 0) {
-            toast.error("Error: Invalid Address ID.");
-            console.error("Attempted to delete address with invalid ID:", id);
+            toast.error("Lỗi: ID địa chỉ không hợp lệ.");
+            console.error("Cố gắng xóa địa chỉ với ID không hợp lệ:", id);
             return;
         }
 
-        if (!window.confirm("Are you sure you want to delete this address?")) return;
+        if (!window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) return;
 
         // SỬ DỤNG addressId đã được xác thực
         setCurrentActionId(addressId);
         try {
             // DÙNG addressId (số nguyên) để gọi API
             await api.delete(`/addresses/${addressId}`);
-            toast.success("Address deleted successfully!");
+            toast.success("Xóa địa chỉ thành công!");
             fetchAddresses();
         } catch (err) {
             // Lỗi từ Backend (ví dụ: "Address not found") sẽ được hiển thị
@@ -267,7 +267,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-black">Shipping Addresses</h2>
+                <h2 className="text-2xl font-bold text-black">Địa chỉ giao hàng</h2>
 
                 {isCustomerProfile && (
                     <button
@@ -277,15 +277,15 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                         }}
                         className="text-red-600 hover:text-red-800 font-medium"
                     >
-                        {showAddForm ? "Cancel Add" : "Add New"}
+                        {showAddForm ? "Hủy thêm" : "Thêm mới"}
                     </button>
                 )}
             </div>
 
             {addressLoading && !editingAddress ? (
-                <p className="text-center text-gray-500">Loading...</p>
+                <p className="text-center text-gray-500">Đang tải...</p>
             ) : addresses.length === 0 && !showAddForm ? (
-                <p className="text-center text-gray-500 py-8">No saved addresses yet.</p>
+                <p className="text-center text-gray-500 py-8">Chưa có địa chỉ nào được lưu.</p>
             ) : (
                 <div className="flex-grow overflow-y-auto space-y-4 pr-2">
                     {addresses.map((addr) => (
@@ -297,14 +297,14 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                     className="bg-red-100 rounded-lg p-4 border-2 border-red-500"
                                 >
                                     <h4 className="font-bold mb-3 text-red-700">
-                                        Edit Address
+                                        Chỉnh sửa địa chỉ
                                     </h4>
 
                                     <input
                                         name="delivery_address"
                                         value={editForm.delivery_address}
                                         onChange={handleEditFormChange}
-                                        placeholder="Street address..."
+                                        placeholder="Địa chỉ chi tiết..."
                                         required
                                         className="w-full p-2 mb-2 border border-red-300 rounded"
                                     />
@@ -313,7 +313,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                         name="province"
                                         value={editForm.province}
                                         onChange={handleEditFormChange}
-                                        placeholder="Province"
+                                        placeholder="Tỉnh/Thành phố"
                                         required
                                         className="w-full p-2 mb-2 border border-red-300 rounded"
                                     />
@@ -322,7 +322,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                         name="delivery_note"
                                         value={editForm.delivery_note}
                                         onChange={handleEditFormChange}
-                                        placeholder="Delivery note..."
+                                        placeholder="Ghi chú giao hàng..."
                                         className="w-full p-2 mb-3 border border-red-300 rounded"
                                     />
 
@@ -333,8 +333,8 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             className="flex-1 bg-red-600 text-white p-2 rounded hover:bg-red-700 disabled:opacity-50"
                                         >
                                             {isAddressLoading(editForm.id)
-                                                ? "Updating..."
-                                                : "Save Changes"}
+                                                ? "Đang cập nhật..."
+                                                : "Lưu thay đổi"}
                                         </button>
 
                                         <button
@@ -342,7 +342,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             onClick={handleCancelEdit}
                                             className="bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400"
                                         >
-                                            Cancel
+                                            Hủy
                                         </button>
                                     </div>
                                 </form>
@@ -360,7 +360,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                         </p>
 
                                         <p className="text-sm text-gray-500 italic">
-                                            Note: {addr.delivery_note || "None"}
+                                            Ghi chú: {addr.delivery_note || "Không có"}
                                         </p>
                                     </div>
 
@@ -396,13 +396,13 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                     onSubmit={handleAddAddress}
                     className="mt-6 bg-red-50 rounded-lg p-4"
                 >
-                    <h4 className="font-bold mb-3 text-red-700">Add New Address</h4>
+                    <h4 className="font-bold mb-3 text-red-700">Thêm địa chỉ mới</h4>
 
                     <input
                         name="delivery_address"
                         value={newAddress.delivery_address}
                         onChange={handleNewAddressChange}
-                        placeholder="Street address..."
+                        placeholder="Địa chỉ chi tiết..."
                         required
                         className="w-full p-3 mb-3 border border-gray-300 rounded"
                     />
@@ -412,7 +412,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                         name="province"
                         value={newAddress.province}
                         onChange={handleNewAddressChange}
-                        placeholder="Province"
+                        placeholder="Tỉnh/Thành phố"
                         required
                         className="w-full p-3 mb-3 border border-gray-300 rounded"
                     />
@@ -421,7 +421,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                         name="delivery_note"
                         value={newAddress.delivery_note}
                         onChange={handleNewAddressChange}
-                        placeholder="Delivery note"
+                        placeholder="Ghi chú giao hàng"
                         className="w-full p-3 mb-4 border border-gray-300 rounded"
                     />
 
@@ -429,7 +429,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                         disabled={isAddressLoading("ADD_NEW")}
                         className="w-full bg-red-600 text-white p-3 rounded font-semibold hover:bg-red-700 disabled:opacity-50"
                     >
-                        {isAddressLoading("ADD_NEW") ? "Saving..." : "Save Address"}
+                        {isAddressLoading("ADD_NEW") ? "Đang lưu..." : "Lưu địa chỉ"}
                     </button>
                 </form>
             )}
@@ -461,7 +461,7 @@ const Profile = () => {
             const customerData = await api.get("/customers/profile");
 
             if (!customerData) {
-                throw new Error("Customer profile not found"); // Đổi sang Tiếng Anh
+                throw new Error("Không tìm thấy thông tin khách hàng");
             }
 
             const newProfile = {
@@ -488,8 +488,8 @@ const Profile = () => {
             });
 
         } catch (err) {
-            console.error("Error fetching profile:", err);
-            toast.error("Failed to load personal information. Please log in again."); // Đổi sang Tiếng Anh
+            console.error("Lỗi khi tải hồ sơ:", err);
+            toast.error("Không thể tải thông tin cá nhân. Vui lòng đăng nhập lại.");
         } finally {
             setLoading(false);
         }
@@ -510,19 +510,19 @@ const Profile = () => {
 
         // 1. Full Name
         if (!formData.fullName.trim()) {
-            newErrors.fullName = "Full Name is required.";
+            newErrors.fullName = "Vui lòng nhập Họ và tên.";
             isValid = false;
         } else if (!NAME_REGEX.test(formData.fullName)) {
-            newErrors.fullName = "Full Name must contain only letters and spaces.";
+            newErrors.fullName = "Họ và tên chỉ được chứa chữ cái và khoảng trắng.";
             isValid = false;
         }
 
         // 2. Phone Number
         if (!formData.phoneNumber.trim()) {
-            newErrors.phoneNumber = "Phone Number is required.";
+            newErrors.phoneNumber = "Vui lòng nhập Số điện thoại.";
             isValid = false;
         } else if (!PHONE_REGEX.test(formData.phoneNumber)) {
-            newErrors.phoneNumber = "Invalid phone number format (e.g., 0901234567 or +84901234567).";
+            newErrors.phoneNumber = "Định dạng số điện thoại không hợp lệ (vd: 0901234567 hoặc +84901234567).";
             isValid = false;
         }
 
@@ -530,7 +530,7 @@ const Profile = () => {
         if (formData.dateOfBirth) {
             const today = new Date().toISOString().split('T')[0];
             if (formData.dateOfBirth >= today) {
-                newErrors.dateOfBirth = "Date of Birth cannot be in the future.";
+                newErrors.dateOfBirth = "Ngày sinh không thể ở tương lai.";
                 isValid = false;
             }
         }
@@ -557,12 +557,12 @@ const Profile = () => {
 
         // 1. Kiểm tra Validation
         if (!validateForm()) {
-            toast.error("Please review the information entered.");
+            toast.error("Vui lòng kiểm tra lại thông tin đã nhập.");
             return;
         }
 
         if (!formData.id) {
-            toast.error("Customer ID could not be determined.");
+            toast.error("Không thể xác định ID khách hàng.");
             return;
         }
 
@@ -577,11 +577,11 @@ const Profile = () => {
                 dateOfBirth: formData.dateOfBirth || null,
             });
 
-            toast.success("Profile updated successfully!");
+            toast.success("Cập nhật thông tin thành công!");
             // Cập nhật lại initialProfile để reset trạng thái hasChanged
             await fetchProfile();
         } catch (err) {
-            toast.error(err.message || "Profile Update Failed.");
+            toast.error(err.message || "Cập nhật thông tin thất bại.");
         } finally {
             setSaving(false);
         }
@@ -596,7 +596,7 @@ const Profile = () => {
             <div className="bg-white rounded-2xl shadow-2xl p-8 mb-8">
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-3xl font-extrabold text-black">
-                        My Profile
+                        Hồ sơ của tôi
                     </h1>
                 </div>
 
@@ -605,7 +605,7 @@ const Profile = () => {
                         <div className="space-y-6">
                             {/* Username / Email */}
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Username / Email</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">Tên đăng nhập / Email</label>
                                 <input
                                     value={profile.email}
                                     readOnly
@@ -615,12 +615,12 @@ const Profile = () => {
 
                             {/* Full Name */}
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Full Name</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">Họ và tên</label>
                                 <input
                                     name="fullName"
                                     value={formData.fullName}
                                     onChange={handleChange}
-                                    placeholder="Enter your full name"
+                                    placeholder="Nhập họ và tên của bạn"
                                     className={`w-full p-3 border rounded-lg focus:ring-2 transition ${
                                         errors.fullName
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
@@ -634,12 +634,12 @@ const Profile = () => {
 
                             {/* Phone Number */}
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Phone Number</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">Số điện thoại</label>
                                 <input
                                     name="phoneNumber"
                                     value={formData.phoneNumber}
                                     onChange={handleChange}
-                                    placeholder="Enter your phone number"
+                                    placeholder="Nhập số điện thoại của bạn"
                                     className={`w-full p-3 border rounded-lg focus:ring-2 transition ${
                                         errors.phoneNumber
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
@@ -653,7 +653,7 @@ const Profile = () => {
 
                             {/* Date of Birth */}
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Date of Birth</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">Ngày sinh</label>
                                 <input
                                     type="date"
                                     name="dateOfBirth"
@@ -672,16 +672,16 @@ const Profile = () => {
 
                             {/* Gender */}
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Gender</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">Giới tính</label>
                                 <select
                                     name="gender"
                                     value={formData.gender}
                                     onChange={handleChange}
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition"
                                 >
-                                    <option value="MALE">Male</option>
-                                    <option value="FEMALE">Female</option>
-                                    <option value="OTHER">Other</option>
+                                    <option value="MALE">Nam</option>
+                                    <option value="FEMALE">Nữ</option>
+                                    <option value="OTHER">Khác</option>
                                 </select>
                             </div>
 
@@ -690,7 +690,7 @@ const Profile = () => {
                                 disabled={!hasChanged || saving}
                                 className="w-full bg-red-600 text-white p-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 transition"
                             >
-                                {saving ? "Saving..." : "Save Changes"}
+                                {saving ? "Đang lưu..." : "Lưu thay đổi"}
                             </button>
                         </div>
                     </form>
