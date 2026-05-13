@@ -57,7 +57,7 @@ export default function Wishlist() {
         const data = await api.get("/wishlists");
         setWishlistList(data.result || []);
       } catch (err) {
-        setError(err.message);
+        setError("Không thể tải danh sách yêu thích");
         if (err.message.includes("Unauthorized")) {
           localStorage.removeItem("accessToken");
           navigate("/login");
@@ -96,9 +96,9 @@ export default function Wishlist() {
       const data = await api.post("/wishlists", { name: name.trim(), description: description.trim() || null });
       setWishlistList(prev => [...prev, data.result]);
       closeAll();
-      toast.success(`Success creating "${data.result.name}"`);
+      toast.success(`Đã tạo danh sách "${data.result.name}" thành công`);
     } catch (err) {
-      toast.error(err.message || "Failed to create wishlist");
+      toast.error(err.message || "Không thể tạo danh sách yêu thích");
     }
   };
 
@@ -111,9 +111,9 @@ export default function Wishlist() {
       });
       setWishlistList(prev => prev.map(item => item.id === currentItem.id ? data.result : item));
       closeAll();
-      toast.success(`Updated "${data.result.name}"`);
+      toast.success(`Đã cập nhật "${data.result.name}"`);
     } catch (err) {
-      toast.error(err.message || "Failed to update");
+      toast.error(err.message || "Cập nhật thất bại");
     }
   };
 
@@ -122,7 +122,7 @@ export default function Wishlist() {
       await api.del(`/wishlists/${currentItem.id}`);
       setWishlistList(prev => prev.filter(item => item.id !== currentItem.id));
       closeAll();
-       toast.success(`Wishlist deleted`);
+       toast.success(`Đã xóa danh sách yêu thích`);
     } catch (err) {
       alert(err.message);
     }
@@ -134,11 +134,11 @@ export default function Wishlist() {
     <>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Wishlists</h1>
+          <h1 className="text-2xl font-bold">Danh sách yêu thích</h1>
           <button
             onClick={openCreate}
             className="w-10 h-10 bg-black hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-all hover:shadow-lg"
-            title="Create new wishlist"
+            title="Tạo danh sách yêu thích mới"
           >
             <Plus size={22} />
           </button>
@@ -147,7 +147,7 @@ export default function Wishlist() {
         {/* Loading & Error */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-black"></div>
+            <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-black">Đang tải...</div>
           </div>
         )}
         {error && !loading && (
@@ -159,8 +159,8 @@ export default function Wishlist() {
           <div className="space-y-4">
             {wishlistList.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
-                <p className="text-lg">You dont have any wishlist</p>
-                <p className="text-sm mt-2">Press <strong className="text-black">+</strong> to make a new one !</p>
+                <p className="text-lg">Bạn chưa có danh sách yêu thích nào</p>
+                <p className="text-sm mt-2">Nhấn <strong className="text-black">+</strong> để tạo mới !</p>
               </div>
             ) : (
               wishlistList.map((item) => (
@@ -179,7 +179,7 @@ export default function Wishlist() {
                         <p className="text-sm text-gray-500 mt-1 line-clamp-1">{item.description}</p>
                       )}
                       {item.itemCount > 0 && (
-                        <span className="text-xs text-gray-400">• {item.itemCount} product</span>
+                        <span className="text-xs text-gray-400">• {item.itemCount} sản phẩm</span>
                       )}
                     </div>
                   </button>
@@ -209,14 +209,14 @@ export default function Wishlist() {
       {/* MODAL TẠO / SỬA */}
       {(isCreateOpen || isEditOpen) && (
         <Modal
-          title={isCreateOpen ? "Create new wishlist" : "Edit your wishlist"}
+          title={isCreateOpen ? "Tạo danh sách yêu thích mới" : "Chỉnh sửa danh sách yêu thích"}
           name={name}
           description={description}
           setName={setName}
           setDescription={setDescription}
           onConfirm={isCreateOpen ? handleCreate : handleUpdate}
           onClose={closeAll}
-          confirmText={isCreateOpen ? "Add" : "Update"}
+          confirmText={isCreateOpen ? "Thêm" : "Cập nhật"}
           disabled={!name.trim()}
         />
       )}
@@ -227,29 +227,29 @@ export default function Wishlist() {
           <div className="absolute inset-0 bg-black/40" onClick={closeAll} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-red-600">Delete your wishlist?</h2>
+              <h2 className="text-xl font-bold text-red-600">Xóa danh sách yêu thích?</h2>
               <button onClick={closeAll} className="p-2 hover:bg-gray-100 rounded-lg">
                 <X size={20} />
               </button>
             </div>
             <div className="p-6">
               <p className="text-gray-700">
-                Are you sure to delete <strong className="text-black">"{currentItem?.name}"</strong>?
+                Bạn có chắc chắn muốn xóa <strong className="text-black">"{currentItem?.name}"</strong>?
               </p>
-              <p className="text-sm text-gray-500 mt-3">This action cant be undo.</p>
+              <p className="text-sm text-gray-500 mt-3">Hành động này không thể hoàn tác.</p>
             </div>
             <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
               <button
                 onClick={closeAll}
                 className="px-5 py-2.5 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 font-medium transition"
               >
-                Cancel
+                Hủy
               </button>
               <button
                 onClick={handleDelete}
                 className="px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-900 font-medium transition"
               >
-                Delete
+                Xóa
               </button>
             </div>
           </div>
@@ -276,23 +276,23 @@ function Modal({ title, name, description, setName, setDescription, onConfirm, o
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Wishlist name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tên danh sách yêu thích</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !disabled && onConfirm()}
-              placeholder="Ex: Your favorite clothes, special birthday outfit..."
+              placeholder="Ví dụ: Quần áo yêu thích, trang phục sinh nhật..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
               autoFocus
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả (tùy chọn)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Note something about this wishlist..."
+              placeholder="Ghi chú điều gì đó về danh sách này..."
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
             />

@@ -12,7 +12,7 @@ const ChatBot = () => {
 
   // ================== LOCALSTORAGE - F5 KHÔNG MẤT CHAT ==================
   useEffect(() => {
-    const saved = localStorage.getItem("kh3t_chat_history");
+    const saved = localStorage.getItem("kredo_chat_history");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -29,13 +29,13 @@ const ChatBot = () => {
     const hasRealMessage = messages.length > 1 || 
       (messages.length === 1 && messages[0].sender === "user");
     if (hasRealMessage) {
-      localStorage.setItem("kh3t_chat_history", JSON.stringify(messages));
+      localStorage.setItem("kredo_chat_history", JSON.stringify(messages));
     }
   }, [messages]);
 
   useEffect(() => {
     const handleLogout = () => {
-      localStorage.removeItem("kh3t_chat_history");
+      localStorage.removeItem("kredo_chat_history");
       setMessages([
         { sender: "bot", text: "Xin chào! Mình là trợ lý mua sắm đây. Bạn đang tìm sản phẩm nào hôm nay?" }
       ]);

@@ -76,7 +76,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
         );
         setWishlists(updated);
       } catch (err) {
-        toast.error("Cant load wishlist");
+        toast.error("Không thể tải danh sách yêu thích");
       } finally {
         setLoading(false);
       }
@@ -93,10 +93,10 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
     try {
       if (currentHasProduct) {
         await api.del(`/wishlists/${wishlistId}/items/${productId}`);
-        toast.error(`Removed product from "${wishlistName}"`);
+        toast.error(`Đã xóa sản phẩm khỏi "${wishlistName}"`);
       } else {
         await api.post(`/wishlists/${wishlistId}/items`, { productId });
-        toast.success(`Saved to "${wishlistName}"`);
+        toast.success(`Đã lưu vào "${wishlistName}"`);
       }
 
       setWishlists(prev =>
@@ -119,7 +119,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
 
   const handleCreateWishlist = async () => {
     if (!newName.trim()) {
-      toast.error("Wishlist name cant be empty");
+      toast.error("Tên danh sách yêu thích không được để trống");
       return;
     }
 
@@ -131,7 +131,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
 
       const newWishlist = data.result;
       setWishlists(prev => [...prev, { ...newWishlist, hasProduct: true }]);
-      toast.success(`Created wishlist "${newWishlist.name}" and saved product to wishlist`);
+      toast.success(`Đã tạo danh sách "${newWishlist.name}" và lưu sản phẩm thành công`);
 
       setNewName("");
       setNewDesc("");
@@ -140,7 +140,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
       // Cập nhật trạng thái tim ở ProductCard
       onSuccess?.();
     } catch (err) {
-      toast.error("Failed to create wishlist: " + err.message);
+      toast.error("Không thể tạo danh sách yêu thích: " + err.message);
     }
   };
 
@@ -152,7 +152,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b">
-          <h3 className="text-lg font-semibold">Save to wishlist</h3>
+          <h3 className="text-lg font-semibold">Lưu vào danh sách yêu thích</h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full transition">
             <X size={20} />
           </button>
@@ -161,19 +161,19 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
         {/* Nội dung cuộn */}
         <div className="overflow-y-auto flex-1">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading...</div>
+            <div className="p-8 text-center text-gray-500">Đang tải...</div>
           ) : showCreateForm ? (
             <div className="p-5 space-y-4">
               <input
                 type="text"
-                placeholder="Your wishlist name..."
+                placeholder="Tên danh sách yêu thích của bạn..."
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 autoFocus
               />
               <textarea
-                placeholder="Description (optional)"
+                placeholder="Mô tả (tùy chọn)"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
                 rows={3}
@@ -184,19 +184,19 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
                   onClick={() => setShowCreateForm(false)}
                   className="flex-1 py-3 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition font-medium"
                 >
-                  Cancel
+                  Hủy
                 </button>
                 <button
                   onClick={handleCreateWishlist}
                   className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium"
                 >
-                  Add
+                  Thêm
                 </button>
               </div>
             </div>
           ) : wishlists.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              <p>You dont have any wishlist</p>
+              <p>Bạn chưa có danh sách yêu thích nào</p>
             </div>
           ) : (
             <div className="divide-y">
@@ -213,7 +213,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
                       <div className="text-xs text-gray-500 mt-1">{wl.description}</div>
                     )}
                     <div className="text-xs text-gray-400 mt-1">
-                      {wl.itemCount || 0} product
+                      {wl.itemCount || 0} sản phẩm
                     </div>
                   </div>
                   {savingIds.has(wl.id) ? (
@@ -239,7 +239,7 @@ export default function WishlistSelectorModal({ productId, isOpen, onClose, onSu
               className="w-full py-3 flex items-center justify-center gap-2 text-black font-medium hover:bg-gray-200 rounded-lg transition"
             >
               <Plus size={20} />
-              Create new wishlist
+              Tạo danh sách yêu thích mới
             </button>
           </div>
         )}

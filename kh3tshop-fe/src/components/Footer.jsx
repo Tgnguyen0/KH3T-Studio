@@ -13,66 +13,65 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="flex flex-col gap-4">
-            <div className="bg-white text-black px-6 py-3 rounded-2xl inline-block w-fit">
-              <span className="font-bold text-lg">
-                KH<span className="text-red-500">3</span>T STUDIO
+            <div className="bg-white text-black px-6 py-3 rounded-xl inline-block w-fit">
+              <span className="font-black text-xl tracking-tighter uppercase">
+                KREDO<span className="text-accent">.</span>
               </span>
             </div>
             <p className="text-gray-300 text-base font-bold leading-relaxed mx-2">
-              Trusted fashion <br></br> brand with youthful <br></br> and
-              dynamic style !
+              Thương hiệu thời trang <br></br> uy tín với phong cách <br></br> trẻ trung và năng động !
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-white font-bold text-lg mb-2">Quick Links</h3>
+            <h3 className="text-white font-bold text-lg mb-2">Liên kết nhanh</h3>
             <a
               href="/"
               className="text-gray-300 hover:text-red-500 transition text-sm"
             >
-              Home
+              Trang chủ
             </a>
             <a
               href="/product"
               className="text-gray-300 hover:text-red-500 transition text-sm"
             >
-              Products
+              Sản phẩm
             </a>
             <a
               href="/about"
               className="text-gray-300 hover:text-red-500 transition text-sm"
             >
-              About Us
+              Về chúng tôi
             </a>
             <a
               href="/policy"
               className="text-gray-300 hover:text-red-500 transition text-sm"
             >
-              Policy
+              Chính sách
             </a>
           </div>
 
           {/* Contact Info */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-white font-bold text-lg mb-2">Contact</h3>
+            <h3 className="text-white font-bold text-lg mb-2">Liên hệ</h3>
             <div className="flex items-center gap-3 text-gray-300 text-sm">
               <Phone size={18} className="text-red-500 flex-shrink-0" />
               <span>093 - 3462 - 6578</span>
             </div>
             <div className="flex items-center gap-3 text-gray-300 text-sm">
               <Mail size={18} className="text-red-500 flex-shrink-0" />
-              <span>contact@kh3tstudio.com</span>
+              <span>contact@kredostudio.com</span>
             </div>
             <div className="flex items-start gap-3 text-gray-300 text-sm">
               <MapPin size={18} className="text-red-500 flex-shrink-0 mt-1" />
-              <span>ABC Street, Go Vap, Ho Chi Minh City</span>
+              <span>Đường ABC, Quận Gò Vấp, TP. Hồ Chí Minh</span>
             </div>
           </div>
 
           {/* Social Media */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-white font-bold text-lg mb-2">Follow Us</h3>
+            <h3 className="text-white font-bold text-lg mb-2">Theo dõi chúng tôi</h3>
             <div className="flex items-center gap-3">
               <a
                 href="#"
@@ -112,7 +111,7 @@ export default function Footer() {
               </a>
             </div>
             <p className="text-gray-300 text-xs mt-2">
-              Get updates on new products and special offers
+              Nhận cập nhật về sản phẩm mới và ưu đãi đặc biệt
             </p>
           </div>
         </div>
@@ -123,7 +122,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <p className="text-gray-400 text-2sm text-center">
-              © 2025 KH3T Studio. All rights reserved.
+              © 2025 KREDO Studio. Bảo lưu mọi quyền.
             </p>
           </div>
         </div>

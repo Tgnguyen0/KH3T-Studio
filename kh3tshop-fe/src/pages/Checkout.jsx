@@ -245,6 +245,7 @@ const Checkout = () => {
           });
         } else {
           for (const item of selectedCartItems) {
+            // Create order detail
             await fetch(`http://localhost:8080/order-details/create`, {
               method: "POST",
               headers: {
@@ -257,13 +258,22 @@ const Checkout = () => {
                 unitPrice: item.priceAtTime,
                 totalPrice: item.subtotal,
                 orderId: orderData.id,
-                productId: item.id,
+                productId: item.productId || item.id, // Try productId first, fallback to id if joined
               }),
+            });
+
+            // DELETE from backend cart
+            await fetch(`http://localhost:8080/cart-details/delete/${item.id}`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             });
           }
           localStorage.removeItem("cartItems");
+          window.dispatchEvent(new Event("cartUpdated"));
         }
-        toast.success("Order successfull!!");
+        toast.success("Đặt hàng thành công!!");
         if (payment === "bank") {
           const orderId = orderData.id;
           const invoiceRequest = {
@@ -294,7 +304,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.error("Failed to place order. Please try again.");
+      toast.error("Đặt hàng thất bại. Vui lòng thử lại.");
     }
   };
   const handleAddNewAddress = async () => {
@@ -325,7 +335,7 @@ const Checkout = () => {
           delivery_address: "",
           delivery_note: "",
         });
-        toast.success("Add address successfully!!");
+        toast.success("Thêm địa chỉ thành công!!");
         setIsAddAddress(false);
       }
       const resAddress = await fetch(
@@ -341,7 +351,7 @@ const Checkout = () => {
       setAddresses(data);
     } catch (error) {
       console.error("Fail to add new address!!", error);
-      toast.error("Fail to add new address!!");
+      toast.error("Thêm địa chỉ thất bại!!");
     }
   };
 
@@ -349,7 +359,7 @@ const Checkout = () => {
     <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
       <div className="lg:col-span-2 space-y-10">
         <div>
-          <h1 className="text-3xl font-bold mb-5">Shipping Information</h1>
+          <h1 className="text-3xl font-bold mb-5">Thông tin giao hàng</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <input
@@ -363,7 +373,7 @@ const Checkout = () => {
             <input
               type="text"
               name="name"
-              placeholder="Full Name"
+              placeholder="Họ và tên"
               className="border p-3 rounded"
               onChange={handleChange}
               value={form.name}
@@ -371,7 +381,7 @@ const Checkout = () => {
             <input
               type="text"
               name="phone"
-              placeholder="Phone Number"
+              placeholder="Số điện thoại"
               className="border p-3 rounded"
               onChange={handleChange}
               value={form.phone}
@@ -383,7 +393,7 @@ const Checkout = () => {
                   onClick={() => setIsAddAddress(true)}
                   className="absolute right-0 bottom-0 px-4 bg-black text-white py-2 rounded font-bold text-sm hover:bg-gray-800 transition"
                 >
-                  Add new address
+                  Thêm địa chỉ mới
                 </button>
               ) : (
                 <></>
@@ -395,7 +405,7 @@ const Checkout = () => {
                 className="border p-3 rounded md:col-span-2"
                 onChange={(e) => handleSelectAddress(e.target.value)}
               >
-                <option value="">-- Select saved address --</option>
+                <option value="">-- Chọn địa chỉ đã lưu --</option>
                 {addresses.map((addr, index) => (
                   <option key={index} value={index}>
                     {addr.delivery_address} ({addr.province})
@@ -404,12 +414,12 @@ const Checkout = () => {
               </select>
             ) : (
               <div className="md:col-span-2 border p-5 rounded bg-gray-100 space-y-4">
-                <h3 className="text-xl font-bold">Add New Address</h3>
+                <h3 className="text-xl font-bold">Thêm địa chỉ mới</h3>
 
                 <input
                   type="text"
                   name="delivery_address"
-                  placeholder="Delivery Address"
+                  placeholder="Địa chỉ giao hàng"
                   className="border p-3 rounded w-full"
                   onChange={handleChangeAddress}
                   value={formAddress.delivery_address}
@@ -421,7 +431,7 @@ const Checkout = () => {
                     onChange={(e) => handleProvinceChange(e.target.value)}
                     className="border p-2 rounded"
                   >
-                    <option value="">-- Select Province --</option>
+                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
                     {provinces.map((p) => (
                       <option key={p.code} value={p.name}>
                         {p.name}
@@ -433,7 +443,7 @@ const Checkout = () => {
                     disabled={!selectedProvince}
                     onChange={(e) => setSelectedWard(e.target.value)}
                   >
-                    <option value="">-- Select Wards --</option>
+                    <option value="">-- Chọn Phường/Xã --</option>
                     {wards.map((w) => (
                       <option key={w.code} value={w.name}>
                         {w.name}
@@ -444,7 +454,7 @@ const Checkout = () => {
 
                 <textarea
                   name="delivery_note"
-                  placeholder="Delivery note (optional)"
+                  placeholder="Ghi chú giao hàng (tùy chọn)"
                   className="border p-3 rounded w-full"
                   rows="3"
                   onChange={handleChangeAddress}
@@ -456,38 +466,95 @@ const Checkout = () => {
                     onClick={() => setIsAddAddress(false)}
                     className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
                   >
-                    Cancel
+                    Hủy
                   </button>
 
                   <button
                     onClick={handleAddNewAddress}
                     className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                   >
-                    Save Address
+                    Lưu địa chỉ
                   </button>
                 </div>
               </div>
             )}
 
-            <textarea
+           <textarea
               name="note"
-              placeholder="Notes (optional)"
+              placeholder="Ghi chú (tùy chọn)"
               className="border p-3 rounded md:col-span-2"
               onChange={handleChange}
             ></textarea>
           </div>
         </div>
 
+        {/* Danh sách sản phẩm */}
         <div>
-          <h2 className="text-2xl font-bold mb-3">Delivery Method</h2>
+          <h2 className="text-2xl font-bold mb-4">Sản phẩm đang mua</h2>
+          <div className="space-y-4 border p-4 rounded bg-white shadow-sm">
+            {product ? (
+              // Trường hợp Mua ngay
+              <div className="flex items-center gap-4 py-2">
+                <img
+                  src={product.imageUrlFront}
+                  alt={product.name}
+                  className="w-20 h-20 object-cover rounded-lg border"
+                />
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-900">{product.name}</h4>
+                  <p className="text-sm text-gray-500">
+                    {location.state?.selectedSize && `Kích cỡ: ${location.state.selectedSize} | `}
+                    Số lượng: {quantity}
+                  </p>
+                  <p className="text-sm font-semibold text-red-500 mt-1">
+                    {formatVND(product.costPrice)}
+                  </p>
+                </div>
+                <div className="text-right font-bold">
+                  {formatVND(product.costPrice * quantity)}
+                </div>
+              </div>
+            ) : selectedCartItems.length > 0 ? (
+              // Trường hợp mua từ Giỏ hàng
+              selectedCartItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-4 py-2 border-b last:border-0">
+                  <img
+                    src={item.productImage}
+                    alt={item.productName}
+                    className="w-20 h-20 object-cover rounded-lg border"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900">{item.productName}</h4>
+                    <p className="text-sm text-gray-500">
+                      Kích cỡ: {item.sizeName} | Số lượng: {item.quantity}
+                    </p>
+                    <p className="text-sm font-semibold text-red-500 mt-1">
+                      {formatVND(item.priceAtTime)}
+                    </p>
+                  </div>
+                  <div className="text-right font-bold">
+                    {formatVND(item.subtotal)}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">
+                Không có sản phẩm nào được chọn.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-bold mb-3">Phương thức vận chuyển</h2>
           <div className="border p-4 rounded flex justify-between items-center">
-            <span>Standard (3–5 business days)</span>
+            <span>Tiêu chuẩn (3–5 ngày làm việc)</span>
             <span className="font-semibold">{formatVND(30000)}</span>
           </div>
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-3">Payment Method</h2>
+          <h2 className="text-2xl font-bold mb-3">Phương thức thanh toán</h2>
 
           <div className="space-y-3">
             <label className="flex items-center gap-3 border p-3 rounded cursor-pointer">
@@ -497,7 +564,7 @@ const Checkout = () => {
                 value="cash"
                 onChange={(e) => setPayment(e.target.value)}
               />
-              <span>Cash on Delivery (COD)</span>
+              <span>Thanh toán khi nhận hàng (COD)</span>
             </label>
 
             <label className="flex items-center gap-3 border p-3 rounded cursor-pointer">
@@ -507,49 +574,49 @@ const Checkout = () => {
                 value="bank"
                 onChange={(e) => setPayment(e.target.value)}
               />
-              <span>Bank Transfer</span>
+              <span>Chuyển khoản ngân hàng</span>
             </label>
           </div>
         </div>
       </div>
 
       <div className="border-t-4 border-red-500 p-6 rounded-lg bg-gray-50 shadow-md h-fit">
-        <h2 className="text-3xl font-bold mb-6 text-red-500">Order Summary</h2>
+        <h2 className="text-3xl font-bold mb-6 text-red-500">Tóm tắt đơn hàng</h2>
 
         <div className="space-y-4 text-lg">
           <div className="flex justify-between">
-            <span>Subtotal:</span>
+            <span>Tạm tính:</span>
             <span className="font-semibold">{formatVND(summary.subtotal)}</span>
           </div>
 
           {product ? (
             <div className="flex justify-between">
-              <span>Shipping fee:</span>
+              <span>Phí vận chuyển:</span>
               <span>{formatVND(30000)}</span>
             </div>
           ) : (
             <div className="flex justify-between">
-              <span>Shipping fee:</span>
+              <span>Phí vận chuyển:</span>
               <span>{formatVND(summary.shippingFee)}</span>
             </div>
           )}
 
           <div className="flex justify-between">
-            <span>Discount:</span>
+            <span>Giảm giá:</span>
             <span>{formatVND(summary.discount)}</span>
           </div>
         </div>
 
         {product ? (
           <div className="flex justify-between text-xl font-bold border-t pt-5 mt-5">
-            <span>Total:</span>
+            <span>Tổng cộng:</span>
             <span className="text-red-500">
               {formatVND(product.costPrice * quantity + 30000)}
             </span>
           </div>
         ) : (
           <div className="flex justify-between text-xl font-bold border-t pt-5 mt-5">
-            <span>Total:</span>
+            <span>Tổng cộng:</span>
             <span className="text-red-500">{formatVND(summary.total)}</span>
           </div>
         )}
@@ -558,7 +625,7 @@ const Checkout = () => {
           onClick={handleConfirm}
           className="w-full mt-8 bg-black text-white py-3 rounded font-bold text-lg hover:bg-gray-800 transition"
         >
-          Confirm Order
+          Xác nhận đặt hàng
         </button>
       </div>
     </div>

@@ -55,7 +55,7 @@ const Order = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -67,31 +67,31 @@ const Order = () => {
   const getStatusInfo = (status) => {
     const statusMap = {
       PENDING: {
-        label: "Pending Confirmation",
+        label: "Chờ xác nhận",
         color: "text-yellow-600",
         bgColor: "bg-yellow-50",
         icon: <Clock size={16} />,
       },
       CONFIRMED: {
-        label: "Confirmed",
+        label: "Đã xác nhận",
         color: "text-blue-600",
         bgColor: "bg-blue-50",
         icon: <CheckCircle size={16} />,
       },
       SHIPPING: {
-        label: "Shipping",
+        label: "Đang giao hàng",
         color: "text-purple-600",
         bgColor: "bg-purple-50",
         icon: <Truck size={16} />,
       },
       COMPLETED: {
-        label: "Completed",
+        label: "Đã hoàn thành",
         color: "text-green-600",
         bgColor: "bg-green-50",
         icon: <CheckCircle size={16} />,
       },
       CANCELLED: {
-        label: "Cancelled",
+        label: "Đã hủy",
         color: "text-red-600",
         bgColor: "bg-red-50",
         icon: <XCircle size={16} />,
@@ -102,9 +102,9 @@ const Order = () => {
 
   const getPaymentMethodLabel = (method) => {
     const methodMap = {
-      COD: "Cash on Delivery",
-      BANKING: "Bank Transfer",
-      MOMO: "MoMo Wallet",
+      COD: "Thanh toán khi nhận hàng",
+      BANKING: "Chuyển khoản ngân hàng",
+      MOMO: "Ví MoMo",
       VNPAY: "VNPAY",
     };
     return methodMap[method] || method;
@@ -127,7 +127,7 @@ const Order = () => {
         <div className="p-3">
           <p className="font-semibold text-sm text-gray-900 flex items-center gap-2">
             <span className="text-red-500 text-sm">⚠️</span>
-            Are you sure you want to cancel this order?
+            Bạn có chắc chắn muốn hủy đơn hàng này không?
           </p>
           <div className="flex gap-3 mt-4 justify-start">
             <button
@@ -157,19 +157,19 @@ const Order = () => {
 
                   await fetchOrders();
 
-                  toast.success("Cancel successful!!!");
+                  toast.success("Hủy đơn hàng thành công!!!");
                 } catch (error) {
-                  toast.error("Error to cancel!");
+                  toast.error("Lỗi khi hủy đơn hàng!");
                 }
               }}
             >
-              Cancel
+              Hủy
             </button>
             <button
               className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition font-medium"
               onClick={() => toast.dismiss(t)}
             >
-              No
+              Không
             </button>
           </div>
         </div>
@@ -185,22 +185,22 @@ const Order = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">My Orders</h1>
-          <p className="text-gray-600">Manage and track your orders</p>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">Đơn hàng của tôi</h1>
+          <p className="text-gray-600">Quản lý và theo dõi đơn hàng của bạn</p>
         </div>
 
         <div className="flex justify-center mb-10">
           <div className="w-full bg-white rounded-full shadow-lg p-1 flex gap-1 justify-between border border-gray-200">
             {[
-              { key: "all", label: "All", icon: <ListChecks size={18} /> },
+              { key: "all", label: "Tất cả", icon: <ListChecks size={18} /> },
               {
                 key: "pending",
-                label: "Pending",
+                label: "Chờ xác nhận",
                 icon: <Clock size={18} />,
               },
               {
                 key: "confirmed",
-                label: "Confirmed",
+                label: "Đã xác nhận",
                 icon: <CheckCircle2 size={18} />,
               },
             ].map((tab) => (
@@ -234,15 +234,15 @@ const Order = () => {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
               <Package size={40} className="text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No Orders Yet</h3>
+            <h3 className="text-xl font-semibold mb-2">Chưa có đơn hàng</h3>
             <p className="text-gray-600 mb-6">
-              You currently have no orders in this section
+              Bạn hiện không có đơn hàng nào trong mục này
             </p>
             <button
               onClick={() => (window.location.href = "/product")}
               className="px-8 py-3 bg-black text-white rounded-full font-medium hover:bg-red-500 transition"
             >
-              Shop Now
+              Mua sắm ngay
             </button>
           </div>
         ) : (
@@ -258,10 +258,10 @@ const Order = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                       <div className="text-sm">
                         <p className="font-semibold text-gray-900">
-                          Order Code: {order.orderCode}
+                          Mã đơn hàng: {order.orderCode}
                         </p>
                         <p className="text-gray-600 mt-1">
-                          Order Date: {formatDate(order.orderDate)}
+                          Ngày đặt: {formatDate(order.orderDate)}
                         </p>
                       </div>
 
@@ -276,19 +276,19 @@ const Order = () => {
                     <div className="bg-gray-50 rounded-lg p-4 text-sm">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                          <span className="text-gray-600">Receiver: </span>
+                          <span className="text-gray-600">Người nhận: </span>
                           <span className="font-medium">
                             {order.customerTrading.receiverName}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Phone: </span>
+                          <span className="text-gray-600">Điện thoại: </span>
                           <span className="font-medium">
                             {order.customerTrading.receiverPhone}
                           </span>
                         </div>
                         <div className="sm:col-span-2">
-                          <span className="text-gray-600">Address: </span>
+                          <span className="text-gray-600">Địa chỉ: </span>
                           <span className="font-medium">
                             {order.customerTrading.receiverAddress}
                           </span>
@@ -303,7 +303,7 @@ const Order = () => {
 
                       {order.note && (
                         <div className="mt-2 pt-2 border-t border-gray-200">
-                          <span className="text-gray-600">Note: </span>
+                          <span className="text-gray-600">Ghi chú: </span>
                           <span className="font-medium italic">
                             {order.note}
                           </span>
@@ -326,14 +326,14 @@ const Order = () => {
                               {detail.productName}
                             </h4>
                             <p className="text-sm text-gray-600 mt-1">
-                              Quantity: {detail.quantity}
+                              Số lượng: {detail.quantity}
                             </p>
                             <p className="text-red-500 font-bold mt-1">
                               {formatPrice(detail.unitPrice)}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-600">Total Price</p>
+                            <p className="text-sm text-gray-600">Thành tiền</p>
                             <p className="text-red-500 font-bold">
                               {formatPrice(detail.quantity * detail.unitPrice)}
                             </p>
@@ -343,7 +343,7 @@ const Order = () => {
                       <div className="flex gap-4">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-gray-900 line-clamp-2">
-                            Shopping fee
+                            Phí vận chuyển
                           </h4>
                         </div>
                         <div className="text-right">
@@ -356,7 +356,7 @@ const Order = () => {
 
                     <div className="mt-6 pt-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="text-right sm:text-left">
-                        <p className="text-sm text-gray-600">Total Amount:</p>
+                        <p className="text-sm text-gray-600">Tổng cộng:</p>
                         <p className="text-2xl font-bold text-red-500">
                           {formatPrice(
                             order.orderDetails.reduce(
@@ -373,19 +373,19 @@ const Order = () => {
                             className="px-6 py-2 bg-red-500 text-white rounded-full font-medium hover:bg-red-600 transition"
                             onClick={() => handleCancel(order.id)}
                           >
-                            Cancel Order
+                            Hủy đơn hàng
                           </button>
                         )}
 
                         {order.statusOrder === "COMPLETED" && (
                           <button className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition">
-                            Buy Again
+                            Mua lại
                           </button>
                         )}
 
                         {order.statusOrder === "SHIPPING" && (
                           <button className="px-6 py-2 bg-blue-500 text-white rounded-full font-medium hover:bg-blue-600 transition">
-                            Track Order
+                            Theo dõi đơn hàng
                           </button>
                         )}
                       </div>

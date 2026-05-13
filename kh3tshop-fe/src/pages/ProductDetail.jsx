@@ -39,7 +39,7 @@ const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
     const newList = compareList.filter((p) => p.id !== productId);
     setCompareList(newList); // Cập nhật localStorage
     setCompareListState(newList); // Cập nhật state
-    toast.info(`${productName} removed from Compare List.`);
+    toast.info(`${productName} đã xóa khỏi danh sách so sánh.`);
   };
 
   // Tạo URL cho trang so sánh
@@ -90,7 +90,7 @@ const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
                 className="flex-shrink-0 w-32 h-36 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm p-2"
               >
                 <Plus size={20} className="mb-1" />
-                Add product
+                Thêm sản phẩm
               </div>
             ))}
         </div>
@@ -98,10 +98,10 @@ const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
         {/* RIGHT: Status and Action Button */}
         <div className="flex-shrink-0 ml-4 space-y-2 text-center">
           <p className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-            {compareList.length} / 4 Products selected
+            {compareList.length} / 4 sản phẩm đã chọn
           </p>
           <p className="text-xs text-gray-500 italic">
-            Select 2-4 products to compare
+            Chọn 2-4 sản phẩm để so sánh
           </p>
           <Link
             to={compareUrl}
@@ -118,7 +118,7 @@ const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
             }`}
             style={{ pointerEvents: compareList.length >= 2 ? "auto" : "none" }}
           >
-            <GitCompare size={20} /> Compare ({compareList.length})
+            <GitCompare size={20} /> So sánh ({compareList.length})
           </Link>
         </div>
       </div>
@@ -211,11 +211,11 @@ const ProductDetail = () => {
           // Dữ liệu SoldQuantity được lấy trực tiếp từ data.result (ProductResponse)
           setProduct(data.result || null);
         } else {
-          setError("Product not found");
+          setError("Không tìm thấy sản phẩm");
         }
       } catch (error) {
         console.error("Error fetching product:", error);
-        setError("Failed to load product");
+        setError("Lỗi tải sản phẩm");
       } finally {
         setLoading(false);
       }
@@ -256,67 +256,57 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
-    // BỔ SUNG: Kiểm tra Sold Out
     if (isSoldOut) {
-      return toast.error("This product is currently sold out.");
+      return toast.error("Sản phẩm này hiện đang hết hàng.");
     }
 
     // Kiểm tra xem có size nào khả dụng không
+    const uniqueSizes = [];
+    const sizeMap = new Map();
+    product?.sizeDetails?.forEach((size) => {
+      if (sizeMap.has(size.sizeName)) {
+        const existing = sizeMap.get(size.sizeName);
+        existing.quantity += size.quantity;
+      } else {
+        sizeMap.set(size.sizeName, { ...size });
+      }
+    });
+    sizeMap.forEach((value) => uniqueSizes.push(value));
+
     const hasSizes = uniqueSizes.length > 0;
 
     if (hasSizes && !selectedSize) {
-      return toast.warning("Please select a size");
+      return toast.warning("Vui lòng chọn kích cỡ");
     }
 
     if (!user?.id) {
-      toast.warning("Vui lòng đăng nhập trước khi thêm vào giỏ hàng");
-      return toast.warning("Please Log in before add to cart");
+      return toast.warning("Vui lòng đăng nhập trước khi thêm vào giỏ hàng");
     }
-    if (quantity < 1) return toast.warning("Quantity must be at least 1");
+    
+    if (quantity < 1) return toast.warning("Số lượng phải ít nhất là 1");
 
     setIsAddedToCart(true);
-    toast.success("Added items, check your Cart!");
+    toast.success("Đã thêm vào giỏ hàng!");
     setTimeout(() => setIsAddedToCart(false), 2000);
 
     try {
       const token = localStorage.getItem("accessToken");
 
-      // Lấy sizeDetailId dựa trên selectedSize (sizeName)
+      // Lấy sizeDetailId từ product.sizeDetails
       let sizeDetailId = null;
       if (hasSizes && selectedSize) {
-        // Tìm sizeDetail có sizeName trùng với selectedSize
-        const sizeDetail = uniqueSizes.find(
-          (size) => size.sizeName === selectedSize
+        // Tìm sizeDetail có sizeName trùng với selectedSize và có số lượng > 0
+        const sizeDetail = product.sizeDetails.find(
+          (sd) => sd.sizeName === selectedSize && sd.quantity > 0
         );
-        // Lưu ý: uniqueSizes đã được gộp quantity, sizeDetailId là id của 1 trong các sizeDetails
-        // Giả định backend có thể xử lý việc này nếu chỉ gửi sizeName hoặc productId + sizeName
-        // Nếu backend yêu cầu sizeDetailId cụ thể, cần fetch size detail dựa trên productId và sizeName
-
-        // **GIẢI QUYẾT CONFLICT:** Giữ lại logic tìm sizeDetailId chi tiết từ nhánh khác
-        const resSize = await fetch(
-          `http://localhost:8080/sizes/${selectedSize}`, // Giả định selectedSize là tên (S, M, L, XL)
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const size = await resSize.json();
-        const sizeIdToFind = size.id;
-        const productIdToFind = parseInt(id);
-        const resSizeDatail = await fetch(
-          `http://localhost:8080/size-details/find?productId=${productIdToFind}&sizeId=${sizeIdToFind}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const sizeDetailResponse = await resSizeDatail.json();
-        sizeDetailId = sizeDetailResponse.id; // Lấy sizeDetailId
+        
+        if (sizeDetail) {
+          sizeDetailId = sizeDetail.id;
+        } else {
+          // Nếu không tìm thấy cái nào có số lượng > 0, lấy cái đầu tiên trùng tên (để backend báo hết hàng nếu cần)
+          const fallbackSize = product.sizeDetails.find(sd => sd.sizeName === selectedSize);
+          sizeDetailId = fallbackSize?.id;
+        }
       }
 
       const dataSend = {
@@ -363,23 +353,27 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.log("Lỗi thêm vào cart: ", error);
-      toast.error("Failed to add to cart.");
+      toast.error("Không thể thêm vào giỏ hàng.");
     }
   };
 
   const handleBuyNow = () => {
-    // BỔ SUNG: Kiểm tra Sold Out
     if (isSoldOut) {
-      return toast.error("This product is currently sold out.");
+      return toast.error("Sản phẩm này hiện đang hết hàng.");
     }
 
     const hasSizes = uniqueSizes.length > 0;
     if (hasSizes && !selectedSize) {
-      return toast.warning("Please select a size");
+      return toast.warning("Vui lòng chọn kích cỡ");
     }
     if (quantity < 1) return toast.warning("Quantity must be at least 1");
     navigate("/checkout", {
-      state: { userId: user.id, product: product, quantity: quantity },
+      state: { 
+        userId: user.id, 
+        product: product, 
+        quantity: quantity,
+        selectedSize: selectedSize 
+      },
     });
   };
 
@@ -440,7 +434,7 @@ const ProductDetail = () => {
       const newList = compareList.filter((p) => p.id !== product.id);
       setCompareList(newList);
       setCompareListState(newList);
-      toast.info(`${product.name} removed from Compare List.`);
+      toast.info(`${product.name} đã xóa khỏi danh sách so sánh.`);
     } else {
       // Nếu chưa có trong danh sách -> Thêm vào (Toggle on)
       if (compareList.length < 4) {
@@ -448,10 +442,10 @@ const ProductDetail = () => {
         setCompareList(newList);
         setCompareListState(newList);
         toast.success(
-          `${product.name} added to Compare List (${newList.length}/4).`
+          `${product.name} đã thêm vào danh sách so sánh (${newList.length}/4).`
         );
       } else {
-        toast.error("Maximum 4 products allowed for comparison.");
+        toast.error("Chỉ được phép so sánh tối đa 4 sản phẩm.");
       }
     }
   };
@@ -468,10 +462,10 @@ const ProductDetail = () => {
     return (
       <div className="text-center py-16">
         <h3 className="text-2xl font-bold text-gray-700 mb-2">
-          {error || "Product not found"}
+          {error || "Không tìm thấy sản phẩm"}
         </h3>
         <Link to="/product" className="text-red-500 hover:underline">
-          Back to Products
+          Quay lại trang sản phẩm
         </Link>
       </div>
     );
@@ -512,7 +506,7 @@ const ProductDetail = () => {
               {isSoldOut && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
                   <div className="bg-red-600 text-white px-8 py-3 rounded-full text-xl font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12 opacity-90">
-                    SOLD OUT
+                    HẾT HÀNG
                   </div>
                 </div>
               )}
@@ -550,7 +544,7 @@ const ProductDetail = () => {
                 }`}
               >
                 <GitCompare size={16} />{" "}
-                {isComparing ? "Comparing" : "Add to Compare"}
+                {isComparing ? "Đang so sánh" : "Thêm vào so sánh"}
               </button>
               {/* END COMPARE BUTTON */}
 
@@ -588,9 +582,9 @@ const ProductDetail = () => {
             </div>
             <div className="flex items-center gap-2 mb-6 text-gray-600">
               <ShoppingBag size={20} className="text-red-500" />
-              <span className="font-semibold">Sold:</span>
+              <span className="font-semibold">Đã bán:</span>
               <span className="font-bold text-red-600">
-                {(product.soldQuantity || 0).toLocaleString("en-US")} products
+                {(product.soldQuantity || 0).toLocaleString("vi-VN")} sản phẩm
               </span>
             </div>
             <div className="flex items-center mb-4">
@@ -601,7 +595,7 @@ const ProductDetail = () => {
             </div>
             {/* SIZE SELECT */}
             <div className="mb-6">
-              <h3 className="font-bold text-lg mb-2">Select Size</h3>
+              <h3 className="font-bold text-lg mb-2">Chọn kích cỡ</h3>
               <div className="flex gap-2 flex-wrap">
                 {uniqueSizes.map((size) => (
                   <button
@@ -619,12 +613,12 @@ const ProductDetail = () => {
                     {size.sizeName}
                   </button>
                 ))}
-                {uniqueSizes.length === 0 && <p>No sizes available</p>}
+                {uniqueSizes.length === 0 && <p>Không có sẵn kích cỡ nào</p>}
               </div>
             </div>
             {/* QUANTITY */}
             <div className="mb-6">
-              <h3 className="font-bold text-lg mb-2">Quantity</h3>
+              <h3 className="font-bold text-lg mb-2">Số lượng</h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => changeQuantity(-1)}
@@ -662,10 +656,10 @@ const ProductDetail = () => {
               >
                 <ShoppingCart size={20} />{" "}
                 {isSoldOut
-                  ? "Sold Out"
+                  ? "Hết hàng"
                   : isAddedToCart
-                  ? "Added"
-                  : "Add to Cart"}
+                  ? "Đã thêm"
+                  : "Thêm vào giỏ hàng"}
               </button>
 
               <button
@@ -677,22 +671,22 @@ const ProductDetail = () => {
                     : "bg-black text-white hover:bg-green-600 hover:shadow-lg"
                 }`}
               >
-                <CreditCard size={20} /> Buy Now
+                <CreditCard size={20} /> Mua ngay
               </button>
             </div>
             {/* DESCRIPTION */}
             <div className="space-y-4">
-              <h3 className="font-bold text-lg">Description</h3>
+              <h3 className="font-bold text-lg">Mô tả sản phẩm</h3>
               <p className="text-gray-600">{product.description}</p>
 
-              <h3 className="font-bold text-lg">Details</h3>
+              <h3 className="font-bold text-lg">Chi tiết</h3>
               <ul className="list-disc pl-5 text-gray-600">
                 <li>Form: {product.form}</li>
-                <li>Material: {product.material}</li>
-                <li>Unit: {product.unit}</li>
+                <li>Chất liệu: {product.material}</li>
+                <li>Đơn vị: {product.unit}</li>
               </ul>
 
-              <h3 className="font-bold text-lg">Size Chart</h3>
+              <h3 className="font-bold text-lg">Bảng size</h3>
               <img
                 src={product.category?.imageUrl}
                 alt="Size Chart"
@@ -707,7 +701,7 @@ const ProductDetail = () => {
         {/* YOU MAY ALSO LIKE */}
         {otherProducts.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-3xl font-bold mb-6">You May Also Like</h2>
+            <h2 className="text-3xl font-bold mb-6">Bạn cũng có thể thích</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {otherProducts.map((prod) => (
                 <ProductCard key={prod.id} product={prod} />

@@ -2,186 +2,147 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Search,
-  User,
   ShoppingCart,
+  User,
   Menu,
   X,
+  ChevronDown,
   LogOut,
-  CardSim,
+  Settings,
+  Shield,
+  Heart,
+  Package,
 } from "lucide-react";
+import { toast } from "sonner";
 
-export default function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+  const [account, setAccount] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const profileRef = useRef(null);
   const searchRef = useRef(null);
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const sessionAlive = sessionStorage.getItem("session_alive");
-
-    if (!sessionAlive) {
-      // Tab mới hoặc browser vừa bật → logout
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-
-      // Đánh dấu phiên đang hoạt động
-      sessionStorage.setItem("session_alive", "true");
-
-      console.log("Tab/browser mới → auto logout");
-    } else {
-      console.log("Reload hoặc chuyển trang → giữ trạng thái đăng nhập");
-    }
-  }, []);
-
-  // Kiểm tra đăng nhập
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("accessToken");
-      setIsLoggedIn(!!token);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
     };
-    checkAuth();
-    window.addEventListener("storage", checkAuth);
-    window.addEventListener("login", checkAuth);
-    window.addEventListener("logout", checkAuth);
-    return () => {
-      window.removeEventListener("storage", checkAuth);
-      window.removeEventListener("login", checkAuth);
-      window.removeEventListener("logout", checkAuth);
-    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  //lay thong tin gio hang
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  const [cart, setCart] = useState(null);
-
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-
-      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      console.log("Tài khoản đang login: ", data.result);
-      setUser(data.result);
-    } catch (error) {
-      console.error("Lỗi fetch user", error);
-    }
-  };
 
   useEffect(() => {
-    fetchUser();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
+    const fetchAccount = async () => {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(
-        `http://localhost:8080/carts/account/${user.id}`,
-        {
+      if (!token) {
+        setAccount(null);
+        return;
+      }
+      try {
+        const response = await fetch("http://localhost:8080/accounts/myinfor", {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAccount(data.result);
+        } else {
+          // Token invalid or expired
+          localStorage.removeItem("accessToken");
+          setAccount(null);
         }
-      );
-      const data = await res.json();
-      console.log("Cart của user: ", data.result);
-      setCart(data.result);
-    } catch (error) {
-      console.error("Lỗi fetch cart: ", error);
-    }
-  };
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchCart();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const handleCartUpdated = () => {
-      if (user?.id) {
-        fetchCart();
+      } catch (error) {
+        console.error("Error fetching account:", error);
       }
     };
-    window.addEventListener("cartUpdated", handleCartUpdated);
-    return () => window.removeEventListener("cartUpdated", handleCartUpdated);
-  });
+    fetchAccount();
+  }, [location.pathname]); // Re-fetch on navigation to keep sync
 
-  // Đóng dropdown khi click ngoài
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/categories");
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.result || []);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      if (!account) {
+        setCartCount(0);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `http://localhost:8080/carts/account/${account.id}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setCartCount(data.result?.totalQuantity || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+    fetchCart();
+
+    const handleCartUpdate = () => fetchCart();
+    window.addEventListener("cartUpdated", handleCartUpdate);
+
+    const interval = setInterval(fetchCart, 3000);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, [account]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target) &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
-        setShowDropdown(false);
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Tìm kiếm sản phẩm
-  useEffect(() => {
-    const searchProducts = async () => {
-      if (searchQuery.trim().length < 1) {
-        setSearchResults([]);
-        setShowDropdown(false);
-        return;
-      }
-
-      setIsSearching(true);
-      try {
-        const response = await fetch(`http://localhost:8080/products`);
-        if (response.ok) {
-          const data = await response.json();
-          const filtered = (data.result || [])
-            .filter((product) =>
-              product.name.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .slice(0, 5);
-          setSearchResults(filtered);
-          setShowDropdown(filtered.length > 0);
-        }
-      } catch (error) {
-        console.error("Error searching products:", error);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const timeoutId = setTimeout(searchProducts, 300);
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
-
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
-    setIsLoggedIn(false);
-    window.dispatchEvent(new Event("logout"));
-    navigate("/");
+    setAccount(null);
+    setCartCount(0);
+    toast.success("Đã đăng xuất thành công");
+    navigate("/login");
   };
 
-  const handleProductClick = (productId) => {
-    setSearchQuery("");
-    setShowDropdown(false);
-    setSearchOpen(false);
-    navigate(`/product/${productId}`);
+  const submitSearch = () => {
+    if (searchValue.trim()) {
+      navigate(`/product?search=${encodeURIComponent(searchValue.trim())}`);
+      setIsSearchOpen(false);
+      setSearchValue("");
+    }
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      submitSearch();
+    }
   };
 
   const formatPrice = (price) => {
@@ -194,376 +155,259 @@ export default function Header() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
+    <header className={`bg-white border-b border-primary/5 sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-2 shadow-lg" : "py-4"}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-3xl sm:text-4xl font-bold tracking-tight">
-              KH<span className="text-red-500">3</span>T STUDIO
+          <Link to="/" className="flex items-center gap-2 group">
+            <span className="text-2xl sm:text-4xl font-black tracking-tighter text-primary uppercase">
+              Kredo<span className="text-accent">.</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-12">
+          <nav className="hidden lg:flex items-center gap-10">
             <Link
               to="/"
-              className={`font-bold text-lg transition ${
+              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
                 isActive("/")
-                  ? "text-red-500"
-                  : "text-gray-800 hover:text-red-500"
+                  ? "text-accent"
+                  : "text-primary/60 hover:text-primary"
               }`}
             >
-              Home
+              Trang chủ
             </Link>
             <Link
               to="/product"
-              className={`font-bold text-lg transition ${
+              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
                 isActive("/product")
-                  ? "text-red-500"
-                  : "text-gray-800 hover:text-red-500"
+                  ? "text-accent"
+                  : "text-primary/60 hover:text-primary"
               }`}
             >
-              Product
+              Sản phẩm
             </Link>
             <Link
               to="/about"
-              className={`font-bold text-lg transition ${
+              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
                 isActive("/about")
-                  ? "text-red-500"
-                  : "text-gray-800 hover:text-red-500"
+                  ? "text-accent"
+                  : "text-primary/60 hover:text-primary"
               }`}
             >
-              About Us
+              Về chúng tôi
             </Link>
             <Link
-              //to="/policy"
-              className={`font-bold text-lg transition ${
+              to="/policy"
+              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
                 isActive("/policy")
-                  ? "text-red-500"
-                  : "text-gray-800 hover:text-red-500"
+                  ? "text-accent"
+                  : "text-primary/60 hover:text-primary"
               }`}
             >
-              Policy
+              Chính sách
             </Link>
           </nav>
 
-          {/* Icons */}
-          <div className="flex items-center gap-6 sm:gap-8">
-            {/* Search Bar with Dropdown */}
-            <div className="relative hidden sm:block" ref={searchRef}>
-              {searchOpen ? (
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search product..."
-                    className="border border-gray-300 rounded-full px-5 py-2.5 w-48 lg:w-64 focus:outline-none focus:border-red-500 text-base pr-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    autoFocus
-                  />
-                  <button
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
-                    onClick={() => {
-                      setSearchOpen(false);
-                      setSearchQuery("");
-                      setShowDropdown(false);
-                    }}
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setSearchOpen(true)}
-                  className="text-gray-600 hover:text-red-500 transition"
-                >
-                  <Search size={26} strokeWidth={2} />
-                </button>
-              )}
-
-              {/* Search Results Dropdown */}
-              {showDropdown && searchResults.length > 0 && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute top-full mt-2 w-80 lg:w-96 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-y-auto z-50"
-                >
-                  {isSearching && (
-                    <div className="p-4 text-center text-gray-500">
-                      Đang tìm kiếm...
-                    </div>
-                  )}
-
-                  {!isSearching &&
-                    searchResults.map((product) => (
-                      <button
-                        key={product.id}
-                        onClick={() => handleProductClick(product.id)}
-                        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0"
+          {/* Actions */}
+          <div className="flex items-center gap-2 sm:gap-6">
+            {/* Search */}
+            <div className="relative" ref={searchRef}>
+               <button 
+                 onClick={() => setIsSearchOpen(!isSearchOpen)}
+                 className="text-primary/60 hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary"
+               >
+                 <Search size={20} />
+               </button>
+               {isSearchOpen && (
+                 <div className="absolute right-0 top-full mt-4 w-72 bg-white shadow-2xl rounded-3xl p-3 border border-primary/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                   <div className="relative flex items-center">
+                      <Search size={14} className="absolute left-4 text-primary/30" />
+                      <input 
+                        autoFocus
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm..."
+                        className="w-full pl-10 pr-12 py-3 bg-secondary border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-accent/10"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyDown={handleSearch}
+                      />
+                      <button 
+                        onClick={submitSearch}
+                        className="absolute right-2 p-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors"
                       >
-                        <img
-                          src={product.imageUrlFront}
-                          alt={product.name}
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <div className="flex-1 text-left">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-semibold text-sm line-clamp-2 flex-1">
-                              {product.name}
-                            </h4>
-                            {/* SOLD OUT BADGE */}
-                            {product.quantity === 0 && (
-                              <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
-                                SOLD OUT
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-red-500 font-bold text-sm mt-1">
-                            {formatPrice(product.price)}
-                          </p>
-                        </div>
+                        <Search size={12} />
                       </button>
-                    ))}
-                </div>
-              )}
+                   </div>
+                 </div>
+               )}
             </div>
 
-            {/* Auth */}
-            {isLoggedIn ? (
-              <>
-                <div className="relative group">
-                  <button className="text-gray-600 hover:text-red-500 transition">
-                    <User size={26} strokeWidth={2} />
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      to="/wishlists"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      Wish List
-                    </Link>
-                    <Link
-                      to="/orders"
-                      onClick={() => {
-                        localStorage.setItem("userId", user.id);
-                      }}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      My Orders
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-lg flex items-center gap-2"
-                    >
-                      <LogOut size={16} />
-                      Logout
-                    </button>
-                  </div>
-                </div>
+            {/* Cart */}
+            <Link
+              to="/cart"
+              className="relative text-primary/60 hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary"
+            >
+              <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-lg">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Profile */}
+            {account ? (
+              <div className="relative" ref={profileRef}>
                 <button
-                  onClick={() => navigate("/cart")}
-                  className="text-gray-600 hover:text-red-500 transition relative"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 p-1 pl-1 pr-3 bg-secondary rounded-full hover:bg-gray-100 transition-all border border-primary/5"
                 >
-                  <ShoppingCart size={26} strokeWidth={2} />
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {cart?.totalQuantity}
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-black border border-accent/30 overflow-hidden">
+                    {account.customer?.fullName?.charAt(0) || <User size={14} />}
+                  </div>
+                  <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-primary truncate max-w-[80px]">
+                    {account.customer?.fullName?.split(' ').pop()}
                   </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-primary/60 transition-transform duration-300 ${
+                      isProfileOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </button>
-              </>
+
+                {/* Dropdown Menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-4 w-64 bg-white border border-primary/5 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="px-6 py-6 border-b border-primary/5 bg-secondary/30">
+                      <p className="text-xs font-black tracking-widest text-primary/40 uppercase mb-1">
+                        Tài khoản
+                      </p>
+                      <p className="text-sm font-black text-primary truncate">
+                        {account.customer?.fullName}
+                      </p>
+                      <p className="text-[10px] text-primary/40 truncate font-medium">
+                        {account.username}
+                      </p>
+                    </div>
+
+                    <div className="p-2">
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-black text-primary/70 hover:text-primary hover:bg-secondary rounded-2xl transition-all group"
+                      >
+                        <User size={18} className="text-primary/30 group-hover:text-accent" />
+                        Trang cá nhân
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-black text-primary/70 hover:text-primary hover:bg-secondary rounded-2xl transition-all group"
+                      >
+                        <Package size={18} className="text-primary/30 group-hover:text-accent" />
+                        Đơn hàng của tôi
+                      </Link>
+                      <Link
+                        to="/wishlists"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-black text-primary/70 hover:text-primary hover:bg-secondary rounded-2xl transition-all group"
+                      >
+                        <Heart size={18} className="text-primary/30 group-hover:text-accent" />
+                        Danh sách yêu thích
+                      </Link>
+
+                      {(account.role?.name === "ADMIN" ||
+                        account.role?.name === "STAFF") && (
+                        <Link
+                          to={
+                            account.role?.name === "ADMIN"
+                              ? "/admin/dashboard"
+                              : "/staff/orders"
+                          }
+                          className="flex items-center gap-3 px-4 py-3 text-sm font-black text-primary/70 hover:text-primary hover:bg-secondary rounded-2xl transition-all group"
+                        >
+                          <Shield size={18} className="text-primary/30 group-hover:text-accent" />
+                          Quản lý hệ thống
+                        </Link>
+                      )}
+                    </div>
+
+                    <div className="p-2 border-t border-primary/5">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm font-black text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all group"
+                      >
+                        <LogOut size={18} />
+                        Đăng xuất
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
-              <div className="hidden sm:flex items-center gap-3">
-                <Link
+              <div className="flex items-center gap-2">
+                 <Link
                   to="/login"
-                  className="px-5 py-2.5 bg-black text-white rounded-full font-medium text-sm hover:bg-red-500 transition"
+                  className="text-primary/60 hover:text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all"
                 >
-                  Sign In
+                  Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="px-5 py-2.5 border border-black text-black rounded-full font-medium text-sm hover:bg-black hover:text-white transition"
+                  className="bg-primary text-white px-5 py-2.5 rounded-full text-[10px] font-black tracking-widest uppercase hover:bg-accent transition-all duration-300 shadow-lg shadow-primary/10"
                 >
-                  Sign Up
+                  Đăng ký
                 </Link>
               </div>
             )}
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden text-gray-600 hover:text-red-500 transition"
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden text-primary/60 hover:text-primary p-2 rounded-full hover:bg-secondary"
             >
-              {menuOpen ? (
-                <X size={28} strokeWidth={2} />
-              ) : (
-                <Menu size={28} strokeWidth={2} />
-              )}
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <nav className="lg:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
-            <div className="flex flex-col gap-3">
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className={`font-bold text-base py-2 transition flex items-center justify-between ${
-                  isActive("/")
-                    ? "text-red-500"
-                    : "text-gray-800 hover:text-red-500"
-                }`}
-              >
-                Home {isActive("/") && <span className="text-red-500">•</span>}
-              </Link>
-
-              <Link
-                to="/product"
-                onClick={() => setMenuOpen(false)}
-                className={`font-bold text-base py-2 transition flex items-center justify-between ${
-                  isActive("/product")
-                    ? "text-red-500"
-                    : "text-gray-800 hover:text-red-500"
-                }`}
-              >
-                Product{" "}
-                {isActive("/product") && (
-                  <span className="text-red-500">•</span>
-                )}
-              </Link>
-
-              <Link
-                to="/about"
-                onClick={() => setMenuOpen(false)}
-                className={`font-bold text-base py-2 transition flex items-center justify-between ${
-                  isActive("/about")
-                    ? "text-red-500"
-                    : "text-gray-800 hover:text-red-500"
-                }`}
-              >
-                About Us{" "}
-                {isActive("/about") && <span className="text-red-500">•</span>}
-              </Link>
-
-              <Link
-                to="/policy"
-                onClick={() => setMenuOpen(false)}
-                className={`font-bold text-base py-2 transition flex items-center justify-between ${
-                  isActive("/policy")
-                    ? "text-red-500"
-                    : "text-gray-800 hover:text-red-500"
-                }`}
-              >
-                Policy{" "}
-                {isActive("/policy") && <span className="text-red-500">•</span>}
-              </Link>
-
-              {/* Mobile Auth */}
-              {!isLoggedIn && (
-                <div className="flex flex-col gap-2 pt-2">
-                  <Link
-                    to="/login"
-                    className="px-5 py-2.5 bg-black text-white rounded-full font-medium text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-5 py-2.5 border border-black text-black rounded-full font-medium text-center hover:bg-black hover:text-white transition"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-
-              {isLoggedIn && (
-                <div className="pt-2 border-t border-gray-200 mt-2">
-                  <Link
-                    to="/profile"
-                    className="block py-2 text-gray-700 font-bold hover:text-red-500"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/orders"
-                    className="block py-2 text-gray-700 font-bold hover:text-red-500"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    My Orders
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMenuOpen(false);
-                    }}
-                    className="w-full text-left py-2 text-red-600 font-bold flex items-center gap-2"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
-                </div>
-              )}
-
-              {/* Mobile Search */}
-              <div className="sm:hidden pt-2">
-                <input
-                  type="text"
-                  placeholder="Search product..."
-                  className="w-full border border-gray-300 rounded-full px-4 py-2.5 focus:outline-none focus:border-red-500 text-base"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-
-                {showDropdown && searchResults.length > 0 && (
-                  <div className="mt-2 bg-white rounded-lg shadow-xl border border-gray-200 max-h-64 overflow-y-auto">
-                    {searchResults.map((product) => (
-                      <button
-                        key={product.id}
-                        onClick={() => {
-                          handleProductClick(product.id);
-                          setMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0"
-                      >
-                        <img
-                          src={product.imageUrlFront}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1 text-left">
-                          <div className="flex items-center justify-between gap-2">
-                            <h4 className="font-semibold text-xs line-clamp-2 flex-1">
-                              {product.name}
-                            </h4>
-                            {/* SOLD OUT BADGE - MOBILE */}
-                            {product.quantity === 0 && (
-                              <span className="bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full text-[10px]">
-                                SOLD OUT
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-red-500 font-bold text-xs mt-1">
-                            {formatPrice(product.price)}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </nav>
-        )}
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-primary/5 p-6 animate-in slide-in-from-top-4 duration-300 shadow-2xl">
+          <nav className="flex flex-col gap-6">
+            <Link
+              to="/"
+              className="text-2xl font-black text-primary tracking-tighter uppercase"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Trang chủ
+            </Link>
+            <Link
+              to="/product"
+              className="text-2xl font-black text-primary tracking-tighter uppercase"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Sản phẩm
+            </Link>
+            <Link
+              to="/about"
+              className="text-2xl font-black text-primary tracking-tighter uppercase"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Về chúng tôi
+            </Link>
+            <Link
+              to="/policy"
+              className="text-2xl font-black text-primary tracking-tighter uppercase"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Chính sách
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
-}
+};
+
+export default Header;
