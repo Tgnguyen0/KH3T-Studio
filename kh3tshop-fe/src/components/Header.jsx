@@ -155,13 +155,13 @@ const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className={`bg-white border-b border-primary/5 sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-2 shadow-lg" : "py-4"}`}>
+    <header className={`sticky top-0 z-50 transition-all duration-500 border-b border-primary/5 ${isScrolled ? "py-3.5 bg-white/95 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.02)]" : "py-5.5 bg-[#fbfbf9]/90 backdrop-blur-md"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <span className="text-2xl sm:text-4xl font-black tracking-tighter text-primary uppercase">
-              Kredo<span className="text-accent">.</span>
+            <span className="text-2xl sm:text-3xl font-display font-black tracking-[0.18em] text-primary uppercase transition-colors group-hover:text-accent">
+              Kredo<span className="text-[#c87a53]">.</span>
             </span>
           </Link>
 
@@ -169,40 +169,40 @@ const Header = () => {
           <nav className="hidden lg:flex items-center gap-10">
             <Link
               to="/"
-              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`relative font-display font-black text-[10.5px] uppercase tracking-[0.25em] pb-1 transition-all duration-300 premium-border ${
                 isActive("/")
-                  ? "text-accent"
-                  : "text-primary/60 hover:text-primary"
+                  ? "text-accent border-accent"
+                  : "text-primary/50 hover:text-primary"
               }`}
             >
               Trang chủ
             </Link>
             <Link
               to="/product"
-              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`relative font-display font-black text-[10.5px] uppercase tracking-[0.25em] pb-1 transition-all duration-300 premium-border ${
                 isActive("/product")
-                  ? "text-accent"
-                  : "text-primary/60 hover:text-primary"
+                  ? "text-accent border-accent"
+                  : "text-primary/50 hover:text-primary"
               }`}
             >
               Sản phẩm
             </Link>
             <Link
               to="/about"
-              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`relative font-display font-black text-[10.5px] uppercase tracking-[0.25em] pb-1 transition-all duration-300 premium-border ${
                 isActive("/about")
-                  ? "text-accent"
-                  : "text-primary/60 hover:text-primary"
+                  ? "text-accent border-accent"
+                  : "text-primary/50 hover:text-primary"
               }`}
             >
               Về chúng tôi
             </Link>
             <Link
               to="/policy"
-              className={`font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`relative font-display font-black text-[10.5px] uppercase tracking-[0.25em] pb-1 transition-all duration-300 premium-border ${
                 isActive("/policy")
-                  ? "text-accent"
-                  : "text-primary/60 hover:text-primary"
+                  ? "text-accent border-accent"
+                  : "text-primary/50 hover:text-primary"
               }`}
             >
               Chính sách
@@ -215,30 +215,30 @@ const Header = () => {
             <div className="relative" ref={searchRef}>
                <button 
                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                 className="text-primary/60 hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary"
+                 className="text-primary/60 hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary/80"
                >
-                 <Search size={20} />
+                 <Search size={18} />
                </button>
                {isSearchOpen && (
-                 <div className="absolute right-0 top-full mt-4 w-72 bg-white shadow-2xl rounded-3xl p-3 border border-primary/5 animate-in fade-in slide-in-from-top-2 duration-300">
-                   <div className="relative flex items-center">
-                      <Search size={14} className="absolute left-4 text-primary/30" />
-                      <input 
-                        autoFocus
-                        type="text"
-                        placeholder="Tìm kiếm sản phẩm..."
-                        className="w-full pl-10 pr-12 py-3 bg-secondary border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-accent/10"
-                        value={searchValue}
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        onKeyDown={handleSearch}
-                      />
-                      <button 
-                        onClick={submitSearch}
-                        className="absolute right-2 p-2 bg-primary text-white rounded-xl hover:bg-accent transition-colors"
-                      >
-                        <Search size={12} />
-                      </button>
-                   </div>
+                 <div className="absolute right-0 top-full mt-4 w-76 bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] rounded-2xl p-4 border border-primary/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="relative flex items-center">
+                       <Search size={14} className="absolute left-4 text-primary/30" />
+                       <input 
+                         autoFocus
+                         type="text"
+                         placeholder="Tìm kiếm sản phẩm..."
+                         className="w-full pl-10 pr-12 py-3.5 bg-secondary text-xs font-semibold rounded-xl focus:ring-1 focus:ring-[#c87a53] focus:outline-none"
+                         value={searchValue}
+                         onChange={(e) => setSearchValue(e.target.value)}
+                         onKeyDown={handleSearch}
+                       />
+                       <button 
+                         onClick={submitSearch}
+                         className="absolute right-2 p-2 bg-[#111111] hover:bg-[#c87a53] text-white rounded-lg transition-colors"
+                       >
+                         <Search size={12} />
+                       </button>
+                    </div>
                  </div>
                )}
             </div>

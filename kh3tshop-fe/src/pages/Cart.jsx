@@ -325,160 +325,180 @@ const Cart = () => {
     };
 
     return (
-        <div className="min-h-screen py-10">
+        <div className="min-h-screen bg-secondary py-16 selection:bg-accent selection:text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <div className="lg:col-span-2">
-                        <div className="flex justify-between items-center mb-10">
-                            <h1 className="text-4xl font-bold text-gray-900">Giỏ hàng</h1>
-                            <span className="text-sm font-semibold text-gray-500 cursor-pointer hover:text-red-500">
-                🔍︎ Theo dõi đơn hàng
-              </span>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                    {/* CART ITEMS LEFT COLUMN */}
+                    <div className="lg:col-span-8">
+                        <div className="flex justify-between items-end mb-12 pb-6 border-b border-primary/5">
+                            <h1 className="text-3xl lg:text-4xl font-display font-black uppercase tracking-tight text-primary">Giỏ hàng của bạn</h1>
+                            <span className="text-[10px] font-black tracking-widest text-[#c87a53] uppercase cursor-pointer hover:underline">
+                                🔍︎ Theo dõi đơn hàng
+                            </span>
                         </div>
-                        <div className="grid grid-cols-6 font-semibold border-b pb-3 text-gray-700 text-sm uppercase">
-                            <div className="col-span-3">Sản phẩm</div>
-                            <div className="text-center">Số lượng</div>
-                            <div className="text-right">Đơn giá</div>
-                            <div className="text-center"></div>
+
+                        {/* TABLE HEADER */}
+                        <div className="grid grid-cols-12 font-display font-black text-[10px] tracking-[0.25em] border-b border-primary/10 pb-4 text-primary/40 uppercase hidden sm:grid">
+                            <div className="col-span-7">SẢN PHẨM</div>
+                            <div className="col-span-2 text-center">SỐ LƯỢNG</div>
+                            <div className="col-span-2 text-right">ĐƠN GIÁ</div>
+                            <div className="col-span-1 text-center"></div>
                         </div>
+
                         {cartItems.length > 0 ? (
-                            cartItems.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="grid grid-cols-6 items-center border-b py-6"
-                                >
-                                    <div className="col-span-3 flex items-start space-x-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={item.selected}
-                                            onChange={() => handleToggleSelect(item.id)}
-                                            className="mt-2 w-4 h-4 border-gray-300 rounded"
-                                        />
-
-                                        <img
-                                            src={item.productImage}
-                                            alt={item.productName}
-                                            className="w-24 h-24 object-cover rounded"
-                                        />
-
-                                        <div className="flex flex-col">
-                                            <div className="font-semibold text-base hover:text-red-500">
-                                                {item.productName}
-                                            </div>
-                                            <div className="text-gray-500 text-sm">
-                                                {item.productName ? item.productName.split(",")[0] : ""}
-                                            </div>
-                                            <div className="text-gray-500 text-sm">
-                                                Kích cỡ: {item.sizeName}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="flex items-center justify-center border border-gray-300 rounded-full w-24 mx-auto p-1">
-                                            <button
-                                                className="text-lg px-2 hover:bg-gray-100 rounded-full"
-                                                onClick={() =>
-                                                    handleToggleDecrease(item.id, item.priceAtTime)
-                                                }
-                                            >
-                                                -
-                                            </button>
-
+                            <div className="divide-y divide-primary/5">
+                                {cartItems.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="grid grid-cols-1 sm:grid-cols-12 items-center py-8 gap-6 sm:gap-0"
+                                    >
+                                        {/* Product Details info */}
+                                        <div className="col-span-12 sm:col-span-7 flex items-center gap-4">
                                             <input
-                                                type="number"
-                                                value={item.quantity}
-                                                min="1"
-                                                readOnly
-                                                className="w-10 text-center text-sm bg-transparent"
+                                                type="checkbox"
+                                                checked={item.selected}
+                                                onChange={() => handleToggleSelect(item.id)}
+                                                className="w-4 h-4 border-primary/10 text-primary focus:ring-accent rounded-none cursor-pointer accent-[#111111]"
                                             />
 
+                                            <div className="w-24 aspect-[3/4] bg-secondary overflow-hidden flex-shrink-0">
+                                                <img
+                                                    src={item.productImage}
+                                                    alt={item.productName}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+
+                                            <div className="flex flex-col space-y-1">
+                                                <div className="font-display font-black text-sm uppercase tracking-tight text-primary hover:text-accent transition-colors">
+                                                    {item.productName}
+                                                </div>
+                                                <div className="text-[10px] font-bold text-primary/30 uppercase tracking-widest">
+                                                    Kích cỡ: <span className="text-primary font-black">{item.sizeName}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Quantity control */}
+                                        <div className="col-span-6 sm:col-span-2 flex justify-start sm:justify-center">
+                                            <div className="inline-flex items-center border border-primary/10 h-10 bg-white">
+                                                <button
+                                                    className="w-8 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors text-xs font-bold"
+                                                    onClick={() =>
+                                                        handleToggleDecrease(item.id, item.priceAtTime)
+                                                    }
+                                                >
+                                                    -
+                                                </button>
+
+                                                <input
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    min="1"
+                                                    readOnly
+                                                    className="w-8 text-center text-xs font-black text-primary bg-transparent"
+                                                />
+
+                                                <button
+                                                    className="w-8 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors text-xs font-bold"
+                                                    onClick={() =>
+                                                        handleToggleIncrease(item.id, item.priceAtTime)
+                                                    }
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Price */}
+                                        <div className="col-span-5 sm:col-span-2 text-right font-display font-black text-sm text-primary tracking-tight">
+                                            {formatVND(item.subtotal)}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="col-span-1 text-right sm:text-center">
                                             <button
-                                                className="text-lg px-2 hover:bg-gray-100 rounded-full"
                                                 onClick={() =>
-                                                    handleToggleIncrease(item.id, item.priceAtTime)
+                                                    handleDelete(item.id, item.quantity, item.subtotal)
                                                 }
+                                                className="text-primary/30 hover:text-accent transition-colors p-2"
                                             >
-                                                +
+                                                <FaTrash size={14} />
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="text-right font-semibold text-lg">
-                                        {formatVND(item.subtotal)}
-                                    </div>
-                                    <div className="text-center">
-                                        <button
-                                            onClick={() =>
-                                                handleDelete(item.id, item.quantity, item.subtotal)
-                                            }
-                                            className="text-gray-500 hover:text-red-500"
-                                        >
-                                            <FaTrash size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         ) : (
-                            <div className="text-center py-10 text-gray-500">
-                                Giỏ hàng rỗng.
+                            <div className="text-center py-20 bg-white border border-primary/5 my-6">
+                                <p className="text-xs font-black text-primary/30 uppercase tracking-widest">
+                                    Giỏ hàng của bạn đang trống
+                                </p>
                             </div>
                         )}
 
-                        <div className="mt-8 flex justify-start">
+                        <div className="mt-12">
                             <button
                                 onClick={() => navigate("/product")}
-                                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md transition font-semibold hover:bg-black hover:text-white"
+                                className="h-12 px-6 border border-primary text-[10px] font-black uppercase tracking-widest text-primary hover:bg-[#111111] hover:text-white transition-colors duration-300"
                             >
                                 Tiếp tục mua sắm
                             </button>
                         </div>
                     </div>
 
-                    <div className="lg:col-span-1 border-t-4 border-red-500 p-6 rounded-lg bg-gray-50 shadow-md h-fit">
-                        <h2 className="text-3xl font-bold mb-6 text-red-500">Tổng quan</h2>
+                    {/* CART SUMMARY RIGHT COLUMN */}
+                    <div className="lg:col-span-4 bg-white border border-primary/5 p-8 h-fit">
+                        <h2 className="text-xl font-display font-black uppercase tracking-widest mb-8 text-primary pb-3 border-b border-primary/5">Tóm tắt đơn hàng</h2>
 
-                        <div className="mb-6 pb-4 border-b">
-                            <div className="flex">
+                        {/* Coupon Section */}
+                        <div className="mb-8">
+                            <div className="flex border border-primary/10 bg-secondary">
                                 <input
                                     type="text"
-                                    placeholder="Mã giảm giá"
-                                    className="flex-grow border border-gray-300 p-3 rounded-l focus:outline-none focus:ring-1 focus:ring-gray-400"
+                                    placeholder="MÃ GIẢM GIÁ"
+                                    className="flex-grow bg-transparent p-3 text-[10px] font-black tracking-widest uppercase focus:outline-none placeholder-primary/20"
                                 />
-                                <button className="bg-black text-white px-4 py-3 rounded-r font-semibold hover:bg-gray-800 transition">
-                                    Áp dụng
+                                <button className="bg-[#111111] hover:bg-[#c87a53] text-white px-5 text-[9px] font-black tracking-widest uppercase transition-colors">
+                                    ÁP DỤNG
                                 </button>
                             </div>
                         </div>
-                        <div className="space-y-4 mb-6">
-                            <div className="flex justify-between text-lg text-gray-800">
-                                <span>Tạm tính:</span>
-                                <span className="font-semibold">
-                  {formatVND(summary.subtotal)}
-                </span>
+
+                        {/* Calculated numbers */}
+                        <div className="space-y-4 mb-8 text-xs font-bold text-primary/60 uppercase tracking-widest">
+                            <div className="flex justify-between">
+                                <span className="font-medium text-primary/40">Tạm tính:</span>
+                                <span className="font-black text-primary">
+                                    {formatVND(summary.subtotal)}
+                                </span>
                             </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Phí vận chuyển:</span>
-                                <span>{summary.shippingText}</span>
+                            <div className="flex justify-between">
+                                <span className="font-medium text-primary/40">Phí vận chuyển:</span>
+                                <span className="font-black text-primary">{summary.shippingText}</span>
                             </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Giảm giá:</span>
-                                <span>{formatVND(summary.discount)}</span>
+                            <div className="flex justify-between pb-4 border-b border-primary/5">
+                                <span className="font-medium text-primary/40">Giảm giá:</span>
+                                <span className="font-black text-accent">{formatVND(summary.discount)}</span>
                             </div>
                         </div>
-                        <div className="flex justify-between font-bold text-xl border-t pt-4">
-                            <span>Tổng cộng:</span>
-                            <span className="text-red-500">{formatVND(summary.total)}</span>
+
+                        <div className="flex justify-between items-end font-display font-black text-lg text-primary tracking-tight">
+                            <span className="text-[10px] font-black tracking-[0.2em] text-primary/40 uppercase mb-1">TỔNG CỘNG:</span>
+                            <span className="text-xl text-accent font-black">{formatVND(summary.total)}</span>
                         </div>
+
                         <button
-                            onClick={handleCheckout}
-                            className="w-full mt-8 bg-black text-white py-3 rounded font-bold text-lg hover:bg-gray-800 transition shadow-lg"
+                          onClick={handleCheckout}
+                          className="w-full mt-8 bg-[#111111] hover:bg-[#c87a53] text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
                         >
                             Tiến hành thanh toán
                         </button>
                     </div>
                 </div>
             </div>
-            <ChatBot/>
-      <Contact/>
+            <ChatBot />
+            <Contact />
         </div>
     );
 };

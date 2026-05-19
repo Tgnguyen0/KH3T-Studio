@@ -1,4 +1,4 @@
-// ProductCard.jsx - Thêm prop viewMode
+// ProductCard.jsx - Custom luxury hover transitions, back-image swaps, and floating size indicators.
 import { Heart, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -31,6 +31,12 @@ const ProductCard = ({
   const [isInAnyWishlist, setIsInAnyWishlist] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [showWishlistModal, setShowWishlistModal] = useState(false);
+  const [imageSrc, setImageSrc] = useState(product.imageUrlFront);
+
+  // Sync image source if product changes
+  useEffect(() => {
+    setImageSrc(product.imageUrlFront);
+  }, [product.imageUrlFront]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -78,71 +84,100 @@ const ProductCard = ({
     checkWishlistStatus();
   };
 
+  const handleMouseEnter = () => {
+    if (product.imageUrlBack && product.imageUrlBack !== product.imageUrlFront) {
+      setImageSrc(product.imageUrlBack);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setImageSrc(product.imageUrlFront);
+  };
+
+  // Lấy các size khả dụng của sản phẩm
+  const availableSizes = product.sizeDetails
+    ? product.sizeDetails.filter((sd) => sd.quantity > 0).map((sd) => sd.sizeName)
+    : [];
+
   // LIST VIEW
   if (viewMode === "list") {
     return (
       <>
         <div
-          className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 group cursor-pointer relative flex gap-4 p-4"
+          className="bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative flex gap-6 p-5 hover:shadow-[0_15px_35px_rgba(0,0,0,0.02)]"
           onClick={goToDetail}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
-          {/* HÌNH ẢNH BÊN TRÁI */}
-          <div className="relative overflow-hidden w-40 h-40 flex-shrink-0 rounded-lg">
+          {/* IMAGE LEFT */}
+          <div className="relative overflow-hidden w-48 h-48 flex-shrink-0 bg-secondary">
             <img
-              src={product.imageUrlFront}
+              src={imageSrc}
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out"
             />
 
             {/* SOLD OUT */}
             {isSoldOut && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                <div className="bg-red-600 text-white px-6 py-2 rounded-full text-base font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12">
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                <div className="bg-white text-primary px-4 py-1.5 text-[9px] font-black tracking-[0.2em] uppercase shadow-lg">
                   HẾT HÀNG
                 </div>
               </div>
             )}
 
-            {/* GIẢM GIÁ */}
+            {/* DISCOUNT TAG */}
             {!isSoldOut && product.discountAmount > 0 && (
-              <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+              <div className="absolute top-3 left-3 bg-[#c87a53] text-[#111111] px-2 py-1 text-[9px] font-black tracking-widest uppercase">
                 -{product.discountAmount}%
+              </div>
+            )}
+
+            {/* Sizes overlay on hover */}
+            {!isSoldOut && availableSizes.length > 0 && (
+              <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-[2px] py-2 px-1 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10 border-t border-primary/5">
+                <p className="text-[8px] font-black text-primary/40 uppercase tracking-widest mb-1">Kích cỡ sẵn có</p>
+                <div className="flex justify-center gap-1.5 flex-wrap">
+                  {availableSizes.map((size) => (
+                    <span key={size} className="text-[9px] font-black text-primary border border-primary/10 px-1.5 py-0.5 bg-secondary uppercase">
+                      {size}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* HOT BADGE - GÓC PHẢI CARD */}
+          {/* BADGES */}
           {isHot && !isSoldOut && (
-            <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 animate-pulse z-10">
+            <div className="absolute top-5 right-5 bg-accent text-white px-2.5 py-1 text-[8px] font-black tracking-[0.2em] uppercase shadow-md flex items-center gap-1 z-10">
               🔥 HOT
             </div>
           )}
 
-          {/* NEW BADGE - GÓC PHẢI CARD */}
           {!isHot && isNew && !isSoldOut && (
-            <div className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+            <div className="absolute top-5 right-5 bg-[#111111] text-[#fbfbf9] px-2.5 py-1 text-[8px] font-black tracking-[0.2em] uppercase shadow-md z-10">
               ✨ MỚI
             </div>
           )}
 
-          {/* THÔNG TIN BÊN PHẢI */}
-          <div className="flex-1 flex flex-col justify-between">
-            {/* PHẦN TRÊN: TÊN + RATING + MÔ TẢ */}
+          {/* INFO RIGHT */}
+          <div className="flex-1 flex flex-col justify-between py-1">
             <div>
-              <h3 className="font-bold text-2xl mb-3 line-clamp-2">
+              <h3 className="font-display font-black text-lg tracking-tight uppercase mb-2 group-hover:text-accent transition-colors line-clamp-2">
                 {product.name}
               </h3>
 
               {/* Rating */}
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-1.5 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`w-3.5 h-3.5 ${
                         i < Math.floor(product.rating || 4.5)
-                          ? "text-yellow-400"
-                          : "text-gray-300"
+                          ? "text-accent"
+                          : "text-primary/10"
                       }`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
@@ -151,64 +186,64 @@ const ProductCard = ({
                     </svg>
                   ))}
                 </div>
-                <span className="text-base text-gray-600 font-medium">
+                <span className="text-[11px] text-primary/40 font-bold">
                   ({product.rating || 4.5})
                 </span>
               </div>
             </div>
 
-            {/* PHẦN DƯỚI: GIÁ + NÚT */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-              <div>
-                <p className="text-3xl font-bold text-red-500">
-                  {formatPrice(product.costPrice)}
-                </p>
+            {/* PRICE + BUTTONS */}
+            <div className="flex items-center justify-between pt-4 border-t border-primary/5">
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-display font-black text-accent tracking-tight">
+                  {formatPrice(product.costPrice || product.price)}
+                </span>
                 {!isSoldOut && product.discountAmount > 0 && (
-                  <p className="text-base text-gray-400 line-through">
+                  <span className="text-xs text-primary/30 line-through font-medium">
                     {formatPrice(product.price)}
-                  </p>
+                  </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-3">
-                {/* NÚT TIM */}
+              <div className="flex items-center gap-2">
+                {/* LIKE */}
                 <button
                   onClick={openWishlistModal}
                   disabled={loadingStatus}
                   className={`
-                                        p-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center
-                                        ${
-                                          loadingStatus
-                                            ? "opacity-60 cursor-wait"
-                                            : "hover:scale-110"
-                                        }
-                                        ${
-                                          isInAnyWishlist
-                                            ? "bg-red-500 text-white shadow-red-500/50"
-                                            : "bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 border border-gray-200"
-                                        }
-                                    `}
+                    w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border
+                    ${
+                      loadingStatus
+                        ? "opacity-60 cursor-wait"
+                        : "hover:scale-105 active:scale-95"
+                    }
+                    ${
+                      isInAnyWishlist
+                        ? "bg-accent border-accent text-white shadow-md shadow-accent/15"
+                        : "bg-white border-primary/10 text-primary/60 hover:border-accent hover:text-accent"
+                    }
+                  `}
                 >
                   <Heart
-                    size={24}
+                    size={16}
                     fill={isInAnyWishlist ? "currentColor" : "none"}
                     strokeWidth={2}
                   />
                 </button>
 
-                {/* NÚT GIỎ HÀNG */}
+                {/* VIEW DETAIL */}
                 <button
                   onClick={goToDetail}
-                  className="px-8 py-4 rounded-full bg-black text-white hover:bg-red-500 transition flex items-center justify-center gap-2 font-semibold"
+                  className="px-6 h-10 text-[10px] font-black uppercase tracking-widest bg-primary hover:bg-[#c87a53] text-white transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  <ShoppingCart size={20} />
+                  Mua ngay
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* MODAL CHỌN WISHLIST */}
+        {/* WISHLIST SELECTOR MODAL */}
         {showWishlistModal && (
           <WishlistSelectorModal
             productId={product.id}
@@ -221,72 +256,88 @@ const ProductCard = ({
     );
   }
 
-  // GRID VIEW (Giữ nguyên code cũ)
+  // GRID VIEW
   return (
     <>
       <div
-        className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 group cursor-pointer relative"
+        className="bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.03)] flex flex-col h-full"
         onClick={goToDetail}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
-        {/* HÌNH ẢNH + OVERLAY */}
-        <div className="relative overflow-hidden h-80">
+        {/* IMAGE */}
+        <div className="relative overflow-hidden aspect-[3/4] bg-secondary flex-shrink-0">
           <img
-            src={product.imageUrlFront}
+            src={imageSrc}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out"
           />
 
           {/* SOLD OUT */}
           {isSoldOut && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="bg-red-600 text-white px-8 py-3 rounded-full text-lg font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12">
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+              <div className="bg-white text-primary px-5 py-2 text-[9px] font-black tracking-[0.2em] uppercase shadow-lg">
                 HẾT HÀNG
               </div>
             </div>
           )}
 
-          {/* GIẢM GIÁ */}
+          {/* DISCOUNT */}
           {!isSoldOut && product.discountAmount > 0 && (
-            <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+            <div className="absolute top-3 left-3 bg-[#c87a53] text-[#111111] px-2 py-1 text-[9px] font-black tracking-widest uppercase z-10">
               -{product.discountAmount}%
             </div>
           )}
 
-          {/* HOT BADGE */}
+          {/* HOT */}
           {isHot && !isSoldOut && (
-            <div className="absolute top-3 right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-1 animate-pulse">
+            <div className="absolute top-3 right-3 bg-accent text-white px-2.5 py-1 text-[8px] font-black tracking-[0.2em] uppercase shadow-md flex items-center gap-1 z-10">
               🔥 HOT
             </div>
           )}
 
-          {/* NEW BADGE */}
+          {/* NEW */}
           {!isHot && isNew && !isSoldOut && (
-            <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
+            <div className="absolute top-3 right-3 bg-[#111111] text-[#fbfbf9] px-2.5 py-1 text-[8px] font-black tracking-[0.2em] uppercase shadow-md z-10">
               ✨ MỚI
             </div>
           )}
 
-          {/* NÚT TIM */}
+          {/* Sizes overlay on hover */}
+          {!isSoldOut && availableSizes.length > 0 && (
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-[2px] py-3 px-2 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10 border-t border-primary/5">
+              <p className="text-[8px] font-black text-primary/40 uppercase tracking-widest mb-1.5">Kích cỡ sẵn có</p>
+              <div className="flex justify-center gap-1.5 flex-wrap">
+                {availableSizes.map((size) => (
+                  <span key={size} className="text-[9px] font-black text-primary border border-primary/10 px-2 py-0.5 bg-secondary uppercase hover:bg-[#c87a53] hover:text-white hover:border-transparent transition-colors">
+                    {size}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* WISHLIST BUTTON FLOATING */}
           <div className="absolute bottom-3 right-3 z-20">
             <button
               onClick={openWishlistModal}
               disabled={loadingStatus}
               className={`
-                                p-3 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center
-                                ${
-                                  loadingStatus
-                                    ? "opacity-60 cursor-wait"
-                                    : "hover:scale-110"
-                                }
-                                ${
-                                  isInAnyWishlist
-                                    ? "bg-red-500 text-white shadow-red-500/50 opacity-100"
-                                    : "bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100"
-                                }
-                            `}
+                w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 border
+                ${
+                  loadingStatus
+                    ? "opacity-60 cursor-wait"
+                    : "hover:scale-105 active:scale-95"
+                }
+                ${
+                  isInAnyWishlist
+                    ? "bg-accent border-accent text-white opacity-100 shadow-accent/20"
+                    : "bg-white border-primary/5 text-primary/60 hover:text-accent hover:border-accent opacity-0 group-hover:opacity-100"
+                }
+              `}
             >
               <Heart
-                size={22}
+                size={14}
                 fill={isInAnyWishlist ? "currentColor" : "none"}
                 strokeWidth={2}
               />
@@ -294,60 +345,62 @@ const ProductCard = ({
           </div>
         </div>
 
-        {/* THÔNG TIN SẢN PHẨM */}
-        <div className="p-4">
-          <h3 className="font-bold text-lg mb-2 line-clamp-2 h-14">
-            {product.name}
-          </h3>
+        {/* INFO */}
+        <div className="p-5 flex flex-col flex-1 justify-between">
+          <div>
+            <h3 className="font-display font-black text-sm tracking-tight uppercase mb-2 group-hover:text-accent transition-colors line-clamp-2 h-10">
+              {product.name}
+            </h3>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <svg
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < Math.floor(product.rating || 4.5)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
+            {/* Rating */}
+            <div className="flex items-center gap-1 mb-4">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className={`w-3 h-3 ${
+                      i < Math.floor(product.rating || 4.5)
+                        ? "text-accent"
+                        : "text-primary/10"
+                    }`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-[10px] text-primary/40 font-bold">
+                ({product.rating || 4.5})
+              </span>
             </div>
-            <span className="text-sm text-gray-600">
-              ({product.rating || 4.5})
-            </span>
           </div>
 
-          {/* Giá */}
-          <div className="flex items-center justify-between">
+          {/* Pricing + Cart Button */}
+          <div className="flex items-center justify-between pt-3 border-t border-primary/5">
             <div>
-              <p className="text-2xl font-bold text-red-500">
-                {formatPrice(product.costPrice)}
+              <p className="text-base font-display font-black text-accent tracking-tight">
+                {formatPrice(product.costPrice || product.price)}
               </p>
               {!isSoldOut && product.discountAmount > 0 && (
-                <p className="text-sm text-gray-400 line-through">
+                <p className="text-xs text-primary/30 line-through font-medium">
                   {formatPrice(product.price)}
                 </p>
               )}
             </div>
 
-            {/* Nút giỏ hàng */}
+            {/* Shopping Cart Trigger */}
             <button
               onClick={goToDetail}
-              className="p-4 rounded-full bg-black text-white hover:bg-red-500 transition flex items-center justify-center"
+              className="w-9 h-9 bg-primary hover:bg-[#c87a53] text-white transition-all duration-300 flex items-center justify-center shadow-md active:scale-95"
             >
-              <ShoppingCart size={20} />
+              <ShoppingCart size={15} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* MODAL CHỌN WISHLIST */}
+      {/* WISHLIST SELECTOR */}
       {showWishlistModal && (
         <WishlistSelectorModal
           productId={product.id}

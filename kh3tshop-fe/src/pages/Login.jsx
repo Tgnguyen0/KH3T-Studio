@@ -152,13 +152,13 @@ const Login = () => {
               <div className="pt-6 space-y-4">
                 <button
                   type="submit"
-                  className="group w-full py-6 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-accent transition-all duration-500 shadow-2xl shadow-primary/20 flex items-center justify-center gap-3"
+                  className="group w-full py-5 bg-[#111111] hover:bg-[#c87a53] text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3"
                 >
                   Đăng nhập ngay
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#c87a53]" />
                 </button>
                 
-                <div className="flex items-center justify-center gap-4 py-4">
+                <div className="flex items-center justify-center gap-4 py-2">
                   <div className="h-[1px] flex-1 bg-primary/5"></div>
                   <span className="text-[10px] font-black text-primary/20 uppercase tracking-widest">Hoặc</span>
                   <div className="h-[1px] flex-1 bg-primary/5"></div>
@@ -167,7 +167,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/register")}
-                  className="w-full py-6 rounded-2xl bg-secondary text-primary font-black text-xs uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all duration-500"
+                  className="w-full py-5 border border-primary/10 hover:border-primary text-primary font-black text-xs uppercase tracking-[0.3em] hover:bg-[#111111] hover:text-white transition-all duration-500 bg-transparent"
                 >
                   Tạo tài khoản mới
                 </button>

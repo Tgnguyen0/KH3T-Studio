@@ -356,277 +356,334 @@ const Checkout = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-      <div className="lg:col-span-2 space-y-10">
-        <div>
-          <h1 className="text-3xl font-bold mb-5">Thông tin giao hàng</h1>
+    <div className="min-h-screen bg-secondary py-16 selection:bg-accent selection:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16">
+        
+        {/* LEFT COLUMN: SHIPPING INFO & PRODUCTS */}
+        <div className="lg:col-span-8 space-y-12">
+          
+          {/* Delivery Info */}
+          <div className="bg-white border border-primary/5 p-8">
+            <h2 className="text-xl font-display font-black uppercase tracking-widest mb-8 text-primary pb-3 border-b border-primary/5">
+              Thông tin giao hàng
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              className="border p-3 rounded"
-              onChange={handleChange}
-              value={form.email}
-            />
-            <input
-              type="text"
-              name="name"
-              placeholder="Họ và tên"
-              className="border p-3 rounded"
-              onChange={handleChange}
-              value={form.name}
-            />
-            <input
-              type="text"
-              name="phone"
-              placeholder="Số điện thoại"
-              className="border p-3 rounded"
-              onChange={handleChange}
-              value={form.phone}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">EMAIL</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  onChange={handleChange}
+                  value={form.email}
+                />
+              </div>
 
-            <div className="p-3 relative">
-              {isAddAddress === false ? (
-                <button
-                  onClick={() => setIsAddAddress(true)}
-                  className="absolute right-0 bottom-0 px-4 bg-black text-white py-2 rounded font-bold text-sm hover:bg-gray-800 transition"
-                >
-                  Thêm địa chỉ mới
-                </button>
-              ) : (
-                <></>
-              )}
-            </div>
-            {isAddAddress === false ? (
-              <select
-                name="address"
-                className="border p-3 rounded md:col-span-2"
-                onChange={(e) => handleSelectAddress(e.target.value)}
-              >
-                <option value="">-- Chọn địa chỉ đã lưu --</option>
-                {addresses.map((addr, index) => (
-                  <option key={index} value={index}>
-                    {addr.delivery_address} ({addr.province})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="md:col-span-2 border p-5 rounded bg-gray-100 space-y-4">
-                <h3 className="text-xl font-bold">Thêm địa chỉ mới</h3>
-
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">HỌ VÀ TÊN</label>
                 <input
                   type="text"
-                  name="delivery_address"
-                  placeholder="Địa chỉ giao hàng"
-                  className="border p-3 rounded w-full"
-                  onChange={handleChangeAddress}
-                  value={formAddress.delivery_address}
+                  name="name"
+                  placeholder="Họ và tên"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  onChange={handleChange}
+                  value={form.name}
                 />
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <select
-                    value={selectedProvince}
-                    onChange={(e) => handleProvinceChange(e.target.value)}
-                    className="border p-2 rounded"
+              <div className="flex flex-col space-y-1.5">
+                <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">SỐ ĐIỆN THOẠI</label>
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Số điện thoại"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  onChange={handleChange}
+                  value={form.phone}
+                />
+              </div>
+
+              <div className="flex items-end justify-end pb-1.5">
+                {!isAddAddress && (
+                  <button
+                    onClick={() => setIsAddAddress(true)}
+                    className="h-10 px-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors"
                   >
-                    <option value="">-- Chọn Tỉnh/Thành phố --</option>
-                    {provinces.map((p) => (
-                      <option key={p.code} value={p.name}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
+                    Thêm địa chỉ mới
+                  </button>
+                )}
+              </div>
+
+              {/* Saved addresses dropdown */}
+              {!isAddAddress ? (
+                <div className="md:col-span-2 flex flex-col space-y-1.5">
+                  <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">ĐỊA CHỈ ĐÃ LƯU</label>
                   <select
-                    className="border p-2 rounded"
-                    disabled={!selectedProvince}
-                    onChange={(e) => setSelectedWard(e.target.value)}
+                    name="address"
+                    className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer uppercase tracking-wider text-primary"
+                    onChange={(e) => handleSelectAddress(e.target.value)}
                   >
-                    <option value="">-- Chọn Phường/Xã --</option>
-                    {wards.map((w) => (
-                      <option key={w.code} value={w.name}>
-                        {w.name}
+                    <option value="">-- Chọn địa chỉ đã lưu --</option>
+                    {addresses.map((addr, index) => (
+                      <option key={index} value={index}>
+                        {addr.delivery_address} ({addr.province})
                       </option>
                     ))}
                   </select>
                 </div>
+              ) : (
+                <div className="md:col-span-2 border border-primary/5 p-6 bg-secondary space-y-6">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-primary/60 pb-2 border-b border-primary/5">Thêm địa chỉ mới</h3>
 
+                  <div className="flex flex-col space-y-1.5">
+                    <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Địa chỉ chi tiết</label>
+                    <input
+                      type="text"
+                      name="delivery_address"
+                      placeholder="Số nhà, tên đường..."
+                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                      onChange={handleChangeAddress}
+                      value={formAddress.delivery_address}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">TỈNH/THÀNH PHỐ</label>
+                      <select
+                        value={selectedProvince}
+                        onChange={(e) => handleProvinceChange(e.target.value)}
+                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer"
+                      >
+                        <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                        {provinces.map((p) => (
+                          <option key={p.code} value={p.name}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">PHƯỜNG/XÃ</label>
+                      <select
+                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer"
+                        disabled={!selectedProvince}
+                        onChange={(e) => setSelectedWard(e.target.value)}
+                      >
+                        <option value="">-- Chọn Phường/Xã --</option>
+                        {wards.map((w) => (
+                          <option key={w.code} value={w.name}>
+                            {w.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col space-y-1.5">
+                    <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Ghi chú giao hàng</label>
+                    <textarea
+                      name="delivery_note"
+                      placeholder="Ghi chú giao hàng (tùy chọn)"
+                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20 w-full"
+                      rows="2"
+                      onChange={handleChangeAddress}
+                      value={formAddress.delivery_note}
+                    ></textarea>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <button
+                      onClick={() => setIsAddAddress(false)}
+                      className="px-4 py-2 border border-primary/10 text-[9px] font-black tracking-widest uppercase hover:bg-primary/5 transition-colors bg-white"
+                    >
+                      Hủy
+                    </button>
+
+                    <button
+                      onClick={handleAddNewAddress}
+                      className="px-4 py-2 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors"
+                    >
+                      Lưu địa chỉ
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="md:col-span-2 flex flex-col space-y-1.5">
+                <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">GHI CHÚ ĐƠN HÀNG</label>
                 <textarea
-                  name="delivery_note"
-                  placeholder="Ghi chú giao hàng (tùy chọn)"
-                  className="border p-3 rounded w-full"
+                  name="note"
+                  placeholder="Ghi chú thêm về đơn hàng của bạn..."
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20 md:col-span-2 w-full"
                   rows="3"
-                  onChange={handleChangeAddress}
-                  value={formAddress.delivery_note}
+                  onChange={handleChange}
                 ></textarea>
-
-                <div className="flex justify-between pt-2">
-                  <button
-                    onClick={() => setIsAddAddress(false)}
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                  >
-                    Hủy
-                  </button>
-
-                  <button
-                    onClick={handleAddNewAddress}
-                    className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-                  >
-                    Lưu địa chỉ
-                  </button>
-                </div>
               </div>
-            )}
-
-           <textarea
-              name="note"
-              placeholder="Ghi chú (tùy chọn)"
-              className="border p-3 rounded md:col-span-2"
-              onChange={handleChange}
-            ></textarea>
+            </div>
           </div>
-        </div>
 
-        {/* Danh sách sản phẩm */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Sản phẩm đang mua</h2>
-          <div className="space-y-4 border p-4 rounded bg-white shadow-sm">
-            {product ? (
-              // Trường hợp Mua ngay
-              <div className="flex items-center gap-4 py-2">
-                <img
-                  src={product.imageUrlFront}
-                  alt={product.name}
-                  className="w-20 h-20 object-cover rounded-lg border"
-                />
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-900">{product.name}</h4>
-                  <p className="text-sm text-gray-500">
-                    {location.state?.selectedSize && `Kích cỡ: ${location.state.selectedSize} | `}
-                    Số lượng: {quantity}
-                  </p>
-                  <p className="text-sm font-semibold text-red-500 mt-1">
-                    {formatVND(product.costPrice)}
-                  </p>
-                </div>
-                <div className="text-right font-bold">
-                  {formatVND(product.costPrice * quantity)}
-                </div>
-              </div>
-            ) : selectedCartItems.length > 0 ? (
-              // Trường hợp mua từ Giỏ hàng
-              selectedCartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 py-2 border-b last:border-0">
-                  <img
-                    src={item.productImage}
-                    alt={item.productName}
-                    className="w-20 h-20 object-cover rounded-lg border"
-                  />
+          {/* Product list */}
+          <div className="bg-white border border-primary/5 p-8">
+            <h2 className="text-xl font-display font-black uppercase tracking-widest mb-8 text-primary pb-3 border-b border-primary/5">
+              Sản phẩm đang mua
+            </h2>
+
+            <div className="divide-y divide-primary/5">
+              {product ? (
+                // BUY NOW SINGLE PRODUCT
+                <div className="flex items-center gap-6 py-6">
+                  <div className="w-20 aspect-[3/4] bg-secondary overflow-hidden flex-shrink-0">
+                    <img
+                      src={product.imageUrlFront}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900">{item.productName}</h4>
-                    <p className="text-sm text-gray-500">
-                      Kích cỡ: {item.sizeName} | Số lượng: {item.quantity}
+                    <h4 className="font-display font-black text-sm uppercase tracking-tight text-primary">{product.name}</h4>
+                    <p className="text-[10px] font-bold text-primary/30 uppercase tracking-widest mt-1">
+                      {location.state?.selectedSize && `Kích cỡ: ${location.state.selectedSize} | `}
+                      Số lượng: <span className="text-primary font-black">{quantity}</span>
                     </p>
-                    <p className="text-sm font-semibold text-red-500 mt-1">
-                      {formatVND(item.priceAtTime)}
+                    <p className="text-xs font-black text-accent mt-1">
+                      {formatVND(product.costPrice)}
                     </p>
                   </div>
-                  <div className="text-right font-bold">
-                    {formatVND(item.subtotal)}
+                  <div className="text-right font-display font-black text-sm text-primary tracking-tight">
+                    {formatVND(product.costPrice * quantity)}
                   </div>
                 </div>
-              ))
+              ) : selectedCartItems.length > 0 ? (
+                // CART ITEMS LIST
+                selectedCartItems.map((item) => (
+                  <div key={item.id} className="flex items-center gap-6 py-6">
+                    <div className="w-20 aspect-[3/4] bg-secondary overflow-hidden flex-shrink-0">
+                      <img
+                        src={item.productImage}
+                        alt={item.productName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-display font-black text-sm uppercase tracking-tight text-primary">{item.productName}</h4>
+                      <p className="text-[10px] font-bold text-primary/30 uppercase tracking-widest mt-1">
+                        Kích cỡ: <span className="text-primary font-black">{item.sizeName}</span> | Số lượng: <span className="text-primary font-black">{item.quantity}</span>
+                      </p>
+                      <p className="text-xs font-black text-accent mt-1">
+                        {formatVND(item.priceAtTime)}
+                      </p>
+                    </div>
+                    <div className="text-right font-display font-black text-sm text-primary tracking-tight">
+                      {formatVND(item.subtotal)}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-primary/30 font-bold uppercase tracking-widest text-xs">
+                  Không có sản phẩm nào được chọn.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Delivery option */}
+          <div className="bg-white border border-primary/5 p-8">
+            <h2 className="text-xl font-display font-black uppercase tracking-widest mb-6 text-primary pb-3 border-b border-primary/5">
+              Phương thức vận chuyển
+            </h2>
+            <div className="flex justify-between items-center border border-primary/10 p-5 bg-secondary">
+              <span className="text-[11px] font-black tracking-widest uppercase text-primary/60">Tiêu chuẩn (3–5 ngày làm việc)</span>
+              <span className="font-display font-black text-sm text-primary">{formatVND(30000)}</span>
+            </div>
+          </div>
+
+          {/* Payment option */}
+          <div className="bg-white border border-primary/5 p-8">
+            <h2 className="text-xl font-display font-black uppercase tracking-widest mb-6 text-primary pb-3 border-b border-primary/5">
+              Phương thức thanh toán
+            </h2>
+
+            <div className="space-y-4">
+              <label className="flex items-center gap-4 border border-primary/10 p-4 cursor-pointer bg-secondary hover:bg-primary/5 transition-colors">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cash"
+                  className="w-4 h-4 accent-[#111111]"
+                  onChange={(e) => setPayment(e.target.value)}
+                />
+                <span className="text-[11px] font-black tracking-widest uppercase text-primary">Thanh toán khi nhận hàng (COD)</span>
+              </label>
+
+              <label className="flex items-center gap-4 border border-primary/10 p-4 cursor-pointer bg-secondary hover:bg-primary/5 transition-colors">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="bank"
+                  className="w-4 h-4 accent-[#111111]"
+                  onChange={(e) => setPayment(e.target.value)}
+                />
+                <span className="text-[11px] font-black tracking-widest uppercase text-primary">Chuyển khoản ngân hàng</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: SUMMARY & CONFIRM */}
+        <div className="lg:col-span-4 bg-white border border-primary/5 p-8 h-fit">
+          <h2 className="text-xl font-display font-black uppercase tracking-widest mb-8 text-primary pb-3 border-b border-primary/5">
+            Tóm tắt đơn hàng
+          </h2>
+
+          <div className="space-y-4 mb-8 text-xs font-bold text-primary/60 uppercase tracking-widest">
+            <div className="flex justify-between">
+              <span className="font-medium text-primary/40">Tạm tính:</span>
+              <span className="font-black text-primary">{formatVND(summary.subtotal)}</span>
+            </div>
+
+            {product ? (
+              <div className="flex justify-between">
+                <span className="font-medium text-primary/40">Phí vận chuyển:</span>
+                <span className="font-black text-primary">{formatVND(30000)}</span>
+              </div>
             ) : (
-              <div className="text-center py-4 text-gray-500">
-                Không có sản phẩm nào được chọn.
+              <div className="flex justify-between">
+                <span className="font-medium text-primary/40">Phí vận chuyển:</span>
+                <span className="font-black text-primary">{formatVND(summary.shippingFee)}</span>
               </div>
             )}
-          </div>
-        </div>
 
-        <div>
-          <h2 className="text-2xl font-bold mb-3">Phương thức vận chuyển</h2>
-          <div className="border p-4 rounded flex justify-between items-center">
-            <span>Tiêu chuẩn (3–5 ngày làm việc)</span>
-            <span className="font-semibold">{formatVND(30000)}</span>
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-bold mb-3">Phương thức thanh toán</h2>
-
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 border p-3 rounded cursor-pointer">
-              <input
-                type="radio"
-                name="payment"
-                value="cash"
-                onChange={(e) => setPayment(e.target.value)}
-              />
-              <span>Thanh toán khi nhận hàng (COD)</span>
-            </label>
-
-            <label className="flex items-center gap-3 border p-3 rounded cursor-pointer">
-              <input
-                type="radio"
-                name="payment"
-                value="bank"
-                onChange={(e) => setPayment(e.target.value)}
-              />
-              <span>Chuyển khoản ngân hàng</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t-4 border-red-500 p-6 rounded-lg bg-gray-50 shadow-md h-fit">
-        <h2 className="text-3xl font-bold mb-6 text-red-500">Tóm tắt đơn hàng</h2>
-
-        <div className="space-y-4 text-lg">
-          <div className="flex justify-between">
-            <span>Tạm tính:</span>
-            <span className="font-semibold">{formatVND(summary.subtotal)}</span>
+            <div className="flex justify-between pb-4 border-b border-primary/5">
+              <span className="font-medium text-primary/40">Giảm giá:</span>
+              <span className="font-black text-accent">{formatVND(summary.discount)}</span>
+            </div>
           </div>
 
           {product ? (
-            <div className="flex justify-between">
-              <span>Phí vận chuyển:</span>
-              <span>{formatVND(30000)}</span>
+            <div className="flex justify-between items-end font-display font-black text-lg text-primary tracking-tight">
+              <span className="text-[10px] font-black tracking-[0.2em] text-primary/40 uppercase mb-1">TỔNG CỘNG:</span>
+              <span className="text-xl text-accent font-black">
+                {formatVND(product.costPrice * quantity + 30000)}
+              </span>
             </div>
           ) : (
-            <div className="flex justify-between">
-              <span>Phí vận chuyển:</span>
-              <span>{formatVND(summary.shippingFee)}</span>
+            <div className="flex justify-between items-end font-display font-black text-lg text-primary tracking-tight">
+              <span className="text-[10px] font-black tracking-[0.2em] text-primary/40 uppercase mb-1">TỔNG CỘNG:</span>
+              <span className="text-xl text-accent font-black">{formatVND(summary.total)}</span>
             </div>
           )}
 
-          <div className="flex justify-between">
-            <span>Giảm giá:</span>
-            <span>{formatVND(summary.discount)}</span>
-          </div>
+          <button
+            onClick={handleConfirm}
+            className="w-full mt-8 bg-[#111111] hover:bg-[#c87a53] text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
+          >
+            Xác nhận đặt hàng
+          </button>
         </div>
-
-        {product ? (
-          <div className="flex justify-between text-xl font-bold border-t pt-5 mt-5">
-            <span>Tổng cộng:</span>
-            <span className="text-red-500">
-              {formatVND(product.costPrice * quantity + 30000)}
-            </span>
-          </div>
-        ) : (
-          <div className="flex justify-between text-xl font-bold border-t pt-5 mt-5">
-            <span>Tổng cộng:</span>
-            <span className="text-red-500">{formatVND(summary.total)}</span>
-          </div>
-        )}
-
-        <button
-          onClick={handleConfirm}
-          className="w-full mt-8 bg-black text-white py-3 rounded font-bold text-lg hover:bg-gray-800 transition"
-        >
-          Xác nhận đặt hàng
-        </button>
       </div>
     </div>
   );

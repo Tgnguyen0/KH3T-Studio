@@ -496,212 +496,248 @@ const ProductDetail = () => {
   const isComparing = compareList.some((p) => p.id === product.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* IMAGE SECTION */}
-          <div className="bg-white rounded-xl shadow-md p-6 relative">
-            <div className="relative group">
-              {/* BỔ SUNG: Tag Sold Out */}
+    <div className="min-h-screen bg-secondary selection:bg-accent selection:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          {/* IMAGE GALLERY SECTION */}
+          <div className="lg:col-span-7 bg-white border border-primary/5 p-8 relative flex flex-col items-center justify-between">
+            <div className="relative group w-full flex flex-col items-center">
+              {/* Sold Out Overlay */}
               {isSoldOut && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-                  <div className="bg-red-600 text-white px-8 py-3 rounded-full text-xl font-bold tracking-wider shadow-2xl border-4 border-white transform -rotate-12 opacity-90">
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-30">
+                  <div className="bg-white text-primary px-8 py-3 text-[11px] font-black tracking-[0.25em] uppercase shadow-2xl">
                     HẾT HÀNG
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-center mt-4 gap-2">
+              {/* TOP ACTIONS BAR */}
+              <div className="w-full flex justify-between items-center mb-6 z-10">
+                {/* COMPARE BUTTON */}
                 <button
-                  onClick={() => setCurrentImage("front")}
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    currentImage === "front"
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-gray-700"
+                  onClick={handleCompare}
+                  className={`flex items-center gap-1.5 px-4 h-9 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 ${
+                    isComparing
+                      ? "bg-accent text-white shadow-md"
+                      : "bg-[#111111] hover:bg-[#c87a53] text-white"
                   }`}
                 >
-                  Front
+                  <GitCompare size={12} />{" "}
+                  {isComparing ? "Đang so sánh" : "Thêm vào so sánh"}
                 </button>
-                <button
-                  onClick={() => setCurrentImage("back")}
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    currentImage === "back"
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-gray-700"
-                  }`}
-                >
-                  Back
-                </button>
+
+                {/* VIEW CONTROLS */}
+                <div className="flex gap-2 bg-secondary p-1 border border-primary/5">
+                  <button
+                    onClick={() => setCurrentImage("front")}
+                    className={`px-3 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      currentImage === "front"
+                        ? "bg-white text-primary shadow-sm"
+                        : "text-primary/40 hover:text-primary"
+                    }`}
+                  >
+                    Mặt trước
+                  </button>
+                  <button
+                    onClick={() => setCurrentImage("back")}
+                    className={`px-3 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      currentImage === "back"
+                        ? "bg-white text-primary shadow-sm"
+                        : "text-primary/40 hover:text-primary"
+                    }`}
+                  >
+                    Mặt sau
+                  </button>
+                </div>
               </div>
 
-              {/* COMPARE BUTTON */}
-              <button
-                onClick={handleCompare}
-                className={`absolute top-0 left-0 flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all z-10 ${
-                  isComparing
-                    ? "bg-red-500 text-white shadow-lg"
-                    : "bg-black text-white border border-white"
-                }`}
-              >
-                <GitCompare size={16} />{" "}
-                {isComparing ? "Đang so sánh" : "Thêm vào so sánh"}
-              </button>
-              {/* END COMPARE BUTTON */}
-
-              <img
-                src={
-                  currentImage === "front"
-                    ? product.imageUrlFront
-                    : product.imageUrlBack
-                }
-                alt={product.name}
-                className="w-140 h-140 rounded-lg object-cover cursor-pointer"
-                onClick={() => handleZoom(currentImage)}
-              />
-
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <ZoomIn size={24} className="text-gray-600" />
+              {/* MAIN HERO IMAGE */}
+              <div className="relative aspect-[3/4] max-w-md w-full bg-secondary overflow-hidden">
+                <img
+                  src={
+                    currentImage === "front"
+                      ? product.imageUrlFront
+                      : product.imageUrlBack
+                  }
+                  alt={product.name}
+                  className="w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105"
+                  onClick={() => handleZoom(currentImage)}
+                />
+                
+                <div className="absolute bottom-4 right-4 p-3 bg-white/80 backdrop-blur-md rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ZoomIn size={16} className="text-primary" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* DETAILS */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-3xl font-bold mb-4">{product.name}</h2>
-            {/* PRICE SECTION */}
-            <div className="flex items-center gap-3 mb-4">
-              {/* Giá sale (Giá sau khi giảm) */}
-              <span className="text-3xl font-bold text-red-500">
-                {formatPrice(product.costPrice)}
-              </span>
-              {!isSoldOut && product.discountAmount > 0 && (
-                <p className="text-sm text-gray-400 line-through">
-                  {formatPrice(product.price)}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2 mb-6 text-gray-600">
-              <ShoppingBag size={20} className="text-red-500" />
-              <span className="font-semibold">Đã bán:</span>
-              <span className="font-bold text-red-600">
-                {(product.soldQuantity || 0).toLocaleString("vi-VN")} sản phẩm
-              </span>
-            </div>
-            <div className="flex items-center mb-4">
-              <Star className="text-yellow-400" size={20} />
-              <span className="ml-1 font-medium">
-                {product.rating || "N/A"}
-              </span>
-            </div>
-            {/* SIZE SELECT */}
-            <div className="mb-6">
-              <h3 className="font-bold text-lg mb-2">Chọn kích cỡ</h3>
-              <div className="flex gap-2 flex-wrap">
-                {uniqueSizes.map((size) => (
+          {/* DETAILS PANELS */}
+          <div className="lg:col-span-5 flex flex-col justify-between">
+            <div className="space-y-8">
+              {/* Product title & pricing */}
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-display font-black tracking-tight uppercase mb-4 text-primary">
+                  {product.name}
+                </h2>
+                
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl lg:text-3xl font-display font-black text-accent tracking-tight">
+                    {formatPrice(product.costPrice || product.price)}
+                  </span>
+                  {!isSoldOut && product.discountAmount > 0 && (
+                    <span className="text-sm text-primary/30 line-through font-medium">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Quiet Meta Stats */}
+              <div className="flex items-center gap-6 py-4 border-y border-primary/5 text-[10px] font-black tracking-widest text-primary/40 uppercase">
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={14} className="text-[#c87a53]" />
+                  <span>Đã bán: <span className="text-primary font-black">{(product.soldQuantity || 0).toLocaleString("vi-VN")}</span></span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Star className="text-[#c87a53] fill-current" size={14} />
+                  <span>Đánh giá: <span className="text-primary font-black">{product.rating || "5.0"}</span></span>
+                </div>
+              </div>
+
+              {/* SIZE SELECT */}
+              <div>
+                <h3 className="font-display font-black text-[10px] tracking-[0.25em] uppercase mb-4 text-primary/40">
+                  Chọn kích cỡ
+                </h3>
+                <div className="flex gap-2.5 flex-wrap">
+                  {uniqueSizes.map((size) => (
+                    <button
+                      key={size.sizeName}
+                      onClick={() => setSelectedSize(size.sizeName)}
+                      disabled={size.quantity <= 0}
+                      className={`w-12 h-12 text-xs font-black transition-all duration-300 border ${
+                        selectedSize === size.sizeName
+                          ? "bg-primary border-primary text-white"
+                          : "border-primary/10 hover:border-primary/30 text-primary hover:bg-secondary"
+                      } ${
+                        size.quantity <= 0 ? "opacity-30 cursor-not-allowed line-through" : ""
+                      }`}
+                    >
+                      {size.sizeName}
+                    </button>
+                  ))}
+                  {uniqueSizes.length === 0 && <p className="text-xs text-primary/30 uppercase tracking-widest font-black">Không có sẵn kích cỡ nào</p>}
+                </div>
+              </div>
+
+              {/* QUANTITY */}
+              <div>
+                <h3 className="font-display font-black text-[10px] tracking-[0.25em] uppercase mb-4 text-primary/40">
+                  Số lượng
+                </h3>
+                <div className="inline-flex items-center border border-primary/10 h-12 bg-white">
                   <button
-                    key={size.sizeName}
-                    onClick={() => setSelectedSize(size.sizeName)}
-                    disabled={size.quantity <= 0}
-                    className={`px-4 py-2 rounded-lg border ${
-                      selectedSize === size.sizeName
-                        ? "bg-red-500 text-white border-red-500"
-                        : "border-gray-300 hover:bg-gray-100"
-                    } ${
-                      size.quantity <= 0 ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    onClick={() => changeQuantity(-1)}
+                    disabled={isSoldOut}
+                    className="w-12 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
                   >
-                    {size.sizeName}
+                    <Minus size={14} />
                   </button>
-                ))}
-                {uniqueSizes.length === 0 && <p>Không có sẵn kích cỡ nào</p>}
+                  <span className="w-12 text-center text-xs font-black text-primary">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => changeQuantity(1)}
+                    disabled={isSoldOut}
+                    className="w-12 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               </div>
-            </div>
-            {/* QUANTITY */}
-            <div className="mb-6">
-              <h3 className="font-bold text-lg mb-2">Số lượng</h3>
-              <div className="flex items-center gap-2">
+
+              {/* ACTION CTA BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
-                  onClick={() => changeQuantity(-1)}
-                  disabled={isSoldOut} // Disable quantity change if sold out
-                  className={`p-2 border border-gray-300 rounded-lg ${
-                    isSoldOut ? "opacity-50" : "hover:bg-gray-100"
+                  onClick={handleAddToCart}
+                  disabled={isSoldOut}
+                  className={`flex-1 h-13 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
+                    isSoldOut
+                      ? "bg-primary/5 text-primary/20 border-primary/5 cursor-not-allowed"
+                      : "bg-white text-primary border-primary hover:bg-primary hover:text-white"
                   }`}
                 >
-                  <Minus size={16} />
+                  <ShoppingCart size={14} />{" "}
+                  {isSoldOut
+                    ? "Hết hàng"
+                    : isAddedToCart
+                    ? "Đã thêm vào giỏ"
+                    : "Thêm vào giỏ"}
                 </button>
-                <span className="px-4 py-2 border border-gray-300 rounded-lg">
-                  {quantity}
-                </span>
+
                 <button
-                  onClick={() => changeQuantity(1)}
-                  disabled={isSoldOut} // Disable quantity change if sold out
-                  className={`p-2 border border-gray-300 rounded-lg ${
-                    isSoldOut ? "opacity-50" : "hover:bg-gray-100"
+                  onClick={handleBuyNow}
+                  disabled={isSoldOut}
+                  className={`flex-1 h-13 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                    isSoldOut
+                      ? "bg-primary/5 text-primary/20 cursor-not-allowed"
+                      : "bg-[#111111] hover:bg-[#c87a53] text-white shadow-lg active:scale-98"
                   }`}
                 >
-                  <Plus size={16} />
+                  <CreditCard size={14} /> Mua ngay
                 </button>
               </div>
-            </div>
-            {/* ACTION BUTTONS */}
-            <div className="flex gap-4 mb-6">
-              <button
-                onClick={handleAddToCart}
-                disabled={isSoldOut} // FIX: Vô hiệu hóa nếu hết hàng
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 shadow-md ${
-                  isSoldOut
-                    ? "bg-gray-400 text-white cursor-not-allowed" // Style khi disabled
-                    : "bg-white text-black hover:bg-black hover:text-white hover:shadow-lg"
-                }`}
-              >
-                <ShoppingCart size={20} />{" "}
-                {isSoldOut
-                  ? "Hết hàng"
-                  : isAddedToCart
-                  ? "Đã thêm"
-                  : "Thêm vào giỏ hàng"}
-              </button>
 
-              <button
-                onClick={handleBuyNow}
-                disabled={isSoldOut} // FIX: Vô hiệu hóa nếu hết hàng
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 shadow-md ${
-                  isSoldOut
-                    ? "bg-gray-400 text-white cursor-not-allowed" // Style khi disabled
-                    : "bg-black text-white hover:bg-green-600 hover:shadow-lg"
-                }`}
-              >
-                <CreditCard size={20} /> Mua ngay
-              </button>
-            </div>
-            {/* DESCRIPTION */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-lg">Mô tả sản phẩm</h3>
-              <p className="text-gray-600">{product.description}</p>
+              {/* SPECIFICATION ACCORDIONS */}
+              <div className="pt-8 border-t border-primary/5 space-y-6">
+                <div>
+                  <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+                    Mô tả sản phẩm
+                  </h3>
+                  <p className="text-primary/60 text-xs leading-relaxed">{product.description}</p>
+                </div>
 
-              <h3 className="font-bold text-lg">Chi tiết</h3>
-              <ul className="list-disc pl-5 text-gray-600">
-                <li>Form: {product.form}</li>
-                <li>Chất liệu: {product.material}</li>
-                <li>Đơn vị: {product.unit}</li>
-              </ul>
+                <div>
+                  <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+                    Chi tiết sản phẩm
+                  </h3>
+                  <ul className="grid grid-cols-2 gap-y-2.5 text-[11px] font-bold text-primary/50 uppercase tracking-wider">
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Form:</span> {product.form}</li>
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Chất liệu:</span> {product.material}</li>
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Đơn vị:</span> {product.unit}</li>
+                  </ul>
+                </div>
 
-              <h3 className="font-bold text-lg">Bảng size</h3>
-              <img
-                src={product.category?.imageUrl}
-                alt="Size Chart"
-                className="w-full h-auto rounded-lg"
-              />
+                {product.category?.imageUrl && (
+                  <div>
+                    <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-4 text-primary">
+                      Bảng thông số size
+                    </h3>
+                    <div className="border border-primary/5 bg-[#fafbf9] p-4">
+                      <img
+                        src={product.category.imageUrl}
+                        alt="Size Chart"
+                        className="w-full h-auto grayscale opacity-80"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <ChatBot /> {/* Giữ lại ChatBot ở đây */}
-            <Contact />
           </div>
         </div>
 
-        {/* YOU MAY ALSO LIKE */}
+        {/* RELATED RECOMMENDATIONS ROW */}
         {otherProducts.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-3xl font-bold mb-6">Bạn cũng có thể thích</h2>
+          <div className="mt-32 pt-16 border-t border-primary/5">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <span className="text-accent font-black text-[10px] tracking-[0.4em] uppercase mb-3 block">Có thể bạn quan tâm</span>
+                <h2 className="text-2xl lg:text-3xl font-display font-black text-primary tracking-tight uppercase">
+                  Sản phẩm tương tự
+                </h2>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {otherProducts.map((prod) => (
                 <ProductCard key={prod.id} product={prod} />
@@ -713,17 +749,15 @@ const ProductDetail = () => {
 
       {/* ZOOM MODAL */}
       {zoomImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 overflow-hidden transition-opacity duration-300 ease-in-out">
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 overflow-hidden transition-opacity duration-300 ease-in-out">
           <div className="relative w-full h-full flex items-center justify-center">
             <img
               ref={imageRef}
               src={zoomImage}
-              alt="Zoomed product"
-              className="rounded-lg cursor-grab transition-transform duration-200 ease-in-out"
+              alt="Zoomed campaign design"
+              className="cursor-grab active:cursor-grabbing transition-transform duration-200 ease-in-out max-h-[85vh] object-contain"
               style={{
                 transform: `scale(${zoomLevel}) translate(${position.x}px, ${position.y}px)`,
-                maxHeight: "90vh",
-                objectFit: "contain",
               }}
               onWheel={handleWheel}
               onMouseDown={handleMouseDown}
@@ -731,15 +765,15 @@ const ProductDetail = () => {
 
             <button
               onClick={() => setZoomImage(null)}
-              className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
+              className="absolute top-6 right-6 bg-white hover:bg-[#c87a53] text-primary hover:text-white p-3 transition-colors shadow-2xl"
             >
-              <X size={24} className="text-gray-800" />
+              <X size={20} />
             </button>
           </div>
         </div>
       )}
 
-      {/* COMPARISON BAR - Đặt ở cuối cùng để hiển thị fixed */}
+      {/* COMPARISON BAR */}
       <CompareBar
         compareList={compareList}
         setCompareListState={setCompareListState}

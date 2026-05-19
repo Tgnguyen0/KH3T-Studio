@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import ChatBot from "../components/ChatBot";
-import  Contact  from "../components/Contact";
+import Contact from "../components/Contact";
 
 const API_BASE = "http://localhost:8080";
 
@@ -53,7 +53,6 @@ const api = {
         return data?.result ?? data;
     },
 
-    // Hàm delete cho API client
     async delete(url) {
         const token = localStorage.getItem("accessToken");
         const res = await fetch(`${API_BASE}${url}`, {
@@ -63,7 +62,6 @@ const api = {
                 ...(token && { Authorization: `Bearer ${token}` }),
             },
         });
-        // Chỉ kiểm tra res.ok cho DELETE
         if (!res.ok) {
             const data = await res.json();
             throw new Error(data.message || "Delete failed");
@@ -154,7 +152,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
         setShowAddForm(false);
 
         setEditingAddress(address.id);
-        setCurrentActionId(null); // FIX: Ensure currentActionId is null when starting edit
+        setCurrentActionId(null);
 
         setEditForm({
             id: address.id,
@@ -182,7 +180,6 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
 
         if (!editForm.id) return;
 
-        // Validation for Edit Address Form (optional but recommended)
         if (!editForm.delivery_address.trim() || !editForm.province.trim()) {
             toast.error("Vui lòng nhập địa chỉ và Tỉnh/Thành phố.");
             return;
@@ -201,7 +198,6 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
             console.error("Lỗi cập nhật địa chỉ:", error);
             toast.error("Cập nhật địa chỉ thất bại: " + (error.message || "Lỗi không xác định"));
         } finally {
-            // Reset loading state
             setCurrentActionId(null);
         }
     };
@@ -209,7 +205,6 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
     const handleAddAddress = async (e) => {
         e.preventDefault();
 
-        // Validation for Add Address Form
         if (!newAddress.delivery_address.trim() || !newAddress.province.trim()) {
             toast.error("Vui lòng nhập địa chỉ và Tỉnh/Thành phố.");
             return;
@@ -237,26 +232,21 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
     };
 
     const handleDeleteAddress = async (id) => {
-        // BƯỚC FIX: Ép kiểu ID thành số nguyên rõ ràng
         const addressId = parseInt(id, 10);
 
         if (isNaN(addressId) || addressId <= 0) {
             toast.error("Lỗi: ID địa chỉ không hợp lệ.");
-            console.error("Cố gắng xóa địa chỉ với ID không hợp lệ:", id);
             return;
         }
 
         if (!window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) return;
 
-        // SỬ DỤNG addressId đã được xác thực
         setCurrentActionId(addressId);
         try {
-            // DÙNG addressId (số nguyên) để gọi API
             await api.delete(`/addresses/${addressId}`);
             toast.success("Xóa địa chỉ thành công!");
             fetchAddresses();
         } catch (err) {
-            // Lỗi từ Backend (ví dụ: "Address not found") sẽ được hiển thị
             toast.error(err.message);
         } finally {
             setCurrentActionId(null);
@@ -265,9 +255,9 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
     const isAddressLoading = (id) => currentActionId === id;
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-black">Địa chỉ giao hàng</h2>
+        <div className="bg-white border border-primary/5 p-8 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-8 pb-3 border-b border-primary/5">
+                <h2 className="text-sm font-display font-black uppercase tracking-[0.2em] text-primary">Địa chỉ giao hàng</h2>
 
                 {isCustomerProfile && (
                     <button
@@ -275,72 +265,79 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                             setShowAddForm(!showAddForm);
                             handleCancelEdit();
                         }}
-                        className="text-red-600 hover:text-red-800 font-medium"
+                        className="text-[10px] font-black uppercase tracking-widest text-[#c87a53] hover:underline"
                     >
-                        {showAddForm ? "Hủy thêm" : "Thêm mới"}
+                        {showAddForm ? "Hủy" : "+ Thêm mới"}
                     </button>
                 )}
             </div>
 
             {addressLoading && !editingAddress ? (
-                <p className="text-center text-gray-500">Đang tải...</p>
+                <p className="text-center text-xs text-primary/30 uppercase tracking-widest py-8">Đang tải...</p>
             ) : addresses.length === 0 && !showAddForm ? (
-                <p className="text-center text-gray-500 py-8">Chưa có địa chỉ nào được lưu.</p>
+                <p className="text-center text-xs text-primary/30 uppercase tracking-widest py-8">Chưa có địa chỉ nào được lưu.</p>
             ) : (
-                <div className="flex-grow overflow-y-auto space-y-4 pr-2">
+                <div className="flex-grow space-y-4 pr-2">
                     {addresses.map((addr) => (
                         <div key={addr.id}>
                             {editingAddress === addr.id ? (
                                 // --- FORM EDIT ---
                                 <form
                                     onSubmit={handleEditAddress}
-                                    className="bg-red-100 rounded-lg p-4 border-2 border-red-500"
+                                    className="bg-secondary p-6 border border-primary/10 space-y-4"
                                 >
-                                    <h4 className="font-bold mb-3 text-red-700">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#c87a53]">
                                         Chỉnh sửa địa chỉ
                                     </h4>
 
-                                    <input
-                                        name="delivery_address"
-                                        value={editForm.delivery_address}
-                                        onChange={handleEditFormChange}
-                                        placeholder="Địa chỉ chi tiết..."
-                                        required
-                                        className="w-full p-2 mb-2 border border-red-300 rounded"
-                                    />
+                                    <div className="flex flex-col space-y-1.5">
+                                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Địa chỉ chi tiết</label>
+                                        <input
+                                            name="delivery_address"
+                                            value={editForm.delivery_address}
+                                            onChange={handleEditFormChange}
+                                            placeholder="Số nhà, tên đường..."
+                                            required
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                        />
+                                    </div>
 
-                                    <input
-                                        name="province"
-                                        value={editForm.province}
-                                        onChange={handleEditFormChange}
-                                        placeholder="Tỉnh/Thành phố"
-                                        required
-                                        className="w-full p-2 mb-2 border border-red-300 rounded"
-                                    />
+                                    <div className="flex flex-col space-y-1.5">
+                                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Tỉnh/Thành phố</label>
+                                        <input
+                                            name="province"
+                                            value={editForm.province}
+                                            onChange={handleEditFormChange}
+                                            placeholder="Tỉnh/Thành phố"
+                                            required
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                        />
+                                    </div>
 
-                                    <input
-                                        name="delivery_note"
-                                        value={editForm.delivery_note}
-                                        onChange={handleEditFormChange}
-                                        placeholder="Ghi chú giao hàng..."
-                                        className="w-full p-2 mb-3 border border-red-300 rounded"
-                                    />
+                                    <div className="flex flex-col space-y-1.5">
+                                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Ghi chú giao hàng</label>
+                                        <input
+                                            name="delivery_note"
+                                            value={editForm.delivery_note}
+                                            onChange={handleEditFormChange}
+                                            placeholder="Ghi chú giao hàng..."
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                        />
+                                    </div>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-4 pt-2">
                                         <button
                                             type="submit"
                                             disabled={isAddressLoading(editForm.id)}
-                                            className="flex-1 bg-red-600 text-white p-2 rounded hover:bg-red-700 disabled:opacity-50"
+                                            className="flex-1 py-3 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors disabled:opacity-50"
                                         >
-                                            {isAddressLoading(editForm.id)
-                                                ? "Đang cập nhật..."
-                                                : "Lưu thay đổi"}
+                                            {isAddressLoading(editForm.id) ? "Đang lưu..." : "Lưu thay đổi"}
                                         </button>
 
                                         <button
                                             type="button"
                                             onClick={handleCancelEdit}
-                                            className="bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400"
+                                            className="px-4 py-3 border border-primary/10 text-[9px] font-black tracking-widest uppercase hover:bg-primary/5 transition-colors bg-white"
                                         >
                                             Hủy
                                         </button>
@@ -348,20 +345,19 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                 </form>
                             ) : (
                                 // --- CARD ADDRESS ---
-                                <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md flex justify-between">
-                                    <div>
-                                        {/* BỔ SUNG: Hiển thị địa chỉ chi tiết */}
-                                        <p className="font-semibold text-black mb-1">
+                                <div className="bg-secondary border border-primary/5 p-5 hover:border-primary/15 transition-all flex justify-between items-start gap-4">
+                                    <div className="space-y-1">
+                                        <p className="font-display font-black text-xs uppercase tracking-tight text-primary">
                                             {addr.delivery_address}
                                         </p>
-
-                                        <p className="text-sm text-gray-600 mb-1">
+                                        <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">
                                             {addr.province}
                                         </p>
-
-                                        <p className="text-sm text-gray-500 italic">
-                                            Ghi chú: {addr.delivery_note || "Không có"}
-                                        </p>
+                                        {addr.delivery_note && (
+                                            <p className="text-[10px] text-[#c87a53] font-semibold italic">
+                                                Ghi chú: {addr.delivery_note}
+                                            </p>
+                                        )}
                                     </div>
 
                                     {isCustomerProfile && addr.id > 0 && (
@@ -369,7 +365,8 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             <button
                                                 onClick={() => handleStartEdit(addr)}
                                                 disabled={currentActionId !== null}
-                                                className="text-blue-600 hover:bg-blue-100 p-1 rounded"
+                                                className="w-8 h-8 flex items-center justify-center border border-primary/10 bg-white hover:border-primary transition-colors text-[10px]"
+                                                title="Sửa"
                                             >
                                                 ✏️
                                             </button>
@@ -377,7 +374,8 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             <button
                                                 onClick={() => handleDeleteAddress(addr.id)}
                                                 disabled={currentActionId !== null}
-                                                className="text-red-600 hover:bg-red-100 p-1 rounded"
+                                                className="w-8 h-8 flex items-center justify-center border border-primary/10 bg-white hover:border-accent hover:text-accent transition-colors text-[10px]"
+                                                title="Xóa"
                                             >
                                                 🗑️
                                             </button>
@@ -394,40 +392,48 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
             {showAddForm && (
                 <form
                     onSubmit={handleAddAddress}
-                    className="mt-6 bg-red-50 rounded-lg p-4"
+                    className="mt-8 bg-secondary p-6 border border-primary/10 space-y-4"
                 >
-                    <h4 className="font-bold mb-3 text-red-700">Thêm địa chỉ mới</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#c87a53]">Thêm địa chỉ mới</h4>
 
-                    <input
-                        name="delivery_address"
-                        value={newAddress.delivery_address}
-                        onChange={handleNewAddressChange}
-                        placeholder="Địa chỉ chi tiết..."
-                        required
-                        className="w-full p-3 mb-3 border border-gray-300 rounded"
-                    />
+                    <div className="flex flex-col space-y-1.5">
+                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Địa chỉ chi tiết</label>
+                        <input
+                            name="delivery_address"
+                            value={newAddress.delivery_address}
+                            onChange={handleNewAddressChange}
+                            placeholder="Số nhà, tên đường..."
+                            required
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                        />
+                    </div>
 
+                    <div className="flex flex-col space-y-1.5">
+                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Tỉnh/Thành phố</label>
+                        <input
+                            name="province"
+                            value={newAddress.province}
+                            onChange={handleNewAddressChange}
+                            placeholder="Tỉnh/Thành phố"
+                            required
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                        />
+                    </div>
 
-                    <input
-                        name="province"
-                        value={newAddress.province}
-                        onChange={handleNewAddressChange}
-                        placeholder="Tỉnh/Thành phố"
-                        required
-                        className="w-full p-3 mb-3 border border-gray-300 rounded"
-                    />
-
-                    <input
-                        name="delivery_note"
-                        value={newAddress.delivery_note}
-                        onChange={handleNewAddressChange}
-                        placeholder="Ghi chú giao hàng"
-                        className="w-full p-3 mb-4 border border-gray-300 rounded"
-                    />
+                    <div className="flex flex-col space-y-1.5">
+                        <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Ghi chú giao hàng</label>
+                        <input
+                            name="delivery_note"
+                            value={newAddress.delivery_note}
+                            onChange={handleNewAddressChange}
+                            placeholder="Ghi chú giao hàng..."
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                        />
+                    </div>
 
                     <button
                         disabled={isAddressLoading("ADD_NEW")}
-                        className="w-full bg-red-600 text-white p-3 rounded font-semibold hover:bg-red-700 disabled:opacity-50"
+                        className="w-full py-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50"
                     >
                         {isAddressLoading("ADD_NEW") ? "Đang lưu..." : "Lưu địa chỉ"}
                     </button>
@@ -443,7 +449,7 @@ const Profile = () => {
     const [initialProfile, setInitialProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [errors, setErrors] = useState({}); // <--- THÊM: State để lưu lỗi
+    const [errors, setErrors] = useState({});
 
     const [formData, setFormData] = useState({
         id: null,
@@ -501,14 +507,12 @@ const Profile = () => {
 
     // --- VALIDATION LOGIC ---
     const NAME_REGEX = /^[A-Za-zÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s]+$/;
-    // Regex cho SĐT VN: Bắt đầu bằng 0 hoặc +84, theo sau là 9-10 chữ số (vd: 0901234567 hoặc +84901234567)
     const PHONE_REGEX = /^(0|\+84)[3|5|7|8|9][0-9]{8,9}$/;
 
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
 
-        // 1. Full Name
         if (!formData.fullName.trim()) {
             newErrors.fullName = "Vui lòng nhập Họ và tên.";
             isValid = false;
@@ -517,16 +521,14 @@ const Profile = () => {
             isValid = false;
         }
 
-        // 2. Phone Number
         if (!formData.phoneNumber.trim()) {
             newErrors.phoneNumber = "Vui lòng nhập Số điện thoại.";
             isValid = false;
         } else if (!PHONE_REGEX.test(formData.phoneNumber)) {
-            newErrors.phoneNumber = "Định dạng số điện thoại không hợp lệ (vd: 0901234567 hoặc +84901234567).";
+            newErrors.phoneNumber = "Định dạng số điện thoại không hợp lệ.";
             isValid = false;
         }
 
-        // 3. Date of Birth
         if (formData.dateOfBirth) {
             const today = new Date().toISOString().split('T')[0];
             if (formData.dateOfBirth >= today) {
@@ -538,15 +540,12 @@ const Profile = () => {
         setErrors(newErrors);
         return isValid;
     };
-    // --- END VALIDATION LOGIC ---
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         setProfile((prev) => ({ ...prev, [name]: value }));
 
-        // Xóa lỗi khi người dùng bắt đầu gõ lại
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
@@ -555,7 +554,6 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. Kiểm tra Validation
         if (!validateForm()) {
             toast.error("Vui lòng kiểm tra lại thông tin đã nhập.");
             return;
@@ -578,7 +576,6 @@ const Profile = () => {
             });
 
             toast.success("Cập nhật thông tin thành công!");
-            // Cập nhật lại initialProfile để reset trạng thái hasChanged
             await fetchProfile();
         } catch (err) {
             toast.error(err.message || "Cập nhật thông tin thất bại.");
@@ -587,119 +584,127 @@ const Profile = () => {
         }
     };
 
-    if (loading) return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600"></div></div>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-[70vh] bg-secondary">
+                <div className="w-10 h-10 border-2 border-[#c87a53] border-t-transparent animate-spin"></div>
+            </div>
+        );
+    }
 
     const hasChanged = isProfileChanged(profile, initialProfile);
 
     return (
-        <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-gray-50 to-red-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 mb-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-extrabold text-black">
-                        Hồ sơ của tôi
-                    </h1>
+        <div className="min-h-screen bg-secondary py-16 selection:bg-accent selection:text-white">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* Header */}
+                <div className="flex justify-between items-end mb-12 pb-6 border-b border-primary/5">
+                    <h1 className="text-3xl lg:text-4xl font-display font-black uppercase tracking-tight text-primary">Hồ sơ cá nhân</h1>
+                    <span className="text-[10px] font-black tracking-widest text-[#c87a53] uppercase">
+                        KREDO MEMBER ID: #{formData.id}
+                    </span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6">
-                        <div className="space-y-6">
-                            {/* Username / Email */}
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Tên đăng nhập / Email</label>
-                                <input
-                                    value={profile.email}
-                                    readOnly
-                                    className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed"
-                                />
-                            </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+                    
+                    {/* LEFT COLUMN - GENERAL PROFILE */}
+                    <form onSubmit={handleSubmit} className="lg:col-span-7 bg-white border border-primary/5 p-8 space-y-6">
+                        <h2 className="text-sm font-display font-black uppercase tracking-[0.2em] text-primary pb-3 border-b border-primary/5 mb-2">Thông tin tài khoản</h2>
 
-                            {/* Full Name */}
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Họ và tên</label>
-                                <input
-                                    name="fullName"
-                                    value={formData.fullName}
-                                    onChange={handleChange}
-                                    placeholder="Nhập họ và tên của bạn"
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 transition ${
-                                        errors.fullName
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
-                                            : 'border-gray-300 focus:border-red-500 focus:ring-red-200'
-                                    }`}
-                                />
-                                {errors.fullName && ( // <-- HIỂN THỊ LỖI
-                                    <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
-                                )}
-                            </div>
-
-                            {/* Phone Number */}
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Số điện thoại</label>
-                                <input
-                                    name="phoneNumber"
-                                    value={formData.phoneNumber}
-                                    onChange={handleChange}
-                                    placeholder="Nhập số điện thoại của bạn"
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 transition ${
-                                        errors.phoneNumber
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
-                                            : 'border-gray-300 focus:border-red-500 focus:ring-red-200'
-                                    }`}
-                                />
-                                {errors.phoneNumber && ( // <-- HIỂN THỊ LỖI
-                                    <p className="mt-1 text-xs text-red-500">{errors.phoneNumber}</p>
-                                )}
-                            </div>
-
-                            {/* Date of Birth */}
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Ngày sinh</label>
-                                <input
-                                    type="date"
-                                    name="dateOfBirth"
-                                    value={formData.dateOfBirth}
-                                    onChange={handleChange}
-                                    className={`w-full p-3 border rounded-lg focus:ring-2 transition ${
-                                        errors.dateOfBirth
-                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
-                                            : 'border-gray-300 focus:border-red-500 focus:ring-red-200'
-                                    }`}
-                                />
-                                {errors.dateOfBirth && ( // <-- HIỂN THỊ LỖI
-                                    <p className="mt-1 text-xs text-red-500">{errors.dateOfBirth}</p>
-                                )}
-                            </div>
-
-                            {/* Gender */}
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">Giới tính</label>
-                                <select
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition"
-                                >
-                                    <option value="MALE">Nam</option>
-                                    <option value="FEMALE">Nữ</option>
-                                    <option value="OTHER">Khác</option>
-                                </select>
-                            </div>
-
-                            {/* Save Button */}
-                            <button
-                                disabled={!hasChanged || saving}
-                                className="w-full bg-red-600 text-white p-3 rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 transition"
-                            >
-                                {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                            </button>
+                        {/* Username / Email */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">TÊN ĐĂNG NHẬP / EMAIL</label>
+                            <input
+                                value={profile.email}
+                                readOnly
+                                className="w-full bg-secondary p-3 text-xs font-semibold text-primary/50 cursor-not-allowed border border-primary/5 focus:outline-none"
+                            />
                         </div>
+
+                        {/* Full Name */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">HỌ VÀ TÊN</label>
+                            <input
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                placeholder="Họ và tên của bạn"
+                                className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all placeholder-primary/20 ${
+                                    errors.fullName ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                }`}
+                            />
+                            {errors.fullName && (
+                                <p className="text-[10px] text-accent font-black tracking-wide mt-1 uppercase">{errors.fullName}</p>
+                            )}
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">SỐ ĐIỆN THOẠI</label>
+                            <input
+                                name="phoneNumber"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                                placeholder="Số điện thoại của bạn"
+                                className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all placeholder-primary/20 ${
+                                    errors.phoneNumber ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                }`}
+                            />
+                            {errors.phoneNumber && (
+                                <p className="text-[10px] text-accent font-black tracking-wide mt-1 uppercase">{errors.phoneNumber}</p>
+                            )}
+                        </div>
+
+                        {/* Date of Birth */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">NGÀY SINH</label>
+                            <input
+                                type="date"
+                                name="dateOfBirth"
+                                value={formData.dateOfBirth}
+                                onChange={handleChange}
+                                className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all ${
+                                    errors.dateOfBirth ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                }`}
+                            />
+                            {errors.dateOfBirth && (
+                                <p className="text-[10px] text-accent font-black tracking-wide mt-1 uppercase">{errors.dateOfBirth}</p>
+                            )}
+                        </div>
+
+                        {/* Gender */}
+                        <div className="flex flex-col space-y-1.5">
+                            <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">GIỚI TÍNH</label>
+                            <select
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleChange}
+                                className="w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all cursor-pointer focus:ring-1 focus:ring-[#c87a53]"
+                            >
+                                <option value="MALE">Nam</option>
+                                <option value="FEMALE">Nữ</option>
+                                <option value="OTHER">Khác</option>
+                            </select>
+                        </div>
+
+                        {/* Save Button */}
+                        <button
+                            disabled={!hasChanged || saving}
+                            className="w-full mt-4 py-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {saving ? "Đang lưu..." : "Lưu thay đổi"}
+                        </button>
                     </form>
 
-                    <AddressSection accountId={formData.accountId} isCustomerProfile={true} />
+                    {/* RIGHT COLUMN - ADDRESS LIST */}
+                    <div className="lg:col-span-5">
+                        <AddressSection accountId={formData.accountId} isCustomerProfile={true} />
+                    </div>
                 </div>
             </div>
-            <ChatBot/>
-            <Contact/>
+            <ChatBot />
+            <Contact />
         </div>
     );
 };

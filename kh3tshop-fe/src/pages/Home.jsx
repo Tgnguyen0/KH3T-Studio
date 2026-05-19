@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import ChatBot from "../components/ChatBot";
 import Contact from "../components/Contact";
+import ProductCard from "../components/ProductCard";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF8]">
+    <div className="min-h-screen bg-secondary selection:bg-accent selection:text-white">
       {/* ================== DYNAMIC HERO SLIDER ================== */}
       <section className="relative h-[85vh] overflow-hidden bg-primary">
         {banners.map((banner, index) => (
@@ -101,32 +102,34 @@ const Home = () => {
               index === currentBanner ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
           >
-            <img src={banner} alt="KREDO Campaign" className="w-full h-full object-cover opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
+            <img src={banner} alt="KREDO Campaign" className="w-full h-full object-cover opacity-75" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent"></div>
           </div>
         ))}
 
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
-            <div className="max-w-2xl">
-              <span className="text-accent font-black text-xs tracking-[0.6em] uppercase mb-6 block animate-fade-in">Season 2025</span>
-              <h1 className="text-7xl lg:text-[10rem] font-black text-white mb-8 tracking-tighter leading-[0.85] uppercase">
+            <div className="max-w-2xl text-left">
+              <span className="text-[#c87a53] font-display font-black text-xs tracking-[0.6em] uppercase mb-6 block animate-fade-in-up">
+                Season 2026
+              </span>
+              <h1 className="text-6xl lg:text-[7.5rem] font-display font-black text-white mb-8 tracking-tighter leading-[0.85] uppercase animate-fade-in-up anim-delay-100">
                 KREDO <br />
-                <span className="text-accent underline decoration-4 underline-offset-8">STUDIO</span>
+                <span className="text-[#c87a53] underline decoration-2 underline-offset-16">STUDIO</span>
               </h1>
-              <p className="text-white/70 text-lg lg:text-xl font-medium mb-12 max-w-lg leading-relaxed">
-                Định hình phong cách tối giản, nâng tầm bản sắc cá nhân thông qua ngôn ngữ thiết kế đương đại.
+              <p className="text-white/60 text-base lg:text-lg font-medium mb-12 max-w-lg leading-relaxed animate-fade-in-up anim-delay-200">
+                Định hình phong cách tối giản, nâng tầm bản sắc cá nhân thông qua ngôn ngữ thiết kế đương đại và nghệ thuật cắt may tỉ mỉ.
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-4 animate-fade-in-up anim-delay-300">
                 <button 
                   onClick={() => navigate("/product")}
-                  className="bg-white text-primary px-10 py-5 rounded-full font-black text-xs tracking-widest uppercase hover:bg-accent hover:text-white transition-all duration-500 shadow-2xl"
+                  className="bg-white hover:bg-[#c87a53] text-primary hover:text-white px-10 py-5 rounded-none font-black text-xs tracking-widest uppercase transition-all duration-500 shadow-2xl"
                 >
                   Mua sắm ngay
                 </button>
                 <button 
                   onClick={() => navigate("/about")}
-                  className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-10 py-5 rounded-full font-black text-xs tracking-widest uppercase hover:bg-white hover:text-primary transition-all duration-500"
+                  className="bg-transparent hover:bg-white text-white hover:text-primary border border-white/20 px-10 py-5 rounded-none font-black text-xs tracking-widest uppercase transition-all duration-500"
                 >
                   Câu chuyện
                 </button>
@@ -138,59 +141,59 @@ const Home = () => {
         {/* Slider Controls */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-8 z-20">
           <button onClick={() => setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length)} className="text-white/40 hover:text-white transition-colors">
-            <ChevronLeft size={32} />
+            <ChevronLeft size={24} />
           </button>
           <div className="flex gap-3">
             {banners.map((_, i) => (
-              <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${i === currentBanner ? "bg-accent scale-150" : "bg-white/20"}`} />
+              <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${i === currentBanner ? "bg-[#c87a53] scale-150" : "bg-white/20"}`} />
             ))}
           </div>
           <button onClick={() => setCurrentBanner((prev) => (prev + 1) % banners.length)} className="text-white/40 hover:text-white transition-colors">
-            <ChevronRight size={32} />
+            <ChevronRight size={24} />
           </button>
         </div>
       </section>
 
-      {/* ================== CATEGORY BENTO GRID ================== */}
+      {/* ================== CATEGORY Grid ================== */}
       <section className="py-32 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row justify-between items-end mb-16 gap-8">
           <div>
             <span className="text-accent font-black text-xs tracking-[0.4em] uppercase mb-4 block">Bộ sưu tập</span>
-            <h2 className="text-5xl lg:text-7xl font-black text-primary tracking-tighter uppercase leading-none">
+            <h2 className="text-4xl lg:text-6xl font-display font-black text-primary tracking-tighter uppercase leading-none">
               Danh mục <br /> <span className="text-primary/20 italic">chọn lọc</span>
             </h2>
           </div>
-          <p className="max-w-md text-primary/40 font-medium text-sm leading-relaxed">
-            Mọi sản phẩm của KREDO đều được chế tác từ những chất liệu thượng hạng, tối ưu hóa cả về phom dáng và cảm giác mặc.
+          <p className="max-w-md text-primary/40 font-medium text-xs leading-relaxed uppercase tracking-wider">
+            Mọi sản phẩm của KREDO đều được chế tác từ những chất liệu thượng hạng, tối ưu hóa cả về phom dáng và cảm giác thoải mái khi mặc.
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-12 lg:gap-20">
+        <div className="flex flex-wrap justify-center gap-12 lg:gap-16">
           {dbCategories.map((cat, idx) => (
             <Link 
               to={`/product?category=${cat.id}`} 
               key={idx} 
               className="group relative flex flex-col items-center"
             >
-              <div className="relative w-48 h-72 lg:w-64 lg:h-96 overflow-hidden rounded-full border-4 border-transparent group-hover:border-accent/30 transition-all duration-700 shadow-2xl">
+              <div className="relative w-44 h-64 lg:w-56 lg:h-80 overflow-hidden rounded-full border border-primary/5 group-hover:border-[#c87a53]/30 transition-all duration-700 shadow-2xl">
                 <img 
                   src={cat.representativeImage} 
                   alt={cat.name} 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" 
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105" 
                 />
-                <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors duration-700"></div>
+                <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-700"></div>
               </div>
               
-              <div className="mt-8 text-center relative">
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] font-black text-accent tracking-[0.5em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-500">Discover</span>
-                <h3 className="text-3xl lg:text-4xl font-black text-primary tracking-tighter uppercase leading-none group-hover:text-accent transition-colors duration-500">
+              <div className="mt-6 text-center relative">
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-[#c87a53] tracking-[0.5em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-500">Discover</span>
+                <h3 className="text-xl lg:text-2xl font-display font-black text-primary tracking-tight uppercase leading-none group-hover:text-accent transition-colors duration-500">
                   {cat.name}
                 </h3>
-                <div className="w-0 h-1 bg-accent mx-auto mt-2 group-hover:w-12 transition-all duration-500"></div>
+                <div className="w-0 h-0.5 bg-[#c87a53] mx-auto mt-2 group-hover:w-8 transition-all duration-500"></div>
               </div>
 
               {/* Decorative Number */}
-              <span className="absolute -left-6 top-10 text-6xl font-black text-primary/5 select-none group-hover:text-accent/10 transition-colors">
+              <span className="absolute -left-6 top-8 text-5xl font-display font-black text-primary/5 select-none group-hover:text-[#c87a53]/10 transition-colors">
                 0{idx + 1}
               </span>
             </Link>
@@ -205,48 +208,26 @@ const Home = () => {
             <div className="flex gap-8">
               <button 
                 onClick={() => setActiveTab("new")}
-                className={`text-2xl font-black uppercase tracking-tighter transition-all duration-300 ${activeTab === "new" ? "text-primary" : "text-primary/20 hover:text-primary/40"}`}
+                className={`text-xl font-display font-black uppercase tracking-widest transition-all duration-300 ${activeTab === "new" ? "text-primary border-b-2 border-accent pb-1" : "text-primary/20 hover:text-primary/40 pb-1"}`}
               >
                 Hàng mới về
               </button>
               <button 
                 onClick={() => setActiveTab("best")}
-                className={`text-2xl font-black uppercase tracking-tighter transition-all duration-300 ${activeTab === "best" ? "text-primary" : "text-primary/20 hover:text-primary/40"}`}
+                className={`text-xl font-display font-black uppercase tracking-widest transition-all duration-300 ${activeTab === "best" ? "text-primary border-b-2 border-accent pb-1" : "text-primary/20 hover:text-primary/40 pb-1"}`}
               >
                 Bán chạy nhất
               </button>
             </div>
-            <Link to="/product" className="text-accent font-black text-xs tracking-widest uppercase hover:underline">Xem tất cả</Link>
+            <Link to="/product" className="text-[#c87a53] font-black text-xs tracking-widest uppercase hover:underline">Xem tất cả</Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {loading ? (
-              [1, 2, 3, 4].map((i) => <div key={i} className="aspect-[3/4] bg-secondary animate-pulse rounded-3xl" />)
+              [1, 2, 3, 4].map((i) => <div key={i} className="aspect-[3/4] bg-secondary animate-pulse" />)
             ) : (
               getFilteredProducts().map((product) => (
-                <div key={product.id} className="group cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
-                  <div className="relative aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-secondary">
-                    <img 
-                      src={product.imageUrlFront || "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1974&auto=format&fit=crop"} 
-                      alt={product.name} 
-                      className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${product.quantity <= 0 ? "grayscale opacity-50" : ""}`}
-                    />
-                    {product.quantity <= 0 && (
-                      <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                        <div className="bg-white/90 backdrop-blur-sm px-6 py-2 rounded-full shadow-xl">
-                          <span className="text-primary font-black uppercase tracking-widest text-[10px]">Hết hàng</span>
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                       <button className="bg-primary text-white p-4 rounded-full shadow-2xl hover:bg-accent transition-colors">
-                          <ShoppingBag size={20} />
-                       </button>
-                    </div>
-                  </div>
-                  <h3 className="text-primary font-black uppercase tracking-tight text-sm mb-1 truncate">{product.name}</h3>
-                  <p className="text-accent font-black text-xs">{formatPrice(product.costPrice || product.price)}</p>
-                </div>
+                <ProductCard key={product.id} product={product} />
               ))
             )}
           </div>
@@ -254,29 +235,29 @@ const Home = () => {
       </section>
 
       {/* ================== VALUE PROPS ================== */}
-      <section className="py-24 bg-[#FDFCF8]">
+      <section className="py-24 bg-[#fafbf9]">
          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-               <div className="flex flex-col items-center text-center group">
-                  <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 group-hover:bg-accent transition-colors duration-500">
-                     <Truck className="text-primary group-hover:text-white transition-colors" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+                     <Truck className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
-                  <h3 className="text-primary font-black uppercase tracking-widest text-xs mb-3">Vận chuyển nhanh</h3>
-                  <p className="text-primary/40 text-xs font-medium max-w-[200px]">Giao hàng hỏa tốc trong vòng 24-48 giờ tại nội thành.</p>
+                  <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Vận chuyển nhanh</h3>
+                  <p className="text-primary/40 text-[11px] font-medium leading-relaxed max-w-[220px]">Giao hàng hỏa tốc trong vòng 24-48 giờ tại các thành phố lớn.</p>
                </div>
-               <div className="flex flex-col items-center text-center group">
-                  <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 group-hover:bg-accent transition-colors duration-500">
-                     <Award className="text-primary group-hover:text-white transition-colors" />
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+                     <Award className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
-                  <h3 className="text-primary font-black uppercase tracking-widest text-xs mb-3">Chất lượng cao</h3>
-                  <p className="text-primary/40 text-xs font-medium max-w-[200px]">Cam kết sử dụng chất liệu vải tuyển chọn đạt chuẩn xuất khẩu.</p>
+                  <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Chất lượng cao</h3>
+                  <p className="text-primary/40 text-[11px] font-medium leading-relaxed max-w-[220px]">Cam kết sử dụng chất liệu vải tuyển chọn kỹ lưỡng đạt chuẩn xuất khẩu.</p>
                </div>
-               <div className="flex flex-col items-center text-center group">
-                  <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6 group-hover:bg-accent transition-colors duration-500">
-                     <TrendingUp className="text-primary group-hover:text-white transition-colors" />
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+                     <TrendingUp className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
-                  <h3 className="text-primary font-black uppercase tracking-widest text-xs mb-3">Phong cách dẫn đầu</h3>
-                  <p className="text-primary/40 text-xs font-medium max-w-[200px]">Luôn cập nhật những xu hướng thời trang tối giản mới nhất.</p>
+                  <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Phong cách dẫn đầu</h3>
+                  <p className="text-primary/40 text-[11px] font-medium leading-relaxed max-w-[220px]">Cập nhật nhanh chóng những xu hướng thời trang tối giản mới nhất thế giới.</p>
                </div>
             </div>
          </div>

@@ -86,10 +86,10 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="group w-full py-6 rounded-2xl bg-primary text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-accent transition-all duration-500 shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group w-full py-5 bg-[#111111] hover:bg-[#c87a53] text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Đang gửi yêu cầu..." : "Gửi mã xác thực"}
-                {!loading && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
+                {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#c87a53]" />}
               </button>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-between items-center px-2">
