@@ -27,9 +27,9 @@ const Contact = () => {
       {/* NÚT CHÍNH */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 ring-4 ring-white/50"
+        className="group relative w-16 h-16 bg-accent hover:bg-accent-hover rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all duration-300 ring-4 ring-white/50"
       >
-        <div className="absolute -inset-1 bg-red-600/60 rounded-full blur-xl opacity-70 group-hover:opacity-100 transition"></div>
+        <div className="absolute -inset-1 bg-accent/60 rounded-full blur-xl opacity-70 group-hover:opacity-100 transition"></div>
 
         {/* ICON DẤU HỎI (?) */}
         <svg className="w-10 h-10 text-white relative z-10" fill="currentColor" viewBox="0 0 24 24">

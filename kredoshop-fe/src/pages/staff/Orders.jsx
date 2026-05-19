@@ -254,7 +254,7 @@ export default function Orders() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate("/product")}
-                className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl font-semibold"
+                className="px-5 py-2.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all flex items-center gap-2 shadow-lg hover:shadow-xl font-semibold"
               >
                 <FaPlus />
                 <span>Create Order</span>

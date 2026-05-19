@@ -117,10 +117,10 @@ const ResetPassword = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="group w-full py-5 bg-[#111111] hover:bg-[#c87a53] text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="group w-full py-5 bg-[#111111] hover:bg-accent text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? "Đang xử lý..." : "Xác nhận đổi mật khẩu"}
-                                {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#c87a53]" />}
+                                {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-red-500" />}
                             </button>
 
                             <button

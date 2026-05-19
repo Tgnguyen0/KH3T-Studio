@@ -20,14 +20,14 @@ export default function Footer() {
             </p>
             {/* Newsletter signup */}
             <div className="mt-4">
-              <h4 className="text-xs font-black tracking-widest text-[#c87a53] uppercase mb-3">Newsletter</h4>
+              <h4 className="text-xs font-black tracking-widest text-red-500 uppercase mb-3">Newsletter</h4>
               <div className="flex max-w-sm">
                 <input 
                   type="email" 
                   placeholder="Nhập email của bạn..." 
-                  className="w-full bg-[#1c1c1e] text-white text-xs font-medium px-4 py-3.5 border-none focus:ring-1 focus:ring-[#c87a53] focus:outline-none"
+                  className="w-full bg-[#1c1c1e] text-white text-xs font-medium px-4 py-3.5 border-none focus:ring-1 focus:ring-red-500 focus:outline-none"
                 />
-                <button className="bg-[#c87a53] hover:bg-[#a85f3b] text-[#111111] font-black px-4 transition-colors">
+                <button className="bg-accent hover:bg-accent-hover text-white font-black px-4 transition-colors">
                   <Send size={14} />
                 </button>
               </div>
@@ -36,7 +36,7 @@ export default function Footer() {
 
           {/* Quick Links Column (Col Span 2) */}
           <div className="md:col-span-2 flex flex-col gap-4">
-            <h3 className="text-[#c87a53] font-black text-xs tracking-widest uppercase mb-2">Liên kết</h3>
+            <h3 className="text-red-500 font-black text-xs tracking-widest uppercase mb-2">Liên kết</h3>
             <ul className="space-y-3">
               <li>
                 <a href="/" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Trang chủ</a>
@@ -55,18 +55,18 @@ export default function Footer() {
 
           {/* Contact Column (Col Span 3) */}
           <div className="md:col-span-3 flex flex-col gap-4">
-            <h3 className="text-[#c87a53] font-black text-xs tracking-widest uppercase mb-2">Liên hệ</h3>
+            <h3 className="text-red-500 font-black text-xs tracking-widest uppercase mb-2">Liên hệ</h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-3 text-gray-400 text-sm font-medium">
-                <Phone size={16} className="text-[#c87a53] flex-shrink-0" />
+                <Phone size={16} className="text-red-500 flex-shrink-0" />
                 <span>093 - 3462 - 6578</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm font-medium">
-                <Mail size={16} className="text-[#c87a53] flex-shrink-0" />
+                <Mail size={16} className="text-red-500 flex-shrink-0" />
                 <span>contact@kredostudio.com</span>
               </li>
               <li className="flex items-start gap-3 text-gray-400 text-sm font-medium">
-                <MapPin size={16} className="text-[#c87a53] flex-shrink-0 mt-0.5" />
+                <MapPin size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
                 <span className="leading-relaxed">Đường ABC, Quận Gò Vấp, TP. Hồ Chí Minh</span>
               </li>
             </ul>
@@ -74,7 +74,7 @@ export default function Footer() {
 
           {/* Social / Follow Column (Col Span 3) */}
           <div className="md:col-span-3 flex flex-col gap-4">
-            <h3 className="text-[#c87a53] font-black text-xs tracking-widest uppercase mb-2">Kết nối</h3>
+            <h3 className="text-red-500 font-black text-xs tracking-widest uppercase mb-2">Kết nối</h3>
             <div className="flex items-center gap-3">
               <a
                 href="#"

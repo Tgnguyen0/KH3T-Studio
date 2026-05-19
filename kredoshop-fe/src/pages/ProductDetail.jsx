@@ -519,7 +519,7 @@ const ProductDetail = () => {
                   className={`flex items-center gap-1.5 px-4 h-9 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 ${
                     isComparing
                       ? "bg-accent text-white shadow-md"
-                      : "bg-[#111111] hover:bg-[#c87a53] text-white"
+                      : "bg-[#111111] hover:bg-accent text-white"
                   }`}
                 >
                   <GitCompare size={12} />{" "}
@@ -595,11 +595,11 @@ const ProductDetail = () => {
               {/* Quiet Meta Stats */}
               <div className="flex items-center gap-6 py-4 border-y border-primary/5 text-[10px] font-black tracking-widest text-primary/40 uppercase">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag size={14} className="text-[#c87a53]" />
+                  <ShoppingBag size={14} className="text-red-500" />
                   <span>Đã bán: <span className="text-primary font-black">{(product.soldQuantity || 0).toLocaleString("vi-VN")}</span></span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Star className="text-[#c87a53] fill-current" size={14} />
+                  <Star className="text-red-500 fill-current" size={14} />
                   <span>Đánh giá: <span className="text-primary font-black">{product.rating || "5.0"}</span></span>
                 </div>
               </div>
@@ -681,7 +681,7 @@ const ProductDetail = () => {
                   className={`flex-1 h-13 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                     isSoldOut
                       ? "bg-primary/5 text-primary/20 cursor-not-allowed"
-                      : "bg-[#111111] hover:bg-[#c87a53] text-white shadow-lg active:scale-98"
+                      : "bg-[#111111] hover:bg-accent text-white shadow-lg active:scale-98"
                   }`}
                 >
                   <CreditCard size={14} /> Mua ngay
@@ -765,7 +765,7 @@ const ProductDetail = () => {
 
             <button
               onClick={() => setZoomImage(null)}
-              className="absolute top-6 right-6 bg-white hover:bg-[#c87a53] text-primary hover:text-white p-3 transition-colors shadow-2xl"
+              className="absolute top-6 right-6 bg-white hover:bg-accent text-primary hover:text-white p-3 transition-colors shadow-2xl"
             >
               <X size={20} />
             </button>

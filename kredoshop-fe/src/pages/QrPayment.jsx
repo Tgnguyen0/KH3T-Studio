@@ -61,8 +61,8 @@ const QrPayment = () => {
     return (
       <div className="flex items-center justify-center min-h-[70vh] bg-secondary px-4 selection:bg-accent selection:text-white">
         <div className="bg-white p-12 border border-primary/5 text-center max-w-md w-full">
-          <div className="w-16 h-16 bg-[#c87a53]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-[#c87a53]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
@@ -77,7 +77,7 @@ const QrPayment = () => {
 
           <button
             onClick={() => navigate("/")}
-            className="w-full h-12 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md"
+            className="w-full h-12 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md"
           >
             Trở về Trang chủ
           </button>
@@ -147,7 +147,7 @@ const QrPayment = () => {
                 </div>
                 <div className="flex justify-between pb-2 border-b border-primary/5">
                   <span className="text-primary/40 font-medium">Nội dung chuyển khoản:</span>
-                  <span className="font-black text-primary bg-[#c87a53]/10 px-2 py-0.5 select-all">{invoiceCode}</span>
+                  <span className="font-black text-primary bg-red-500/10 px-2 py-0.5 select-all">{invoiceCode}</span>
                 </div>
               </div>
             </div>

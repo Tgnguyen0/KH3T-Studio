@@ -375,7 +375,7 @@ const Checkout = () => {
                   type="email"
                   name="email"
                   placeholder="Email"
-                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                   onChange={handleChange}
                   value={form.email}
                 />
@@ -387,7 +387,7 @@ const Checkout = () => {
                   type="text"
                   name="name"
                   placeholder="Họ và tên"
-                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                   onChange={handleChange}
                   value={form.name}
                 />
@@ -399,7 +399,7 @@ const Checkout = () => {
                   type="text"
                   name="phone"
                   placeholder="Số điện thoại"
-                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                   onChange={handleChange}
                   value={form.phone}
                 />
@@ -409,7 +409,7 @@ const Checkout = () => {
                 {!isAddAddress && (
                   <button
                     onClick={() => setIsAddAddress(true)}
-                    className="h-10 px-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors"
+                    className="h-10 px-4 bg-[#111111] hover:bg-accent text-white text-[9px] font-black tracking-widest uppercase transition-colors"
                   >
                     Thêm địa chỉ mới
                   </button>
@@ -422,7 +422,7 @@ const Checkout = () => {
                   <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">ĐỊA CHỈ ĐÃ LƯU</label>
                   <select
                     name="address"
-                    className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer uppercase tracking-wider text-primary"
+                    className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all cursor-pointer uppercase tracking-wider text-primary"
                     onChange={(e) => handleSelectAddress(e.target.value)}
                   >
                     <option value="">-- Chọn địa chỉ đã lưu --</option>
@@ -443,7 +443,7 @@ const Checkout = () => {
                       type="text"
                       name="delivery_address"
                       placeholder="Số nhà, tên đường..."
-                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                       onChange={handleChangeAddress}
                       value={formAddress.delivery_address}
                     />
@@ -455,7 +455,7 @@ const Checkout = () => {
                       <select
                         value={selectedProvince}
                         onChange={(e) => handleProvinceChange(e.target.value)}
-                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer"
+                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all cursor-pointer"
                       >
                         <option value="">-- Chọn Tỉnh/Thành phố --</option>
                         {provinces.map((p) => (
@@ -469,7 +469,7 @@ const Checkout = () => {
                     <div className="flex flex-col space-y-1.5">
                       <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">PHƯỜNG/XÃ</label>
                       <select
-                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer"
+                        className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all cursor-pointer"
                         disabled={!selectedProvince}
                         onChange={(e) => setSelectedWard(e.target.value)}
                       >
@@ -488,7 +488,7 @@ const Checkout = () => {
                     <textarea
                       name="delivery_note"
                       placeholder="Ghi chú giao hàng (tùy chọn)"
-                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20 w-full"
+                      className="bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20 w-full"
                       rows="2"
                       onChange={handleChangeAddress}
                       value={formAddress.delivery_note}
@@ -505,7 +505,7 @@ const Checkout = () => {
 
                     <button
                       onClick={handleAddNewAddress}
-                      className="px-4 py-2 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors"
+                      className="px-4 py-2 bg-[#111111] hover:bg-accent text-white text-[9px] font-black tracking-widest uppercase transition-colors"
                     >
                       Lưu địa chỉ
                     </button>
@@ -518,7 +518,7 @@ const Checkout = () => {
                 <textarea
                   name="note"
                   placeholder="Ghi chú thêm về đơn hàng của bạn..."
-                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20 md:col-span-2 w-full"
+                  className="bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20 md:col-span-2 w-full"
                   rows="3"
                   onChange={handleChange}
                 ></textarea>
@@ -679,7 +679,7 @@ const Checkout = () => {
 
           <button
             onClick={handleConfirm}
-            className="w-full mt-8 bg-[#111111] hover:bg-[#c87a53] text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
+            className="w-full mt-8 bg-[#111111] hover:bg-accent text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
           >
             Xác nhận đặt hàng
           </button>

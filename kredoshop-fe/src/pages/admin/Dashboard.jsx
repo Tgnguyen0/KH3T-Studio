@@ -279,7 +279,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-3">
-              <span className="text-[#c87a53] text-[9px] font-black tracking-[0.4em] uppercase">BÁO CÁO KREDO STUDIO</span>
+              <span className="text-red-500 text-[9px] font-black tracking-[0.4em] uppercase">BÁO CÁO KREDO STUDIO</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-display font-black text-white mt-2 uppercase tracking-tight">
               BẢNG ĐIỀU KHIỂN HỆ THỐNG
@@ -288,7 +288,7 @@ const Dashboard = () => {
           </div>
           <div className="md:text-right">
             <span className="text-white/30 text-[9px] font-bold tracking-widest uppercase block mb-1">Cập nhật lần cuối</span>
-            <span className="text-lg font-display font-black text-[#c87a53]">{new Date().toLocaleTimeString('vi-VN')}</span>
+            <span className="text-lg font-display font-black text-red-500">{new Date().toLocaleTimeString('vi-VN')}</span>
           </div>
         </div>
       </div>
@@ -298,7 +298,7 @@ const Dashboard = () => {
         {/* Date Filters block */}
         <div className="bg-white border border-primary/5 p-8">
           <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
-            <Calendar className="w-4 h-4 text-[#c87a53]" />
+            <Calendar className="w-4 h-4 text-red-500" />
             <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">BỘ LỌC THỜI GIAN</h2>
           </div>
 
@@ -314,7 +314,7 @@ const Dashboard = () => {
               <button
                 key={btn.action}
                 onClick={() => setQuickRange(btn.action)}
-                className="px-4 py-3 bg-secondary hover:bg-[#c87a53] hover:text-white text-primary text-[10px] font-black tracking-wider uppercase transition-all duration-300 border border-primary/5"
+                className="px-4 py-3 bg-secondary hover:bg-accent hover:text-white text-primary text-[10px] font-black tracking-wider uppercase transition-all duration-300 border border-primary/5"
               >
                 {btn.label}
               </button>
@@ -328,7 +328,7 @@ const Dashboard = () => {
                 type="date"
                 value={dateRange.start}
                 onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                className="w-full bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none border border-primary/5"
+                className="w-full bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none border border-primary/5"
               />
             </div>
             <div className="flex flex-col space-y-1.5">
@@ -337,7 +337,7 @@ const Dashboard = () => {
                 type="date"
                 value={dateRange.end}
                 onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                className="w-full bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none border border-primary/5"
+                className="w-full bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none border border-primary/5"
               />
             </div>
           </div>
@@ -349,7 +349,7 @@ const Dashboard = () => {
           {/* Card 1: Revenue */}
           <div className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all">
             <div className="flex items-start justify-between mb-4">
-              <div className="bg-secondary p-3 text-[#c87a53]">
+              <div className="bg-secondary p-3 text-red-500">
                 <DollarSign className="w-5 h-5" />
               </div>
               <div className={`flex items-center gap-1 px-2.5 py-1 border text-[9px] font-black tracking-wider uppercase ${revenueGrowth >= 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-accent bg-accent/5 border-accent/10'}`}>
@@ -359,13 +359,13 @@ const Dashboard = () => {
             </div>
             <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Tổng doanh thu</p>
             <p className="text-xl font-display font-black text-primary mt-1">{formatCurrency(totalRevenue)}</p>
-            <span className="text-[9px] text-[#c87a53] font-semibold tracking-wider block mt-2 uppercase">So với chu kỳ trước</span>
+            <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">So với chu kỳ trước</span>
           </div>
 
           {/* Card 2: Orders */}
           <div className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all">
             <div className="flex items-start justify-between mb-4">
-              <div className="bg-secondary p-3 text-[#c87a53]">
+              <div className="bg-secondary p-3 text-red-500">
                 <ShoppingCart className="w-5 h-5" />
               </div>
               <div className={`flex items-center gap-1 px-2.5 py-1 border text-[9px] font-black tracking-wider uppercase ${ordersGrowth >= 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-accent bg-accent/5 border-accent/10'}`}>
@@ -375,33 +375,33 @@ const Dashboard = () => {
             </div>
             <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Số đơn đặt hàng</p>
             <p className="text-xl font-display font-black text-primary mt-1">{totalOrders.toLocaleString()}</p>
-            <span className="text-[9px] text-[#c87a53] font-semibold tracking-wider block mt-2 uppercase">Tổng số giao dịch</span>
+            <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">Tổng số giao dịch</span>
           </div>
 
           {/* Card 3: Customers */}
           <div className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all">
             <div className="flex items-start justify-between mb-4">
-              <div className="bg-secondary p-3 text-[#c87a53]">
+              <div className="bg-secondary p-3 text-red-500">
                 <Users className="w-5 h-5" />
               </div>
               <span className="px-2 py-0.5 border border-primary/15 text-[8px] font-black uppercase tracking-wider text-primary/40">Hoạt động</span>
             </div>
             <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Khách hàng mới</p>
             <p className="text-xl font-display font-black text-primary mt-1">{totalCustomers.toLocaleString()}</p>
-            <span className="text-[9px] text-[#c87a53] font-semibold tracking-wider block mt-2 uppercase">Lượng tương tác chu kỳ</span>
+            <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">Lượng tương tác chu kỳ</span>
           </div>
 
           {/* Card 4: Average ticket */}
           <div className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all">
             <div className="flex items-start justify-between mb-4">
-              <div className="bg-secondary p-3 text-[#c87a53]">
+              <div className="bg-secondary p-3 text-red-500">
                 <Package className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 border border-primary/15 text-[8px] font-black uppercase tracking-wider text-[#c87a53]">Giá trị trung bình</span>
+              <span className="px-2 py-0.5 border border-primary/15 text-[8px] font-black uppercase tracking-wider text-red-500">Giá trị trung bình</span>
             </div>
             <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">Sản phẩm tiêu thụ</p>
             <p className="text-xl font-display font-black text-primary mt-1">{totalProducts.toLocaleString()}</p>
-            <span className="text-[9px] text-[#c87a53] font-semibold tracking-wider block mt-2 uppercase">AOV: {formatCurrency(avgOrderValue)}</span>
+            <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">AOV: {formatCurrency(avgOrderValue)}</span>
           </div>
         </div>
 
@@ -419,8 +419,8 @@ const Dashboard = () => {
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#c87a53" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#c87a53" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f1ee" />
@@ -436,7 +436,7 @@ const Dashboard = () => {
                   }}
                 />
                 <Legend style={{ fontSize: '10px' }} />
-                <Area type="monotone" dataKey="revenue" stroke="#c87a53" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" name="Doanh thu" />
+                <Area type="monotone" dataKey="revenue" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" name="Doanh thu" />
                 <Area type="monotone" dataKey="orders" stroke="#111111" strokeWidth={1.5} fillOpacity={0} name="Số đơn hàng" />
               </AreaChart>
             </ResponsiveContainer>
@@ -449,7 +449,7 @@ const Dashboard = () => {
           {/* Payment breakdown */}
           <div className="bg-white border border-primary/5 p-8">
             <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
-              <CreditCard className="w-4 h-4 text-[#c87a53]" />
+              <CreditCard className="w-4 h-4 text-red-500" />
               <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">💳 PHƯƠNG THỨC THANH TOÁN</h2>
             </div>
             <div className="space-y-6">
@@ -461,12 +461,12 @@ const Dashboard = () => {
                   <div key={idx} className="space-y-2">
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-primary">
                       <span>{displayName}</span>
-                      <span className="text-[#c87a53]">{payment.value}%</span>
+                      <span className="text-red-500">{payment.value}%</span>
                     </div>
                     <div className="h-2 bg-secondary rounded-none overflow-hidden">
                       <div
                         className="h-full bg-[#111111] transition-all duration-500"
-                        style={{ width: `${percent}%`, backgroundColor: '#c87a53' }}
+                        style={{ width: `${percent}%`, backgroundColor: '#ef4444' }}
                       ></div>
                     </div>
                     <div className="flex justify-between text-[9px] font-bold text-primary/40 uppercase tracking-wider">
@@ -482,7 +482,7 @@ const Dashboard = () => {
           {/* Hourly peek graph */}
           <div className="bg-white border border-primary/5 p-8">
             <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
-              <Clock className="w-4 h-4 text-[#c87a53]" />
+              <Clock className="w-4 h-4 text-red-500" />
               <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">⏰ KHUNG GIỜ MUA SẮM CAO ĐIỂM</h2>
             </div>
             <div className="w-full h-64">
@@ -510,7 +510,7 @@ const Dashboard = () => {
         {/* Region Breakdown */}
         <div className="bg-white border border-primary/5 p-8">
           <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
-            <MapPin className="w-4 h-4 text-[#c87a53]" />
+            <MapPin className="w-4 h-4 text-red-500" />
             <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">🗺️ HIỆU SUẤT DOANH THU THEO VÙNG MIỀN</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -533,7 +533,7 @@ const Dashboard = () => {
             <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">📋 DANH SÁCH ĐƠN HÀNG CHI TIẾT</h2>
             <button
               onClick={exportToCSV}
-              className="flex items-center gap-2 px-5 py-3 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-widest uppercase transition-colors"
+              className="flex items-center gap-2 px-5 py-3 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-widest uppercase transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               XUẤT FILE CSV

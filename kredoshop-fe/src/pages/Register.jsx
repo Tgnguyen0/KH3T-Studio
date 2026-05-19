@@ -288,13 +288,13 @@ const Register = () => {
             </div>
 
             {/* Submit */}
-            <div className="md:col-span-2 pt-8">
+             <div className="md:col-span-2 pt-8">
                <button
                 type="submit"
-                className="group w-full py-5 bg-[#111111] hover:bg-[#c87a53] text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3"
+                className="group w-full py-5 bg-[#111111] hover:bg-accent text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3"
               >
                 Tạo tài khoản KREDO
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#c87a53]" />
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-red-500" />
               </button>
             </div>
           </form>

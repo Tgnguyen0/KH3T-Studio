@@ -254,12 +254,12 @@ const Product = () => {
             {/* Left: Info */}
             <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 lg:px-20 py-12 relative">
               <div className="max-w-xl">
-                <span className="text-[#c87a53] font-black text-[9px] tracking-[0.4em] uppercase block mb-4">
+                <span className="text-red-500 font-black text-[9px] tracking-[0.4em] uppercase block mb-4">
                   {slide.collection}
                 </span>
                 <h1 className="text-4xl lg:text-6xl font-display font-black text-primary mb-6 tracking-tighter leading-tight uppercase">
                   {slide.title.replace(slide.highlight, "")}
-                  <span className="text-[#c87a53] underline decoration-1 underline-offset-8">
+                  <span className="text-red-500 underline decoration-1 underline-offset-8">
                     {slide.highlight}
                   </span>
                 </h1>
@@ -394,7 +394,7 @@ const Product = () => {
                   <input
                     type="text"
                     placeholder="Tìm kiếm sản phẩm..."
-                    className="w-full pl-12 pr-4 py-3.5 bg-secondary text-xs font-semibold rounded-none focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                    className="w-full pl-12 pr-4 py-3.5 bg-secondary text-xs font-semibold rounded-none focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -404,7 +404,7 @@ const Product = () => {
                   {/* Sort options */}
                   <div className="relative flex-1 lg:w-64">
                     <select
-                      className="appearance-none w-full px-5 py-3.5 pr-12 bg-secondary border-none rounded-none text-[10px] font-black tracking-widest text-primary focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all cursor-pointer uppercase font-display"
+                      className="appearance-none w-full px-5 py-3.5 pr-12 bg-secondary border-none rounded-none text-[10px] font-black tracking-widest text-primary focus:ring-1 focus:ring-red-500 focus:outline-none transition-all cursor-pointer uppercase font-display"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                     >
@@ -464,7 +464,7 @@ const Product = () => {
             {/* Catalog Grid list */}
             {loading && (
               <div className="flex justify-center items-center py-32">
-                <div className="w-10 h-10 border-2 border-[#c87a53] border-t-transparent animate-spin"></div>
+                <div className="w-10 h-10 border-2 border-red-500 border-t-transparent animate-spin"></div>
               </div>
             )}
 

@@ -161,7 +161,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <span className="text-2xl sm:text-3xl font-display font-black tracking-[0.18em] text-primary uppercase transition-colors group-hover:text-accent">
-              Kredo<span className="text-[#c87a53]">.</span>
+              Kredo<span className="text-red-500">.</span>
             </span>
           </Link>
 
@@ -227,14 +227,14 @@ const Header = () => {
                          autoFocus
                          type="text"
                          placeholder="Tìm kiếm sản phẩm..."
-                         className="w-full pl-10 pr-12 py-3.5 bg-secondary text-xs font-semibold rounded-xl focus:ring-1 focus:ring-[#c87a53] focus:outline-none"
+                         className="w-full pl-10 pr-12 py-3.5 bg-secondary text-xs font-semibold rounded-xl focus:ring-1 focus:ring-red-500 focus:outline-none"
                          value={searchValue}
                          onChange={(e) => setSearchValue(e.target.value)}
                          onKeyDown={handleSearch}
                        />
                        <button 
                          onClick={submitSearch}
-                         className="absolute right-2 p-2 bg-[#111111] hover:bg-[#c87a53] text-white rounded-lg transition-colors"
+                         className="absolute right-2 p-2 bg-[#111111] hover:bg-accent text-white rounded-lg transition-colors"
                        >
                          <Search size={12} />
                        </button>

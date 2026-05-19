@@ -110,12 +110,12 @@ const Home = () => {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
             <div className="max-w-2xl text-left">
-              <span className="text-[#c87a53] font-display font-black text-xs tracking-[0.6em] uppercase mb-6 block animate-fade-in-up">
+              <span className="text-red-500 font-display font-black text-xs tracking-[0.6em] uppercase mb-6 block animate-fade-in-up">
                 Season 2026
               </span>
               <h1 className="text-6xl lg:text-[7.5rem] font-display font-black text-white mb-8 tracking-tighter leading-[0.85] uppercase animate-fade-in-up anim-delay-100">
                 KREDO <br />
-                <span className="text-[#c87a53] underline decoration-2 underline-offset-16">STUDIO</span>
+                <span className="text-red-500 underline decoration-2 underline-offset-16">STUDIO</span>
               </h1>
               <p className="text-white/60 text-base lg:text-lg font-medium mb-12 max-w-lg leading-relaxed animate-fade-in-up anim-delay-200">
                 Định hình phong cách tối giản, nâng tầm bản sắc cá nhân thông qua ngôn ngữ thiết kế đương đại và nghệ thuật cắt may tỉ mỉ.
@@ -123,7 +123,7 @@ const Home = () => {
               <div className="flex gap-4 animate-fade-in-up anim-delay-300">
                 <button 
                   onClick={() => navigate("/product")}
-                  className="bg-white hover:bg-[#c87a53] text-primary hover:text-white px-10 py-5 rounded-none font-black text-xs tracking-widest uppercase transition-all duration-500 shadow-2xl"
+                  className="bg-white hover:bg-accent text-primary hover:text-white px-10 py-5 rounded-none font-black text-xs tracking-widest uppercase transition-all duration-500 shadow-2xl"
                 >
                   Mua sắm ngay
                 </button>
@@ -145,7 +145,7 @@ const Home = () => {
           </button>
           <div className="flex gap-3">
             {banners.map((_, i) => (
-              <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${i === currentBanner ? "bg-[#c87a53] scale-150" : "bg-white/20"}`} />
+              <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${i === currentBanner ? "bg-red-500 scale-150" : "bg-white/20"}`} />
             ))}
           </div>
           <button onClick={() => setCurrentBanner((prev) => (prev + 1) % banners.length)} className="text-white/40 hover:text-white transition-colors">
@@ -175,7 +175,7 @@ const Home = () => {
               key={idx} 
               className="group relative flex flex-col items-center"
             >
-              <div className="relative w-44 h-64 lg:w-56 lg:h-80 overflow-hidden rounded-full border border-primary/5 group-hover:border-[#c87a53]/30 transition-all duration-700 shadow-2xl">
+              <div className="relative w-44 h-64 lg:w-56 lg:h-80 overflow-hidden rounded-full border border-primary/5 group-hover:border-red-500/30 transition-all duration-700 shadow-2xl">
                 <img 
                   src={cat.representativeImage} 
                   alt={cat.name} 
@@ -185,15 +185,15 @@ const Home = () => {
               </div>
               
               <div className="mt-6 text-center relative">
-                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-[#c87a53] tracking-[0.5em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-500">Discover</span>
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-red-500 tracking-[0.5em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-500">Discover</span>
                 <h3 className="text-xl lg:text-2xl font-display font-black text-primary tracking-tight uppercase leading-none group-hover:text-accent transition-colors duration-500">
                   {cat.name}
                 </h3>
-                <div className="w-0 h-0.5 bg-[#c87a53] mx-auto mt-2 group-hover:w-8 transition-all duration-500"></div>
+                <div className="w-0 h-0.5 bg-red-500 mx-auto mt-2 group-hover:w-8 transition-all duration-500"></div>
               </div>
 
               {/* Decorative Number */}
-              <span className="absolute -left-6 top-8 text-5xl font-display font-black text-primary/5 select-none group-hover:text-[#c87a53]/10 transition-colors">
+              <span className="absolute -left-6 top-8 text-5xl font-display font-black text-primary/5 select-none group-hover:text-red-500/10 transition-colors">
                 0{idx + 1}
               </span>
             </Link>
@@ -219,7 +219,7 @@ const Home = () => {
                 Bán chạy nhất
               </button>
             </div>
-            <Link to="/product" className="text-[#c87a53] font-black text-xs tracking-widest uppercase hover:underline">Xem tất cả</Link>
+            <Link to="/product" className="text-red-500 font-black text-xs tracking-widest uppercase hover:underline">Xem tất cả</Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -238,22 +238,22 @@ const Home = () => {
       <section className="py-24 bg-[#fafbf9]">
          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
-                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-red-500/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-accent transition-all duration-500">
                      <Truck className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
                   <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Vận chuyển nhanh</h3>
                   <p className="text-primary/40 text-[11px] font-medium leading-relaxed max-w-[220px]">Giao hàng hỏa tốc trong vòng 24-48 giờ tại các thành phố lớn.</p>
                </div>
-               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
-                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-red-500/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-accent transition-all duration-500">
                      <Award className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
                   <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Chất lượng cao</h3>
                   <p className="text-primary/40 text-[11px] font-medium leading-relaxed max-w-[220px]">Cam kết sử dụng chất liệu vải tuyển chọn kỹ lưỡng đạt chuẩn xuất khẩu.</p>
                </div>
-               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-[#c87a53]/30 transition-all duration-500 shadow-sm">
-                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-[#c87a53] transition-all duration-500">
+               <div className="flex flex-col items-center text-center p-8 border border-primary/5 bg-white group hover:border-red-500/30 transition-all duration-500 shadow-sm">
+                  <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mb-6 group-hover:bg-accent transition-all duration-500">
                      <TrendingUp className="text-primary group-hover:text-white transition-colors" size={20} />
                   </div>
                   <h3 className="text-primary font-display font-black tracking-widest text-[11px] mb-3 uppercase">Phong cách dẫn đầu</h3>

@@ -15,17 +15,17 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setAct
   ];
 
   return (
-    <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#111111] text-white transition-all duration-300 flex flex-col border-r border-white/10 selection:bg-[#c87a53] selection:text-[#111111]`}>
+    <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-[#111111] text-white transition-all duration-300 flex flex-col border-r border-white/10 selection:bg-red-500 selection:text-[#111111]`}>
 
       {/* Sidebar Header */}
       <div className="p-6 flex items-center justify-between border-b border-white/5">
         {sidebarOpen ? (
           <div className="flex flex-col">
             <span className="text-sm font-display font-black tracking-[0.2em] text-white">KREDO STUDIO</span>
-            <span className="text-[8px] font-bold tracking-widest text-[#c87a53] uppercase mt-1">ADMINISTRATOR</span>
+            <span className="text-[8px] font-bold tracking-widest text-red-500 uppercase mt-1">ADMINISTRATOR</span>
           </div>
         ) : (
-          <span className="text-xs font-display font-black text-[#c87a53]">KR</span>
+          <span className="text-xs font-display font-black text-red-500">KR</span>
         )}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -45,12 +45,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setAct
               onClick={() => setActiveTab(item.key)}
               className={`w-full flex items-center gap-3.5 p-3.5 transition-all relative font-display font-black text-[10px] tracking-widest uppercase rounded-none
                 ${isActive
-                  ? 'text-[#c87a53] bg-white/5 border-l-2 border-[#c87a53]'
+                  ? 'text-red-500 bg-white/5 border-l-2 border-red-500'
                   : 'text-white/55 hover:text-white hover:bg-white/5 border-l-2 border-transparent'
                 }
               `}
             >
-              <span className={isActive ? 'text-[#c87a53]' : 'text-white/40 group-hover:text-white'}>
+              <span className={isActive ? 'text-red-500' : 'text-white/40 group-hover:text-white'}>
                 {item.icon}
               </span>
               {sidebarOpen && <span>{item.label}</span>}

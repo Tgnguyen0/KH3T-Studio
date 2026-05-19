@@ -75,7 +75,7 @@ const Order = () => {
       },
       CONFIRMED: {
         label: "Đã xác nhận",
-        color: "text-[#c87a53] border-[#c87a53]/20 bg-[#c87a53]/5",
+        color: "text-red-500 border-red-500/20 bg-red-500/5",
         icon: <CheckCircle size={12} />,
       },
       SHIPPING: {
@@ -210,11 +210,11 @@ const Order = () => {
 
         {loading ? (
           <div className="flex justify-center items-center py-24">
-            <div className="w-10 h-10 border-2 border-[#c87a53] border-t-transparent animate-spin"></div>
+            <div className="w-10 h-10 border-2 border-red-500 border-t-transparent animate-spin"></div>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="text-center py-24 bg-white border border-primary/5">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary mb-6 text-[#c87a53]">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary mb-6 text-red-500">
               <Package size={28} />
             </div>
             <h3 className="text-sm font-display font-black uppercase tracking-[0.2em] mb-3 text-primary">Không có đơn hàng nào</h3>
@@ -223,7 +223,7 @@ const Order = () => {
             </p>
             <button
               onClick={() => navigate("/product")}
-              className="px-8 py-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors"
+              className="px-8 py-4 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors"
             >
               MUA SẮM NGAY
             </button>
@@ -241,7 +241,7 @@ const Order = () => {
                   <div className="p-6 sm:p-8 bg-secondary/50 border-b border-primary/5 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-1">
                       <p className="text-xs font-black text-primary uppercase tracking-widest">
-                        Mã đơn hàng: <span className="text-[#c87a53]">{order.orderCode}</span>
+                        Mã đơn hàng: <span className="text-red-500">{order.orderCode}</span>
                       </p>
                       <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">
                         Thời gian: {formatDate(order.orderDate)}
@@ -279,7 +279,7 @@ const Order = () => {
                         <div key={detail.id} className="py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 first:pt-0 last:pb-0">
                           <div className="flex-1 min-w-0">
                             <h4
-                              className="font-display font-black text-xs text-primary uppercase tracking-wider hover:text-[#c87a53] transition-colors cursor-pointer"
+                              className="font-display font-black text-xs text-primary uppercase tracking-wider hover:text-red-500 transition-colors cursor-pointer"
                               onClick={() =>
                                 navigate(`/product/${detail.productId}`)
                               }
@@ -337,7 +337,7 @@ const Order = () => {
                         {order.statusOrder === "COMPLETED" && (
                           <button
                             onClick={() => navigate("/product")}
-                            className="px-6 py-3 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-widest uppercase transition-all"
+                            className="px-6 py-3 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-widest uppercase transition-all"
                           >
                             Mua lại
                           </button>

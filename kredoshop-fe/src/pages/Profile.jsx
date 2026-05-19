@@ -265,7 +265,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                             setShowAddForm(!showAddForm);
                             handleCancelEdit();
                         }}
-                        className="text-[10px] font-black uppercase tracking-widest text-[#c87a53] hover:underline"
+                        className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:underline"
                     >
                         {showAddForm ? "Hủy" : "+ Thêm mới"}
                     </button>
@@ -286,7 +286,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                     onSubmit={handleEditAddress}
                                     className="bg-secondary p-6 border border-primary/10 space-y-4"
                                 >
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#c87a53]">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-red-500">
                                         Chỉnh sửa địa chỉ
                                     </h4>
 
@@ -298,7 +298,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             onChange={handleEditFormChange}
                                             placeholder="Số nhà, tên đường..."
                                             required
-                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                                         />
                                     </div>
 
@@ -310,7 +310,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             onChange={handleEditFormChange}
                                             placeholder="Tỉnh/Thành phố"
                                             required
-                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                                         />
                                     </div>
 
@@ -321,7 +321,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             value={editForm.delivery_note}
                                             onChange={handleEditFormChange}
                                             placeholder="Ghi chú giao hàng..."
-                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                                         />
                                     </div>
 
@@ -329,7 +329,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                         <button
                                             type="submit"
                                             disabled={isAddressLoading(editForm.id)}
-                                            className="flex-1 py-3 bg-[#111111] hover:bg-[#c87a53] text-white text-[9px] font-black tracking-widest uppercase transition-colors disabled:opacity-50"
+                                            className="flex-1 py-3 bg-[#111111] hover:bg-accent text-white text-[9px] font-black tracking-widest uppercase transition-colors disabled:opacity-50"
                                         >
                                             {isAddressLoading(editForm.id) ? "Đang lưu..." : "Lưu thay đổi"}
                                         </button>
@@ -354,7 +354,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                                             {addr.province}
                                         </p>
                                         {addr.delivery_note && (
-                                            <p className="text-[10px] text-[#c87a53] font-semibold italic">
+                                            <p className="text-[10px] text-red-500 font-semibold italic">
                                                 Ghi chú: {addr.delivery_note}
                                             </p>
                                         )}
@@ -394,7 +394,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                     onSubmit={handleAddAddress}
                     className="mt-8 bg-secondary p-6 border border-primary/10 space-y-4"
                 >
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#c87a53]">Thêm địa chỉ mới</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-red-500">Thêm địa chỉ mới</h4>
 
                     <div className="flex flex-col space-y-1.5">
                         <label className="text-[9px] font-black tracking-widest text-primary/40 uppercase">Địa chỉ chi tiết</label>
@@ -404,7 +404,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                             onChange={handleNewAddressChange}
                             placeholder="Số nhà, tên đường..."
                             required
-                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                         />
                     </div>
 
@@ -416,7 +416,7 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                             onChange={handleNewAddressChange}
                             placeholder="Tỉnh/Thành phố"
                             required
-                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                         />
                     </div>
 
@@ -427,13 +427,13 @@ const AddressSection = ({ accountId, isCustomerProfile }) => {
                             value={newAddress.delivery_note}
                             onChange={handleNewAddressChange}
                             placeholder="Ghi chú giao hàng..."
-                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-[#c87a53] focus:outline-none transition-all placeholder-primary/20"
+                            className="w-full bg-white p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
                         />
                     </div>
 
                     <button
                         disabled={isAddressLoading("ADD_NEW")}
-                        className="w-full py-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50"
+                        className="w-full py-4 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50"
                     >
                         {isAddressLoading("ADD_NEW") ? "Đang lưu..." : "Lưu địa chỉ"}
                     </button>
@@ -587,7 +587,7 @@ const Profile = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-[70vh] bg-secondary">
-                <div className="w-10 h-10 border-2 border-[#c87a53] border-t-transparent animate-spin"></div>
+                <div className="w-10 h-10 border-2 border-red-500 border-t-transparent animate-spin"></div>
             </div>
         );
     }
@@ -601,7 +601,7 @@ const Profile = () => {
                 {/* Header */}
                 <div className="flex justify-between items-end mb-12 pb-6 border-b border-primary/5">
                     <h1 className="text-3xl lg:text-4xl font-display font-black uppercase tracking-tight text-primary">Hồ sơ cá nhân</h1>
-                    <span className="text-[10px] font-black tracking-widest text-[#c87a53] uppercase">
+                    <span className="text-[10px] font-black tracking-widest text-red-500 uppercase">
                         KREDO MEMBER ID: #{formData.id}
                     </span>
                 </div>
@@ -631,7 +631,7 @@ const Profile = () => {
                                 onChange={handleChange}
                                 placeholder="Họ và tên của bạn"
                                 className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all placeholder-primary/20 ${
-                                    errors.fullName ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                    errors.fullName ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-red-500'
                                 }`}
                             />
                             {errors.fullName && (
@@ -648,7 +648,7 @@ const Profile = () => {
                                 onChange={handleChange}
                                 placeholder="Số điện thoại của bạn"
                                 className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all placeholder-primary/20 ${
-                                    errors.phoneNumber ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                    errors.phoneNumber ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-red-500'
                                 }`}
                             />
                             {errors.phoneNumber && (
@@ -665,7 +665,7 @@ const Profile = () => {
                                 value={formData.dateOfBirth}
                                 onChange={handleChange}
                                 className={`w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all ${
-                                    errors.dateOfBirth ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-[#c87a53]'
+                                    errors.dateOfBirth ? 'ring-1 ring-accent' : 'focus:ring-1 focus:ring-red-500'
                                 }`}
                             />
                             {errors.dateOfBirth && (
@@ -680,7 +680,7 @@ const Profile = () => {
                                 name="gender"
                                 value={formData.gender}
                                 onChange={handleChange}
-                                className="w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all cursor-pointer focus:ring-1 focus:ring-[#c87a53]"
+                                className="w-full bg-secondary p-3 text-xs font-semibold focus:outline-none transition-all cursor-pointer focus:ring-1 focus:ring-red-500"
                             >
                                 <option value="MALE">Nam</option>
                                 <option value="FEMALE">Nữ</option>
@@ -691,7 +691,7 @@ const Profile = () => {
                         {/* Save Button */}
                         <button
                             disabled={!hasChanged || saving}
-                            className="w-full mt-4 py-4 bg-[#111111] hover:bg-[#c87a53] text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full mt-4 py-4 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {saving ? "Đang lưu..." : "Lưu thay đổi"}
                         </button>

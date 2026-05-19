@@ -150,12 +150,12 @@ const Login = () => {
               </div>
 
               <div className="pt-6 space-y-4">
-                <button
+                 <button
                   type="submit"
-                  className="group w-full py-5 bg-[#111111] hover:bg-[#c87a53] text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3"
+                  className="group w-full py-5 bg-[#111111] hover:bg-accent text-white font-black text-xs uppercase tracking-[0.3em] transition-colors duration-500 shadow-md flex items-center justify-center gap-3"
                 >
                   Đăng nhập ngay
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#c87a53]" />
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-red-500" />
                 </button>
                 
                 <div className="flex items-center justify-center gap-4 py-2">

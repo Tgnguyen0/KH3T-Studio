@@ -127,13 +127,13 @@ const ChatBot = () => {
           setChatOpen(!chatOpen);
           window.dispatchEvent(new Event(chatOpen ? "chatbotClosed" : "chatbotOpened"));
         }}
-        className="group fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-[#c87a53] via-[#c87a53] to-[#c87a53] rounded-full shadow-[0_8px_30px_rgba(200,122,83,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 ring-4 ring-white/50 cursor-pointer"
+        className="group fixed bottom-6 right-6 z-50 w-16 h-16 bg-accent hover:bg-accent-hover rounded-full shadow-[0_8px_30px_rgba(185,28,28,0.4)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 ring-4 ring-white/50 cursor-pointer"
       >
-        <div className="absolute inset-0 -z-10 rounded-full bg-[#c87a53]/60 blur-xl opacity-70 group-hover:opacity-100 transition duration-300"></div>
+        <div className="absolute inset-0 -z-10 rounded-full bg-accent/60 blur-xl opacity-70 group-hover:opacity-100 transition duration-300"></div>
         
         {/* Pulse ring animation when chat is closed */}
         {!chatOpen && (
-          <div className="absolute inset-0 rounded-full bg-[#c87a53] animate-ping opacity-25"></div>
+          <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-25"></div>
         )}
 
         <div className={`transition-transform duration-300 ${chatOpen ? 'rotate-90' : 'rotate-0'}`}>
@@ -154,7 +154,7 @@ const ChatBot = () => {
         }`}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#c87a53] via-[#c87a53] to-[#c87a53] text-white p-4 flex justify-between items-center shadow-md">
+        <div className="bg-accent text-white p-4 flex justify-between items-center shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 bg-white rounded-full overflow-hidden border-2 border-white shadow-md relative">
               <img
@@ -191,7 +191,7 @@ const ChatBot = () => {
               className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               {msg.sender === "user" ? (
-                <div className="max-w-[75%] px-4 py-3 rounded-2xl bg-gradient-to-br from-[#c87a53] to-[#c87a53] text-white rounded-tr-none shadow-md shadow-[#c87a53]/10 text-sm leading-relaxed">
+                <div className="max-w-[75%] px-4 py-3 rounded-2xl bg-accent text-white rounded-tr-none shadow-md shadow-accent/10 text-sm leading-relaxed">
                   {msg.text}
                 </div>
               ) : (
@@ -213,21 +213,21 @@ const ChatBot = () => {
                             href={`/product/${product.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group block p-3.5 bg-gradient-to-r from-[#c87a53]/5 to-[#c87a53]/10 hover:from-[#c87a53]/10 hover:to-[#c87a53]/15 rounded-xl border border-[#c87a53]/20 hover:border-[#c87a53]/40 hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+                            className="group block p-3.5 bg-accent/5 hover:bg-accent/10 rounded-xl border border-accent/20 hover:border-accent/40 hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
                           >
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-[#c87a53]/10 flex items-center justify-center text-[#c87a53]">
+                                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
                                   <ShoppingBag className="w-4 h-4" />
                                 </div>
                                 <div>
-                                  <p className="font-semibold text-[#c87a53] text-xs group-hover:text-[#c87a53] transition-colors">
+                                  <p className="font-semibold text-red-500 text-xs group-hover:text-red-500 transition-colors">
                                     Xem sản phẩm: {product.name}
                                   </p>
                                   <p className="text-[10px] text-gray-500 mt-0.5">Click để xem chi tiết sản phẩm</p>
                                 </div>
                               </div>
-                              <ArrowRight className="w-4 h-4 text-[#c87a53]/70 group-hover:text-[#c87a53] transition-colors transform group-hover:translate-x-1 duration-300" />
+                              <ArrowRight className="w-4 h-4 text-red-500/70 group-hover:text-red-500 transition-colors transform group-hover:translate-x-1 duration-300" />
                             </div>
                           </a>
                         ))}
@@ -271,9 +271,9 @@ const ChatBot = () => {
               </div>
               <div className="bg-white px-4 py-3 rounded-2xl shadow-sm border border-gray-100 rounded-tl-none">
                 <div className="flex space-x-1.5 items-center h-4">
-                  <div className="w-2 h-2 bg-[#c87a53]/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-[#c87a53]/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-[#c87a53]/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-2 h-2 bg-red-500/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-red-500/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-red-500/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             </div>
@@ -290,13 +290,13 @@ const ChatBot = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Nhập câu hỏi của bạn..."
-              className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#c87a53]/20 focus:border-[#c87a53] text-sm transition"
+              className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-sm transition"
               disabled={chatLoading}
             />
             <button
               onClick={sendMessage}
               disabled={chatLoading || !input.trim()}
-              className="w-11 h-11 bg-gradient-to-r from-[#c87a53] to-[#c87a53] hover:from-[#c87a53] hover:to-[#8c5031] text-white rounded-full flex items-center justify-center shadow-md shadow-[#c87a53]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
+              className="w-11 h-11 bg-accent hover:bg-accent-hover text-white rounded-full flex items-center justify-center shadow-md shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 flex-shrink-0 cursor-pointer"
             >
               <Send className="w-4 h-4" />
             </button>

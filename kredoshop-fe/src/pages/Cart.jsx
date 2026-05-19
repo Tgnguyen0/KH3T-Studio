@@ -332,7 +332,7 @@ const Cart = () => {
                     <div className="lg:col-span-8">
                         <div className="flex justify-between items-end mb-12 pb-6 border-b border-primary/5">
                             <h1 className="text-3xl lg:text-4xl font-display font-black uppercase tracking-tight text-primary">Giỏ hàng của bạn</h1>
-                            <span className="text-[10px] font-black tracking-widest text-[#c87a53] uppercase cursor-pointer hover:underline">
+                            <span className="text-[10px] font-black tracking-widest text-red-500 uppercase cursor-pointer hover:underline">
                                 🔍︎ Theo dõi đơn hàng
                             </span>
                         </div>
@@ -459,7 +459,7 @@ const Cart = () => {
                                     placeholder="MÃ GIẢM GIÁ"
                                     className="flex-grow bg-transparent p-3 text-[10px] font-black tracking-widest uppercase focus:outline-none placeholder-primary/20"
                                 />
-                                <button className="bg-[#111111] hover:bg-[#c87a53] text-white px-5 text-[9px] font-black tracking-widest uppercase transition-colors">
+                                <button className="bg-[#111111] hover:bg-accent text-white px-5 text-[9px] font-black tracking-widest uppercase transition-colors">
                                     ÁP DỤNG
                                 </button>
                             </div>
@@ -490,7 +490,7 @@ const Cart = () => {
 
                         <button
                           onClick={handleCheckout}
-                          className="w-full mt-8 bg-[#111111] hover:bg-[#c87a53] text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
+                          className="w-full mt-8 bg-[#111111] hover:bg-accent text-white py-4 text-[10px] font-black tracking-[0.2em] uppercase transition-colors shadow-md active:scale-98"
                         >
                             Tiến hành thanh toán
                         </button>

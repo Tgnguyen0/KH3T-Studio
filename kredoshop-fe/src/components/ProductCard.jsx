@@ -128,7 +128,7 @@ const ProductCard = ({
 
             {/* DISCOUNT TAG */}
             {!isSoldOut && product.discountAmount > 0 && (
-              <div className="absolute top-3 left-3 bg-[#c87a53] text-[#111111] px-2 py-1 text-[9px] font-black tracking-widest uppercase">
+              <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase">
                 -{product.discountAmount}%
               </div>
             )}
@@ -234,7 +234,7 @@ const ProductCard = ({
                 {/* VIEW DETAIL */}
                 <button
                   onClick={goToDetail}
-                  className="px-6 h-10 text-[10px] font-black uppercase tracking-widest bg-primary hover:bg-[#c87a53] text-white transition-all duration-300 flex items-center justify-center gap-2"
+                  className="px-6 h-10 text-[10px] font-black uppercase tracking-widest bg-primary hover:bg-accent text-white transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   Mua ngay
                 </button>
@@ -284,7 +284,7 @@ const ProductCard = ({
 
           {/* DISCOUNT */}
           {!isSoldOut && product.discountAmount > 0 && (
-            <div className="absolute top-3 left-3 bg-[#c87a53] text-[#111111] px-2 py-1 text-[9px] font-black tracking-widest uppercase z-10">
+            <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase z-10">
               -{product.discountAmount}%
             </div>
           )}
@@ -309,7 +309,7 @@ const ProductCard = ({
               <p className="text-[8px] font-black text-primary/40 uppercase tracking-widest mb-1.5">Kích cỡ sẵn có</p>
               <div className="flex justify-center gap-1.5 flex-wrap">
                 {availableSizes.map((size) => (
-                  <span key={size} className="text-[9px] font-black text-primary border border-primary/10 px-2 py-0.5 bg-secondary uppercase hover:bg-[#c87a53] hover:text-white hover:border-transparent transition-colors">
+                  <span key={size} className="text-[9px] font-black text-primary border border-primary/10 px-2 py-0.5 bg-secondary uppercase hover:bg-accent hover:text-white hover:border-transparent transition-colors">
                     {size}
                   </span>
                 ))}
@@ -392,7 +392,7 @@ const ProductCard = ({
             {/* Shopping Cart Trigger */}
             <button
               onClick={goToDetail}
-              className="w-9 h-9 bg-primary hover:bg-[#c87a53] text-white transition-all duration-300 flex items-center justify-center shadow-md active:scale-95"
+              className="w-9 h-9 bg-primary hover:bg-accent text-white transition-all duration-300 flex items-center justify-center shadow-md active:scale-95"
             >
               <ShoppingCart size={15} />
             </button>
