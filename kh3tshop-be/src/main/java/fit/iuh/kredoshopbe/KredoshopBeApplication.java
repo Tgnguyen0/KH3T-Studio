@@ -10,10 +10,10 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableAsync
-public class Kh3tshopBeApplication {
+public class KredoshopBeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Kh3tshopBeApplication.class, args);
+        SpringApplication.run(KredoshopBeApplication.class, args);
     }
 
     @Bean

@@ -17,17 +17,6 @@ public class GeminiService {
 
     private final WebClient webClient;
 
-    // System prompt chuyên biệt cho web thời trang
-    private static final String FASHION_SYSTEM_PROMPT = """
-            Bạn là trợ lý tư vấn thời trang chuyên nghiệp của shop KH3T.
-            Nhiệm vụ của bạn:
-            - Tư vấn phối đồ, chọn size, màu sắc phù hợp với khách hàng
-            - Gợi ý sản phẩm dựa trên nhu cầu và phong cách của khách
-            - Trả lời các câu hỏi về chất liệu, cách bảo quản quần áo
-            - Hỗ trợ đơn hàng, đổi trả, chính sách shop
-            Luôn trả lời bằng tiếng Việt, thân thiện và ngắn gọn.
-            """;
-
     public GeminiService(WebClient webClient) {
         this.webClient = webClient;
     }
@@ -36,16 +25,8 @@ public class GeminiService {
         String url = "/models/gemini-2.5-flash:generateContent?key=" + apiKey;
 
         Map<String, Object> requestBody = Map.of(
-                "system_instruction", Map.of(
-                        "parts", List.of(Map.of("text", FASHION_SYSTEM_PROMPT))
-                ),
                 "contents", List.of(
                         Map.of("parts", List.of(Map.of("text", prompt)))
-                ),
-                "generationConfig", Map.of(
-                        "temperature", 0.7,       // Sáng tạo vừa phải
-                        "maxOutputTokens", 500,   // Giới hạn độ dài trả lời
-                        "topP", 0.9
                 )
         );
 

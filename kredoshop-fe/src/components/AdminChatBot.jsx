@@ -1,4 +1,4 @@
-// src/components/AdminChatBot.jsx
+// src/components/AdminChatBot
 import { useState, useEffect, useRef } from "react";
 
 const AdminChatBot = () => {
