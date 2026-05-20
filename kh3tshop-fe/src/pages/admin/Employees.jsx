@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaEdit, FaPlus, FaTrash, FaEnvelope, FaStar, FaEye, FaMailBulk, FaBan } from "react-icons/fa";
+import {
+  FaUser,
+  FaEdit,
+  FaPlus,
+  FaTrash,
+  FaEnvelope,
+  FaStar,
+  FaEye,
+  FaMailBulk,
+  FaBan,
+  FaCheck,
+} from "react-icons/fa";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -220,27 +231,44 @@ export default function Employees() {
     }
   };
 
-  const blockAccount = async (account) => {
+  const toggleAccountStatus = async (account) => {
     try {
       setLoading(true);
 
+      const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
+
       const res = await fetch(
-        `http://localhost:8080/accounts/admin/delete/${account.id}`,
+        `http://localhost:8080/accounts/admin/update/${account.id}`,
         {
-          method: "DELETE",
+          method: "PUT",
           headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        }
+          body: JSON.stringify({
+            username: account.username,
+            role: account.role,
+            statusLogin: newStatus,
+
+            customer: {
+              fullName: account.customer.fullName,
+              phoneNumber: account.customer.phoneNumber,
+              email: account.customer.email,
+              gender: account.customer.gender,
+              dateOfBirth: account.customer.dateOfBirth,
+            },
+          }),
+        },
       );
 
-      if (!res.ok) throw new Error(`Block failed: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Update failed: ${res.status}`);
+      }
 
-      await loadCustomers(); // <-- thêm để refresh UI
+      await loadCustomers();
     } catch (err) {
       console.error(err);
-      alert(err.message || "Lỗi khi block tài khoản");
+      alert(err.message || "Lỗi khi cập nhật trạng thái");
     } finally {
       setLoading(false);
     }
@@ -443,14 +471,10 @@ export default function Employees() {
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center font-bold shadow">
-                            {c.customer.fullName?.charAt(0) || "N"}
-                          </div>
                           <div>
                             <p className="font-bold text-gray-800">
                               {c.customer.fullName}
                             </p>
-                            <p className="text-xs text-gray-500">Nhân viên</p>
                           </div>
                         </div>
                       </td>
@@ -485,19 +509,29 @@ export default function Employees() {
                             onClick={() => openDetail(c)}
                             className="px-3 py-2 rounded-xl bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700 transition-all flex items-center gap-2"
                           >
-                            <FaEye /> Chi Tiết
+                            <FaEye />
                           </button>
                           <button
                             onClick={() => openEdit(c)}
                             className="px-3 py-2 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 transition-all flex items-center gap-2"
                           >
-                            <FaEdit /> Cập Nhật
+                            <FaEdit />
                           </button>
                           <button
-                            onClick={() => blockAccount(c)}
-                            className="px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 transition-all flex items-center gap-2"
+                            onClick={() => toggleAccountStatus(c)}
+                            className={`px-3 py-2 rounded-xl transition-all flex items-center gap-2
+    ${
+      c.statusLogin === "ACTIVE"
+        ? "bg-red-100 hover:bg-red-200 text-red-700"
+        : "bg-emerald-100 hover:bg-emerald-200 text-emerald-700"
+    }
+  `}
                           >
-                            <FaBan /> Khóa
+                            {c.statusLogin === "ACTIVE" ? (
+                              <FaBan />
+                            ) : (
+                              <FaCheck />
+                            )}
                           </button>
                         </div>
                       </td>

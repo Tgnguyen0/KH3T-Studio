@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { FaUser, FaEdit, FaPlus, FaTrash, FaEnvelope, FaStar, FaEye, FaMailBulk, FaBan } from "react-icons/fa";
+import {
+  FaUser,
+  FaEdit,
+  FaPlus,
+  FaTrash,
+  FaEnvelope,
+  FaStar,
+  FaEye,
+  FaMailBulk,
+  FaBan,
+  FaCheck,
+} from "react-icons/fa";
 import AdminChatBot from '../../components/AdminChatBot';
 export default function Customers() {
   const [accounts, setAccounts] = useState([]);
@@ -213,27 +224,45 @@ export default function Customers() {
     }
   };
 
-  const blockAccount = async (account) => {
+  const toggleAccountStatus = async (account) => {
     try {
       setLoading(true);
 
+      // đổi trạng thái
+      const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
+
       const res = await fetch(
-        `http://localhost:8080/accounts/admin/delete/${account.id}`,
+        `http://localhost:8080/accounts/admin/update/${account.id}`,
         {
-          method: "DELETE",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            username: account.username,
+            role: account.role,
+            statusLogin: newStatus,
+
+            customer: {
+              fullName: account.customer.fullName,
+              phoneNumber: account.customer.phoneNumber,
+              email: account.customer.email,
+              gender: account.customer.gender,
+              dateOfBirth: account.customer.dateOfBirth,
+            },
+          }),
         },
       );
 
-      if (!res.ok) throw new Error(`Block failed: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Update status failed: ${res.status}`);
+      }
 
-      await loadCustomers(); // <-- thêm để refresh UI
+      await loadCustomers();
     } catch (err) {
       console.error(err);
-      alert(err.message || "Lỗi khi block tài khoản");
+      alert(err.message || "Lỗi khi cập nhật trạng thái");
     } finally {
       setLoading(false);
     }
@@ -420,7 +449,6 @@ export default function Customers() {
                       {/* USER */}
                       <td className="px-5 py-5">
                         <div className="flex items-center gap-4">
-                          
                           <h3 className="font-semibold text-gray-800 text-sm">
                             {c.customer.fullName}
                           </h3>
@@ -472,10 +500,20 @@ export default function Customers() {
                           </button>
 
                           <button
-                            onClick={() => blockAccount(c)}
-                            className="w-10 h-10 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-300 flex items-center justify-center"
+                            onClick={() => toggleAccountStatus(c)}
+                            className={`w-10 h-10 rounded-xl transition-all duration-300 flex items-center justify-center
+    ${
+      c.statusLogin === "ACTIVE"
+        ? "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
+        : "bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+    }
+  `}
                           >
-                            <FaBan size={15} />
+                            {c.statusLogin === "ACTIVE" ? (
+                              <FaBan size={15} />
+                            ) : (
+                              <FaCheck size={15} />
+                            )}
                           </button>
                         </div>
                       </td>

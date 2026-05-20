@@ -1001,9 +1001,7 @@ const Dashboard = () => {
                             {order.customer}
                           </p>
 
-                          <p className="text-xs text-slate-500">
-                            Khách hàng thân thiết
-                          </p>
+                          
                         </div>
                       </div>
                     </td>
