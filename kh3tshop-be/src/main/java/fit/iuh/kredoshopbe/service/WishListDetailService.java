@@ -96,6 +96,8 @@ public class WishListDetailService {
                 .productName(p.getName())
                 .productImage(p.getImageUrlFront())
                 .productPrice(p.getPrice())
+                .productCostPrice(p.getCostPrice())
+                .productQuantity(p.getQuantity())
                 .discountAmount((int) p.getDiscountAmount())
                 .build();
     }

@@ -356,6 +356,32 @@ const ProductDetail = () => {
   const totalStock = uniqueSizes.reduce((sum, size) => sum + size.quantity, 0);
   const isSoldOut = totalStock === 0;
 
+  const getDiscountPercentage = () => {
+    if (!product.discountAmount || product.discountAmount <= 0) return 0;
+    if (product.discountAmount > 100) {
+      return Math.round((product.discountAmount / (product.price + product.discountAmount)) * 100);
+    }
+    return Math.round(product.discountAmount);
+  };
+
+  const getPrices = () => {
+    const hasDiscount = product.discountAmount > 0;
+    if (!hasDiscount) {
+      return { currentPrice: product.price, originalPrice: null };
+    }
+    if (product.discountAmount > 100) {
+      return {
+        currentPrice: product.price,
+        originalPrice: product.price + product.discountAmount
+      };
+    } else {
+      return {
+        currentPrice: product.costPrice || product.price,
+        originalPrice: product.price
+      };
+    }
+  };
+
 
 
   const renderSizeChart = () => {
@@ -669,7 +695,9 @@ const ProductDetail = () => {
                       : product.imageUrlBack
                   }
                   alt={product.name}
-                  className="w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105"
+                  className={`w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105 ${
+                    isSoldOut ? "blur-[1px] opacity-60 grayscale-[40%]" : ""
+                  }`}
                   onClick={() => handleZoom(currentImage)}
                 />
                 
@@ -691,11 +719,16 @@ const ProductDetail = () => {
                 
                 <div className="flex items-center gap-3">
                   <span className="text-2xl lg:text-3xl font-display font-black text-accent tracking-tight">
-                     {formatPrice(product.costPrice || product.price)}
+                     {formatPrice(getPrices().currentPrice)}
                   </span>
-                  {!isSoldOut && product.discountAmount > 0 && (
+                  {!isSoldOut && getPrices().originalPrice && (
                     <span className="text-sm text-primary/30 line-through font-medium">
-                      {formatPrice(product.price)}
+                      {formatPrice(getPrices().originalPrice)}
+                    </span>
+                  )}
+                  {!isSoldOut && getDiscountPercentage() > 0 && (
+                    <span className="bg-red-500 text-white px-2 py-0.5 text-[9px] font-black tracking-widest uppercase">
+                      -{getDiscountPercentage()}%
                     </span>
                   )}
                 </div>

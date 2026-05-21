@@ -164,10 +164,12 @@ def main():
                 compare_price = first_variant.get('compare_at_price')
                 
                 discount_amount = 0.0
+                original_price = price
                 if compare_price:
                     compare_price_float = float(compare_price)
                     if compare_price_float > price:
-                        discount_amount = compare_price_float - price
+                        original_price = compare_price_float
+                        discount_amount = round(((compare_price_float - price) / compare_price_float) * 100, 0)
                 
                 # Images
                 images = p.get('images', [])
@@ -178,23 +180,6 @@ def main():
                 category_id = get_category_id(title, product_type)
                 form, material = get_form_and_material(title, body_html)
                 
-                # Insert Product
-                sql_product = """
-                    INSERT INTO product (
-                        product_name, description, price, cost_price, unit, quantity, 
-                        image_url_front, image_url_back, created_at, updated_at, brand, rating, 
-                        category, discount_amount, form, material, status
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """
-                
-                cursor.execute(sql_product, (
-                    title, desc, price, price, 'Cai', 100, 
-                    img_front, img_back, current_date, current_date, vendor, 4.5,
-                    category_id, discount_amount, form, material, 'ACTIVE'
-                ))
-                product_id = cursor.lastrowid
-                
-                # Link sizes via size_detail
                 # Shopify options: determine which option represents Size
                 size_option_idx = None
                 for idx, opt in enumerate(p.get('options', [])):
@@ -202,6 +187,9 @@ def main():
                         size_option_idx = idx
                         break
                 
+                is_product_out_of_stock = (imported_count % 8 == 0) # Every 8th product is completely out of stock
+                
+                size_details_to_insert = []
                 added_sizes_for_product = set()
                 
                 for var in variants:
@@ -220,6 +208,42 @@ def main():
                     if size_name in added_sizes_for_product:
                         continue
                     
+                    # Determine size quantity
+                    if is_product_out_of_stock:
+                        qty = 0
+                    else:
+                        # Make some specific clothes/shoes sizes out of stock for diversity
+                        if size_name in ["S", "38", "39"] and (imported_count % 3 == 0):
+                            qty = 0
+                        elif size_name in ["XL", "41", "42"] and (imported_count % 4 == 0):
+                            qty = 0
+                        else:
+                            qty = 25
+                    
+                    size_details_to_insert.append((size_name, qty))
+                    added_sizes_for_product.add(size_name)
+                
+                # Sum size quantities to get total product quantity
+                total_product_qty = sum(qty for _, qty in size_details_to_insert)
+                
+                # Insert Product
+                sql_product = """
+                    INSERT INTO product (
+                        product_name, description, price, cost_price, unit, quantity, 
+                        image_url_front, image_url_back, created_at, updated_at, brand, rating, 
+                        category, discount_amount, form, material, status
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                
+                cursor.execute(sql_product, (
+                    title, desc, original_price, price, 'Cai', total_product_qty, 
+                    img_front, img_back, current_date, current_date, vendor, 4.5,
+                    category_id, discount_amount, form, material, 'ACTIVE'
+                ))
+                product_id = cursor.lastrowid
+                
+                # Insert size details
+                for size_name, qty in size_details_to_insert:
                     # Ensure size exists in `size` table
                     if size_name not in size_cache:
                         cursor.execute("INSERT INTO size (name_size) VALUES (%s)", (size_name,))
@@ -229,8 +253,7 @@ def main():
                     
                     # Insert size detail
                     sql_size_detail = "INSERT INTO size_detail (product_id, size_id, quantity) VALUES (%s, %s, %s)"
-                    cursor.execute(sql_size_detail, (product_id, size_id, 25))
-                    added_sizes_for_product.add(size_name)
+                    cursor.execute(sql_size_detail, (product_id, size_id, qty))
                 
                 imported_count += 1
                 if imported_count % 10 == 0:

@@ -38,7 +38,7 @@ const Product = () => {
   // Hero slide index
   const [activeSlide, setActiveSlide] = useState(0);
 
-  const itemsPerPage = 9;
+  const itemsPerPage = 12;
 
   // Hero Campaign Slides
   const slides = [

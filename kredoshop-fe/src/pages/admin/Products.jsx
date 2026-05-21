@@ -731,7 +731,9 @@ export default function Products({ initialFilter = 'ALL' }) {
                             Giảm giá
                           </p>
                           <p className="font-bold text-green-600 text-lg">
-                            -{detailProduct.discountAmount?.toLocaleString()} %
+                            -{detailProduct.discountAmount > 100 
+                              ? Math.round((detailProduct.discountAmount / ((detailProduct.price || 0) + detailProduct.discountAmount)) * 100) 
+                              : Math.round(detailProduct.discountAmount || 0)} %
                           </p>
                         </div>
                         <div>
@@ -984,18 +986,22 @@ export default function Products({ initialFilter = 'ALL' }) {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                     <div>
                       <label className="text-xs text-gray-600 font-bold uppercase mb-2 block">
-                        Giá vốn (VNĐ)
+                        Giá gốc (VNĐ)
                       </label>
                       <input
                         type="number"
                         className="w-full border-2 border-blue-300 p-3 rounded-xl font-semibold text-blue-600 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                         value={formData.price}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newPrice = Number(e.target.value);
+                          const discount = formData.discountAmount;
+                          const newCostPrice = newPrice - (newPrice * discount / 100);
                           setFormData({
                             ...formData,
-                            price: Number(e.target.value),
-                          })
-                        }
+                            price: newPrice,
+                            costPrice: newCostPrice
+                          });
+                        }}
                       />
                     </div>
                     <div>
@@ -1006,29 +1012,29 @@ export default function Products({ initialFilter = 'ALL' }) {
                         type="number"
                         className="w-full border-2 border-gray-300 p-3 rounded-xl bg-gray-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-200"
                         value={formData.costPrice}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            costPrice: Number(e.target.value),
-                          })
-                        }
                         disabled
                       />
                     </div>
                     <div>
                       <label className="text-xs text-gray-600 font-bold uppercase mb-2 block">
-                        Giảm giá (Số tiền)
+                        Giảm giá (%)
                       </label>
                       <input
                         type="number"
+                        min="0"
+                        max="100"
                         className="w-full border-2 border-red-300 p-3 rounded-xl text-red-600 font-semibold focus:ring-2 focus:ring-red-500 outline-none transition-all duration-200"
                         value={formData.discountAmount}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newDiscount = Number(e.target.value);
+                          const price = formData.price;
+                          const newCostPrice = price - (price * newDiscount / 100);
                           setFormData({
                             ...formData,
-                            discountAmount: Number(e.target.value),
-                          })
-                        }
+                            discountAmount: newDiscount,
+                            costPrice: newCostPrice
+                          });
+                        }}
                       />
                     </div>
                     <div>
