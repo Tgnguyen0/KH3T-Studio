@@ -33,6 +33,8 @@ const Dashboard = () => {
         );
 
         const data = await res.json();
+        console.log(data);
+        console.log(Array.isArray(data));
         setAllData(data || []);
       } catch (e) {
         console.error("Error fetching daily stats:", e);

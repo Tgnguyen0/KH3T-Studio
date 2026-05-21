@@ -11,7 +11,7 @@ export default function Statistics() {
     { month: 'Tháng 6', revenue: 48000000, orders: 71, customers: 165 }
   ];
 
-  const topProducts = [
+gi  const topProducts = [
     { name: 'Sản phẩm A', sales: 245, revenue: '₫12,250,000', trend: 'up' },
     { name: 'Sản phẩm B', sales: 198, revenue: '₫9,900,000', trend: 'up' },
     { name: 'Sản phẩm C', sales: 156, revenue: '₫7,800,000', trend: 'down' },

@@ -37,8 +37,37 @@ export default function Products({ initialFilter = 'ALL' }) {
     status: "",
     sizeDetails: []
   });
+
+ const uploadImageToCloudinary = async (file) => {
+   if (!file) return "";
+
+   const data = new FormData();
+   data.append("file", file);
+   data.append("upload_preset", "products_upload");
+
+   try {
+     const response = await fetch(
+       "https://api.cloudinary.com/v1_1/dfecuogtk/image/upload",
+       {
+         method: "POST",
+         body: data,
+       },
+     );
+
+     if (!response.ok) {
+       throw new Error("Upload failed");
+     }
+
+     const result = await response.json();
+
+     return result.secure_url;
+   } catch (error) {
+     console.error("Cloudinary Error:", error);
+     return "";
+   }
+ };
   useEffect(() => {
-    console.log("Check initialFilter:", initialFilter); // Xem nó in ra gì?
+    console.log("Check initialFilter:", initialFilter); 
 
     if (initialFilter === 'LOW_STOCK') {
       console.log("Đã set LOW");
@@ -55,6 +84,7 @@ export default function Products({ initialFilter = 'ALL' }) {
     loadCategories();
   }, []);
 
+  
   const loadProducts = async () => {
     try {
       const res = await fetch("http://localhost:8080/products");
@@ -1036,15 +1066,22 @@ export default function Products({ initialFilter = 'ALL' }) {
                       </label>
                       <div className="space-y-3">
                         <input
-                          className="w-full border-2 border-gray-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200"
-                          placeholder="https://..."
-                          value={formData.imageUrlFront}
-                          onChange={(e) =>
+                          type="file"
+                          accept="image/*"
+                          className="w-full border-2 border-gray-200 p-3 rounded-xl"
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+
+                            if (!file) return;
+
+                            const imageUrl =
+                              await uploadImageToCloudinary(file);
+
                             setFormData({
                               ...formData,
-                              imageUrlFront: e.target.value,
-                            })
-                          }
+                              imageUrlFront: imageUrl,
+                            });
+                          }}
                         />
                         {formData.imageUrlFront && (
                           <div className="h-32 w-32 border-2 border-gray-300 rounded-xl bg-white p-2 shadow-md hover:shadow-lg transition-shadow duration-200">
@@ -1065,15 +1102,22 @@ export default function Products({ initialFilter = 'ALL' }) {
                       </label>
                       <div className="space-y-3">
                         <input
-                          className="w-full border-2 border-gray-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200"
-                          placeholder="https://..."
-                          value={formData.imageUrlBack}
-                          onChange={(e) =>
+                          type="file"
+                          accept="image/*"
+                          className="w-full border-2 border-gray-200 p-3 rounded-xl"
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+
+                            if (!file) return;
+
+                            const imageUrl =
+                              await uploadImageToCloudinary(file);
+
                             setFormData({
                               ...formData,
-                              imageUrlBack: e.target.value,
-                            })
-                          }
+                              imageUrlBack: imageUrl,
+                            });
+                          }}
                         />
                         {formData.imageUrlBack && (
                           <div className="h-32 w-32 border-2 border-gray-300 rounded-xl bg-white p-2 shadow-md hover:shadow-lg transition-shadow duration-200">
