@@ -32,7 +32,7 @@ VALUES
 
 INSERT INTO address (province, delivery_address, delivery_note, account_id) VALUES
                                                                                 ( 'Hà Nội', '123 Đường Giải Phóng, Quận Hai Bà Trưng', 'Giao giờ hành chính', 1),
-                                                                                ( 'Hà Nội', '45 Trần Duy Hưng, Cầu Giấy', 'Gọi trước khi giao', 1),
+                                                                                 ( 'Hà Nội', '45 Trần Duy Hưng, Cầu Giấy', 'Gọi trước khi giao', 1),
                                                                                 ( 'TP. Hồ Chí Minh', '25 Nguyễn Huệ, Quận 1', 'Giao buổi sáng', 2),
                                                                                 ( 'TP. Hồ Chí Minh', '120 Lê Văn Sỹ, Quận 3', 'Không giao sau 20h', 2),
                                                                                 ( 'Đà Nẵng', '89 Nguyễn Văn Linh, Hải Châu', 'Liên hệ bảo vệ tòa nhà', 3),
