@@ -154,6 +154,10 @@ const Header = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  console.log("ACCOUNT:", account);
+  console.log("ROLE:", account?.role);
+  console.log("ROLE NAME:", account?.role?.name);
+
   return (
     <header className={`sticky top-0 z-50 transition-all duration-500 border-b border-primary/5 ${isScrolled ? "py-3.5 bg-white/95 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.02)]" : "py-5.5 bg-[#fbfbf9]/90 backdrop-blur-md"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -315,17 +319,20 @@ const Header = () => {
                         Danh sách yêu thích
                       </Link>
 
-                      {(account.role?.name === "ADMIN" ||
-                        account.role?.name === "STAFF") && (
+                      {(account.role === "ADMIN" ||
+                        account.role === "STAFF") && (
                         <Link
                           to={
-                            account.role?.name === "ADMIN"
+                            account.role === "ADMIN"
                               ? "/admin/dashboard"
                               : "/staff/orders"
                           }
                           className="flex items-center gap-3 px-4 py-3 text-sm font-black text-primary/70 hover:text-primary hover:bg-secondary rounded-2xl transition-all group"
                         >
-                          <Shield size={18} className="text-primary/30 group-hover:text-accent" />
+                          <Shield
+                            size={18}
+                            className="text-primary/30 group-hover:text-accent"
+                          />
                           Quản lý hệ thống
                         </Link>
                       )}
