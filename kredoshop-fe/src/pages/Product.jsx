@@ -8,6 +8,8 @@ import {
   ChevronRight,
   Grid3x3,
   List,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import ChatBot from "../components/ChatBot";
@@ -15,6 +17,13 @@ import Contact from "../components/Contact";
 
 const Product = () => {
   const location = useLocation();
+  
+  const categoryTranslations = {
+    top: "Áo thời trang",
+    bottom: "Quần thời trang",
+    accessories: "Phụ kiện",
+    shoes: "Giày & Dép",
+  };
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +33,7 @@ const Product = () => {
   const [sortBy, setSortBy] = useState("default");
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   
   // Hero slide index
   const [activeSlide, setActiveSlide] = useState(0);
@@ -157,6 +167,21 @@ const Product = () => {
     return counts;
   }, [products]);
 
+  // Dynamic max price
+  const maxPrice = useMemo(() => {
+    if (products.length === 0) return 1000000000;
+    const maxVal = Math.max(...products.map((p) => p.price || 0));
+    return maxVal > 0 ? maxVal : 1000000000;
+  }, [products]);
+
+  // Set priceRange max to match loaded products max price
+  useEffect(() => {
+    if (products.length > 0) {
+      const maxVal = Math.max(...products.map((p) => p.price || 0));
+      setPriceRange([0, maxVal > 0 ? maxVal : 1000000000]);
+    }
+  }, [products]);
+
   // Filter & Sort
   const processedProducts = useMemo(() => {
     let filtered = [...products];
@@ -240,8 +265,157 @@ const Product = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary selection:bg-accent selection:text-white">
+    <div className="min-h-screen bg-secondary relative">
+      {/* Sliding Filter Drawer Backdrop */}
+      <div 
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity duration-300 ${
+          isFilterOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsFilterOpen(false)}
+      />
       
+      {/* Sliding Filter Drawer Panel */}
+      <div 
+        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[400px] bg-white shadow-2xl p-6 flex flex-col justify-between transform transition-transform duration-300 ease-out ${
+          isFilterOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="space-y-8 overflow-y-auto pr-1">
+          <div className="flex items-center justify-between pb-4 border-b border-primary/10">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal size={18} className="text-primary" />
+              <h3 className="font-black text-sm tracking-widest uppercase text-primary">Bộ lọc sản phẩm</h3>
+            </div>
+            <button 
+              onClick={() => setIsFilterOpen(false)}
+              className="p-1.5 rounded-full hover:bg-secondary text-primary/60 hover:text-primary transition"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Category Section */}
+          <div className="space-y-3">
+            <h4 className="font-black text-xs tracking-widest uppercase text-primary/40">Danh mục</h4>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedCategory("all")}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                  selectedCategory === "all"
+                    ? "bg-primary text-white"
+                    : "bg-secondary text-primary/60 hover:text-primary"
+                }`}
+              >
+                TẤT CẢ SẢN PHẨM ({categoryCounts.all || 0})
+              </button>
+              {categories.map((category) => {
+                const translatedName = categoryTranslations[category.name.toLowerCase()] || category.name;
+                const isSelected = selectedCategory === category.id.toString();
+                const count = categoryCounts[category.id] || 0;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id.toString())}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                      isSelected
+                        ? "bg-primary text-white"
+                        : "bg-secondary text-primary/60 hover:text-primary"
+                    }`}
+                  >
+                    {translatedName.toUpperCase()} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Filter Section */}
+          <div className="space-y-4 pt-4 border-t border-primary/5">
+            <h4 className="font-black text-xs tracking-widest uppercase text-primary/40">Lọc theo giá</h4>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  value={priceRange[0]}
+                  min={0}
+                  max={maxPrice}
+                  onChange={(e) => {
+                    const val = Math.max(0, parseInt(e.target.value) || 0);
+                    setPriceRange([val, priceRange[1]]);
+                  }}
+                  className="w-full pl-3 pr-5 py-2 bg-secondary border border-primary/5 rounded-xl font-bold text-xs outline-none text-primary focus:border-accent"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-primary/40 font-bold">đ</span>
+              </div>
+              <span className="text-primary/20 text-xs">-</span>
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  value={priceRange[1]}
+                  min={0}
+                  max={maxPrice}
+                  onChange={(e) => {
+                    const val = Math.max(0, parseInt(e.target.value) || 0);
+                    setPriceRange([priceRange[0], val]);
+                  }}
+                  className="w-full pl-3 pr-5 py-2 bg-secondary border border-primary/5 rounded-xl font-bold text-xs outline-none text-primary focus:border-accent"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-primary/40 font-bold">đ</span>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <input
+                type="range"
+                min="0"
+                max={maxPrice}
+                step={maxPrice / 100}
+                value={priceRange[0]}
+                onChange={(e) =>
+                  setPriceRange([parseInt(e.target.value), priceRange[1]])
+                }
+                className="w-full h-1 bg-primary/10 rounded-lg appearance-none cursor-pointer accent-accent"
+              />
+              <input
+                type="range"
+                min="0"
+                max={maxPrice}
+                step={maxPrice / 100}
+                value={priceRange[1]}
+                onChange={(e) =>
+                  setPriceRange([priceRange[0], parseInt(e.target.value)])
+                }
+                className="w-full h-1 bg-primary/10 rounded-lg appearance-none cursor-pointer accent-accent"
+              />
+            </div>
+            <div className="flex justify-between items-center text-[10px] font-black text-primary/50">
+              <span>{formatPrice(priceRange[0])}</span>
+              <span>{formatPrice(priceRange[1])}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Drawer Footer Buttons */}
+        <div className="pt-6 border-t border-primary/10 flex gap-3">
+          <button
+            onClick={() => {
+              setSelectedCategory("all");
+              setPriceRange([0, maxPrice]);
+              setSearchTerm("");
+            }}
+            className="flex-1 py-3 bg-secondary text-primary font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-primary/5 transition"
+          >
+            Xóa bộ lọc
+          </button>
+          <button
+            onClick={() => setIsFilterOpen(false)}
+            className="flex-1 py-3 bg-primary text-white font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-accent transition shadow-lg shadow-primary/10"
+          >
+            Áp dụng
+          </button>
+        </div>
+      </div>
+
       {/* Luxury Lookbook Campaign Slider */}
       <div className="relative h-[65vh] bg-[#fbfbf9] border-b border-primary/5 overflow-hidden">
         {slides.map((slide, idx) => (
@@ -295,185 +469,106 @@ const Product = () => {
         </div>
       </div>
 
-      {/* Grid List Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* Combined Header & Filter Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-8 border-b border-primary/10">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-primary uppercase">Cửa hàng</h2>
+            <p className="text-xs text-primary/40 font-bold mt-1 uppercase tracking-wider">
+              Hiện có <span className="text-accent">{processedProducts.length}</span> sản phẩm được tìm thấy
+            </p>
+          </div>
           
-          {/* Sidebar */}
-          <aside className="lg:col-span-1">
-            <div className="bg-white rounded-none border border-primary/5 p-8 sticky top-32">
-              
-              {/* Category selector */}
-              <div>
-                <h3 className="font-display font-black text-[10px] tracking-[0.3em] uppercase mb-8 text-primary/30 pb-3 border-b border-primary/5">
-                  DANH MỤC SẢN PHẨM
-                </h3>
-                <ul className="space-y-4">
-                  <li>
-                    <button
-                      onClick={() => setSelectedCategory("all")}
-                      className={`w-full flex justify-between items-center font-display font-black text-[11px] tracking-widest uppercase transition-all duration-300 ${
-                        selectedCategory === "all"
-                          ? "text-accent translate-x-1"
-                          : "text-primary/50 hover:text-primary hover:translate-x-1"
-                      }`}
-                    >
-                      <span>Tất cả sản phẩm</span>
-                      <span className="text-[9px] opacity-40 font-mono">({categoryCounts.all || 0})</span>
-                    </button>
-                  </li>
-                  {categories.map((category) => (
-                    <li key={category.id}>
-                      <button
-                        onClick={() => setSelectedCategory(category.id.toString())}
-                        className={`w-full flex justify-between items-center font-display font-black text-[11px] tracking-widest uppercase transition-all duration-300 ${
-                          selectedCategory === category.id.toString()
-                            ? "text-accent translate-x-1"
-                            : "text-primary/50 hover:text-primary hover:translate-x-1"
-                        }`}
-                      >
-                        <span>{category.name}</span>
-                        <span className="text-[9px] opacity-40 font-mono">({categoryCounts[category.id] || 0})</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Filter Toggle Button */}
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className={`flex items-center gap-2 px-5 py-2.5 bg-white border rounded-xl text-xs font-black tracking-wider transition ${
+                selectedCategory !== "all" || priceRange[0] !== 0 || priceRange[1] < maxPrice
+                  ? "border-accent text-accent bg-accent/5"
+                  : "border-primary/10 text-primary hover:border-accent"
+              }`}
+            >
+              <SlidersHorizontal size={14} />
+              <span>BỘ LỌC</span>
+              {(selectedCategory !== "all" || priceRange[0] !== 0 || priceRange[1] < maxPrice) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+              )}
+            </button>
 
-              {/* Price range */}
-              <div className="mt-12 pt-8 border-t border-primary/5">
-                <h3 className="font-display font-black text-[10px] tracking-[0.3em] uppercase mb-8 text-primary/30 pb-3 border-b border-primary/5">
-                  LỌC THEO GIÁ
-                </h3>
-                <div className="space-y-6">
-                  <div className="font-display font-black text-accent tracking-tight text-sm">
-                    {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
-                  </div>
-                  <div className="space-y-4 relative">
-                    <input
-                      type="range"
-                      min="0"
-                      max="2000000"
-                      step="50000"
-                      value={priceRange[0]}
-                      onChange={(e) =>
-                        setPriceRange([parseInt(e.target.value), priceRange[1]])
-                      }
-                      className="w-full h-[2px] bg-secondary appearance-none cursor-pointer accent-accent"
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max="2000000"
-                      step="50000"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([priceRange[0], parseInt(e.target.value)])
-                      }
-                      className="w-full h-[2px] bg-secondary appearance-none cursor-pointer accent-accent"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Catalog Listing */}
-          <main className="lg:col-span-3">
-            
-            {/* Filter controls bar */}
-            <div className="bg-white rounded-none border border-primary/5 p-6 mb-8">
-              <div className="flex flex-col lg:flex-row gap-6 items-center">
-                
-                {/* Search input */}
-                <div className="relative flex-1 w-full">
-                  <Search
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30"
-                    size={15}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm sản phẩm..."
-                    className="w-full pl-12 pr-4 py-3.5 bg-secondary text-xs font-semibold rounded-none focus:ring-1 focus:ring-red-500 focus:outline-none transition-all placeholder-primary/20"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-                  {/* Sort options */}
-                  <div className="relative flex-1 lg:w-64">
-                    <select
-                      className="appearance-none w-full px-5 py-3.5 pr-12 bg-secondary border-none rounded-none text-[10px] font-black tracking-widest text-primary focus:ring-1 focus:ring-red-500 focus:outline-none transition-all cursor-pointer uppercase font-display"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                    >
-                      {sortOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <ChevronDown size={14} className="text-primary/40" />
-                    </div>
-                  </div>
-
-                  {/* Layout Grid / List toggles */}
-                  <div className="flex gap-1 bg-secondary p-1 rounded-none">
-                    <button
-                      onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded-none transition-all ${
-                        viewMode === "grid"
-                          ? "bg-white shadow-sm text-accent"
-                          : "text-primary/40 hover:text-primary"
-                      }`}
-                    >
-                      <Grid3x3 size={15} />
-                    </button>
-                    <button
-                      onClick={() => setViewMode("list")}
-                      className={`p-2 rounded-none transition-all ${
-                        viewMode === "list"
-                          ? "bg-white shadow-sm text-accent"
-                          : "text-primary/40 hover:text-primary"
-                      }`}
-                    >
-                      <List size={15} />
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {/* Search Input */}
+            <div className="relative">
+              <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30" />
+              <input
+                type="text"
+                placeholder="Tìm sản phẩm..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2.5 bg-white border border-primary/10 rounded-xl text-xs font-medium w-48 md:w-64 focus:w-80 focus:border-accent transition-all outline-none"
+              />
             </div>
 
-            {/* Results Count Summary */}
-            <div className="flex justify-between items-center mb-6 text-[11px] font-bold text-primary/40 uppercase tracking-widest">
-              <p>
-                Hiển thị {(currentPage - 1) * itemsPerPage + 1} -{" "}
-                {Math.min(currentPage * itemsPerPage, processedProducts.length)}{" "}
-                của {processedProducts.length} sản phẩm
-              </p>
-              <p className="hidden sm:block">
-                CHẾ ĐỘ XEM:{" "}
-                <span className="text-primary font-black">
-                  {viewMode === "grid" ? "Lưới" : "Danh sách"}
-                </span>
-              </p>
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="pl-4 pr-10 py-2.5 bg-white border border-primary/10 rounded-xl text-xs font-black tracking-wider text-primary appearance-none cursor-pointer outline-none hover:border-accent transition"
+              >
+                {sortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary/40 pointer-events-none" />
             </div>
 
-            {/* Catalog Grid list */}
+            {/* View Mode Toggle */}
+            <div className="flex bg-white border border-primary/10 p-1 rounded-xl">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === "grid"
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-primary/40 hover:text-primary"
+                }`}
+                title="Lưới"
+              >
+                <Grid3x3 size={14} />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === "list"
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-primary/40 hover:text-primary"
+                }`}
+                title="Danh sách"
+              >
+                <List size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width Product Grid or List */}
+        <div className="w-full">
+          <main className="w-full">
+            {/* Loading */}
             {loading && (
               <div className="flex justify-center items-center py-32">
                 <div className="w-10 h-10 border-2 border-red-500 border-t-transparent animate-spin"></div>
               </div>
             )}
 
+            {/* Product Display - Grid (4 columns) or List */}
             {!loading && paginatedProducts.length > 0 && (
               <>
                 <div
                   className={
                     viewMode === "grid"
-                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                      ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
                       : "flex flex-col gap-6"
                   }
                 >
@@ -534,7 +629,6 @@ const Product = () => {
                         </button>
                       )}
                     </div>
-
                     <button
                       onClick={() =>
                         setCurrentPage((p) => Math.min(totalPages, p + 1))
@@ -555,16 +649,26 @@ const Product = () => {
 
             {/* No items fallback */}
             {!loading && processedProducts.length === 0 && (
-              <div className="text-center py-24 bg-white border border-primary/5">
-                <div className="text-primary/20 mb-4">
-                  <Search size={48} className="mx-auto" />
+              <div className="text-center py-16 bg-white rounded-3xl border border-primary/5 shadow-sm">
+                <div className="text-gray-400 mb-4">
+                  <Search size={64} className="mx-auto text-primary/20" />
                 </div>
-                <h3 className="text-sm font-display font-black uppercase tracking-[0.2em] text-primary mb-3">
+                <h3 className="text-xl font-bold text-primary mb-2">
                   Không tìm thấy sản phẩm nào
                 </h3>
-                <p className="text-primary/30 text-[10px] font-bold uppercase tracking-widest">
-                  Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm của bạn
+                <p className="text-primary/60 mb-6 max-w-md mx-auto">
+                  Hãy thử điều chỉnh khoảng giá, chọn danh mục khác hoặc nhập từ khóa tìm kiếm khác.
                 </p>
+                <button
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setPriceRange([0, maxPrice]);
+                    setSearchTerm("");
+                  }}
+                  className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-accent transition"
+                >
+                  Xóa tất cả bộ lọc
+                </button>
               </div>
             )}
           </main>

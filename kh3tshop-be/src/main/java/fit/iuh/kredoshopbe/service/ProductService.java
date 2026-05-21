@@ -92,7 +92,7 @@ public class ProductService {
         List<SizeDetailResponse> sizeDetailResponses = product.getSizeDetails().stream()
                 .map(sd -> SizeDetailResponse.builder()
                         .id(sd.getId())
-                        .sizeName(sd.getSize().getNameSize().name()) // Giả sử SizeName là enum, lấy string
+                        .sizeName(sd.getSize().getNameSize()) // Bây giờ nameSize là String, lấy trực tiếp
                         .quantity(sd.getQuantity())
                         .build())
                 .collect(Collectors.toList());

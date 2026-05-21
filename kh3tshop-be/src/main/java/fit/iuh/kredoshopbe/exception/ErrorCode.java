@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatusCode;
 
 @Getter
 public enum ErrorCode {
-    USER_EXISTED(1001, "User already exists", HttpStatus.CREATED),
+    USER_EXISTED(1001, "User already exists", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND(1002, "User not found", HttpStatus.NOT_FOUND),
     ADDRESS_NOT_FOUND(1002, "Address not found", HttpStatus.NOT_FOUND),
     UnknownError(1003, "Unknown error",HttpStatus.BAD_REQUEST),

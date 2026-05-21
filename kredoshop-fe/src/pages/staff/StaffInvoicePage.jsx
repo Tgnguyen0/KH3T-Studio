@@ -3,7 +3,7 @@ import Invoices from "./Invoices";
 
 export default function StaffInvoicesPage() {
   return (
-    <StaffDashboard>
+    <StaffDashboard defaultTab="invoices">
       <Invoices />
     </StaffDashboard>
   );
