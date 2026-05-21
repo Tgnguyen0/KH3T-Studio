@@ -1,0 +1,786 @@
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  ShoppingCart,
+  CreditCard,
+  X,
+  ZoomIn,
+  Minus,
+  Plus,
+  GitCompare,
+  ShoppingBag,
+} from "lucide-react";
+import ProductCard from "../components/ProductCard";
+import { toast } from "sonner";
+import ChatBot from "../components/ChatBot";
+import Contact from "../components/Contact";
+
+// --- GLOBAL UTILS FOR COMPARE LIST ---
+const getCompareList = () => {
+  const list = localStorage.getItem("compareList");
+  return list ? JSON.parse(list) : [];
+};
+
+const setCompareList = (list) => {
+  localStorage.setItem("compareList", JSON.stringify(list));
+};
+// ------------------------------------
+
+// --- COMPARISON BAR COMPONENT ---
+// Component hiển thị thanh so sánh cố định ở cuối trang
+const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
+  if (compareList.length === 0) return null;
+
+  // Hàm loại bỏ sản phẩm khỏi danh sách
+  const handleRemoveProduct = (productId, productName) => {
+    const newList = compareList.filter((p) => p.id !== productId);
+    setCompareList(newList); // Cập nhật localStorage
+    setCompareListState(newList); // Cập nhật state
+    toast.info(`${productName} đã xóa khỏi danh sách so sánh.`);
+  };
+
+  // Tạo URL cho trang so sánh
+  const compareUrl = `/compare?ids=${compareList.map((p) => p.id).join(",")}`;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-40 p-4 transition-transform duration-300 ease-in-out">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* LEFT: Product List */}
+        <div className="flex items-center space-x-4 overflow-x-auto p-2">
+          {compareList.map((p) => (
+            <div
+              key={p.id}
+              className="relative flex-shrink-0 w-32 bg-gray-50 p-2 rounded-lg border border-gray-200"
+            >
+              {/* Product Image and Name */}
+              <Link
+                to={`/product/${p.id}`}
+                className="block text-center hover:opacity-80 transition-opacity"
+              >
+                <img
+                  src={p.imageUrl}
+                  alt={p.name}
+                  className="w-full h-20 object-contain mx-auto mb-1 rounded"
+                />
+                <p className="text-xs font-medium truncate">{p.name}</p>
+                <p className="text-sm font-bold text-red-500">
+                  {formatPrice(p.discount_amount || p.price)}
+                </p>
+              </Link>
+
+              {/* Remove Button */}
+              <button
+                onClick={() => handleRemoveProduct(p.id, p.name)}
+                className="absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 transition"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ))}
+
+          {/* Placeholders for remaining slots */}
+          {Array(4 - compareList.length)
+            .fill(0)
+            .map((_, index) => (
+              <div
+                key={`placeholder-${index}`}
+                className="flex-shrink-0 w-32 h-36 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm p-2"
+              >
+                <Plus size={20} className="mb-1" />
+                Thêm sản phẩm
+              </div>
+            ))}
+        </div>
+
+        {/* RIGHT: Status and Action Button */}
+        <div className="flex-shrink-0 ml-4 space-y-2 text-center">
+          <p className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+            {compareList.length} / 4 sản phẩm đã chọn
+          </p>
+          <p className="text-xs text-gray-500 italic">
+            Chọn 2-4 sản phẩm để so sánh
+          </p>
+          <Link
+            to={compareUrl}
+            onClick={() => {
+              if (compareList.length < 2) {
+                toast.warning("Please select at least 2 products to compare.");
+                return false; // Ngăn chặn điều hướng nếu < 2
+              }
+            }}
+            className={`flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-bold text-white transition-all ${
+              compareList.length >= 2
+                ? "bg-green-600 hover:bg-green-700 shadow-md"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+            style={{ pointerEvents: compareList.length >= 2 ? "auto" : "none" }}
+          >
+            <GitCompare size={20} /> So sánh ({compareList.length})
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+// ------------------------------------
+
+const ProductDetail = () => {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [otherProducts, setOtherProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [currentImage, setCurrentImage] = useState("front");
+  const [zoomImage, setZoomImage] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const imageRef = useRef(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [cart, setCart] = useState(null);
+  const navigate = useNavigate();
+
+  const [compareList, setCompareListState] = useState(getCompareList());
+
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      console.log("Tài khoản đang login: ", data.result);
+      setUser(data.result);
+    } catch (error) {
+      console.error("Lỗi fetch user", error);
+    }
+  };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchCart = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `http://localhost:8080/carts/account/${user.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      console.log("Cart của user: ", data.result);
+      setCart(data.result);
+    } catch (error) {
+      console.error("Lỗi fetch cart: ", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchCart();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:8080/products/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Dữ liệu SoldQuantity được lấy trực tiếp từ data.result (ProductResponse)
+          setProduct(data.result || null);
+        } else {
+          setError("Không tìm thấy sản phẩm");
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        setError("Lỗi tải sản phẩm");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchOtherProducts = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/products");
+        if (response.ok) {
+          const data = await response.json();
+          let products = data.result || [];
+
+          products.sort(
+            (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+          );
+          products = products.filter((p) => p.id !== parseInt(id)).slice(0, 4);
+          setOtherProducts(products);
+        }
+      } catch (error) {
+        console.error("Error fetching other products:", error);
+      }
+    };
+    fetchOtherProducts();
+  }, [id]);
+
+  const formatPrice = (price) => {
+    // Đảm bảo giá là một số hợp lệ
+    const numericPrice =
+      typeof price === "number" && isFinite(price) ? price : 0;
+
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(numericPrice);
+  };
+
+  const handleAddToCart = async () => {
+    if (isSoldOut) {
+      return toast.error("Sản phẩm này hiện đang hết hàng.");
+    }
+
+    // Kiểm tra xem có size nào khả dụng không
+    const uniqueSizes = [];
+    const sizeMap = new Map();
+    product?.sizeDetails?.forEach((size) => {
+      if (sizeMap.has(size.sizeName)) {
+        const existing = sizeMap.get(size.sizeName);
+        existing.quantity += size.quantity;
+      } else {
+        sizeMap.set(size.sizeName, { ...size });
+      }
+    });
+    sizeMap.forEach((value) => uniqueSizes.push(value));
+
+    const hasSizes = uniqueSizes.length > 0;
+
+    if (hasSizes && !selectedSize) {
+      return toast.warning("Vui lòng chọn kích cỡ");
+    }
+
+    if (!user?.id) {
+      return toast.warning("Vui lòng đăng nhập trước khi thêm vào giỏ hàng");
+    }
+    
+    if (quantity < 1) return toast.warning("Số lượng phải ít nhất là 1");
+
+    setIsAddedToCart(true);
+    toast.success("Đã thêm vào giỏ hàng!");
+    setTimeout(() => setIsAddedToCart(false), 2000);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      // Lấy sizeDetailId từ product.sizeDetails
+      let sizeDetailId = null;
+      if (hasSizes && selectedSize) {
+        // Tìm sizeDetail có sizeName trùng với selectedSize và có số lượng > 0
+        const sizeDetail = product.sizeDetails.find(
+          (sd) => sd.sizeName === selectedSize && sd.quantity > 0
+        );
+        
+        if (sizeDetail) {
+          sizeDetailId = sizeDetail.id;
+        } else {
+          // Nếu không tìm thấy cái nào có số lượng > 0, lấy cái đầu tiên trùng tên (để backend báo hết hàng nếu cần)
+          const fallbackSize = product.sizeDetails.find(sd => sd.sizeName === selectedSize);
+          sizeDetailId = fallbackSize?.id;
+        }
+      }
+
+      const dataSend = {
+        productId: parseInt(id),
+        cartId: cart.id,
+        quantity: quantity,
+        // Chỉ thêm sizeDetailId nếu có size được chọn. Nếu không cần, backend sẽ tự xác định.
+        // Cần đảm bảo backend xử lý được cả 2 trường hợp (có sizeDetailId hoặc không)
+        ...(sizeDetailId && { sizeDetailId: sizeDetailId }),
+      };
+
+      const res = await fetch(
+        `http://localhost:8080/cart-details/add-to-cart`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dataSend),
+        }
+      );
+
+      // **GIẢI QUYẾT CONFLICT:** Giữ lại logic cập nhật cart totalAmount
+      const cartRequest = {
+        quantity: parseInt(quantity),
+        totalAmount: product.costPrice, // Dùng costPrice (giá sale)
+      };
+
+      const resCart = await fetch(
+        `http://localhost:8080/carts/update/${cart.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(cartRequest),
+        }
+      );
+      if (resCart.ok) {
+        // Kích hoạt sự kiện để thông báo cập nhật giỏ hàng (ví dụ cho header cart icon)
+        window.dispatchEvent(new Event("cartUpdated"));
+      }
+    } catch (error) {
+      console.log("Lỗi thêm vào cart: ", error);
+      toast.error("Không thể thêm vào giỏ hàng.");
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (isSoldOut) {
+      return toast.error("Sản phẩm này hiện đang hết hàng.");
+    }
+
+    const hasSizes = uniqueSizes.length > 0;
+    if (hasSizes && !selectedSize) {
+      return toast.warning("Vui lòng chọn kích cỡ");
+    }
+    if (quantity < 1) return toast.warning("Quantity must be at least 1");
+    navigate("/checkout", {
+      state: { 
+        userId: user.id, 
+        product: product, 
+        quantity: quantity,
+        selectedSize: selectedSize 
+      },
+    });
+  };
+
+  const handleZoom = (imageType) => {
+    setZoomImage(
+      imageType === "front" ? product.imageUrlFront : product.imageUrlBack
+    );
+    setZoomLevel(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const changeQuantity = (delta) => {
+    setQuantity((prev) => Math.max(1, prev + delta));
+  };
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY * -0.01;
+    setZoomLevel((prev) => Math.max(1, Math.min(prev + delta, 5)));
+  };
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    const startX = e.clientX - position.x;
+    const startY = e.clientY - position.y;
+
+    const handleMouseMove = (moveE) => {
+      setPosition({
+        x: moveE.clientX - startX,
+        y: moveE.clientY - startY,
+      });
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleCompare = () => {
+    // Đảm bảo product đã load xong
+    if (!product) return;
+
+    const currentProductInList = compareList.find((p) => p.id === product.id);
+    const newProductData = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      discount_amount: product.costPrice, // Sử dụng costPrice là giá đã giảm (sale price)
+      imageUrl: product.imageUrlFront, // Lấy ảnh front để hiển thị
+    };
+
+    if (currentProductInList) {
+      // Nếu đã có trong danh sách -> Xóa (Toggle off)
+      const newList = compareList.filter((p) => p.id !== product.id);
+      setCompareList(newList);
+      setCompareListState(newList);
+      toast.info(`${product.name} đã xóa khỏi danh sách so sánh.`);
+    } else {
+      // Nếu chưa có trong danh sách -> Thêm vào (Toggle on)
+      if (compareList.length < 4) {
+        const newList = [...compareList, newProductData];
+        setCompareList(newList);
+        setCompareListState(newList);
+        toast.success(
+          `${product.name} đã thêm vào danh sách so sánh (${newList.length}/4).`
+        );
+      } else {
+        toast.error("Chỉ được phép so sánh tối đa 4 sản phẩm.");
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-500"></div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="text-center py-16">
+        <h3 className="text-2xl font-bold text-gray-700 mb-2">
+          {error || "Không tìm thấy sản phẩm"}
+        </h3>
+        <Link to="/product" className="text-red-500 hover:underline">
+          Quay lại trang sản phẩm
+        </Link>
+      </div>
+    );
+  }
+
+  const uniqueSizes = [];
+  const sizeMap = new Map();
+
+  product.sizeDetails?.forEach((size) => {
+    if (sizeMap.has(size.sizeName)) {
+      const existing = sizeMap.get(size.sizeName);
+      existing.quantity += size.quantity;
+    } else {
+      sizeMap.set(size.sizeName, { ...size });
+    }
+  });
+
+  sizeMap.forEach((value) => uniqueSizes.push(value));
+  uniqueSizes.sort((a, b) => {
+    const order = ["S", "M", "L", "XL"];
+    return order.indexOf(a.sizeName) - order.indexOf(b.sizeName);
+  });
+
+  // LOGIC SOLD OUT: Tính tổng tồn kho và xác định Sold Out
+  const totalStock = uniqueSizes.reduce((sum, size) => sum + size.quantity, 0);
+  const isSoldOut = totalStock === 0;
+
+  const isComparing = compareList.some((p) => p.id === product.id);
+
+  return (
+    <div className="min-h-screen bg-secondary selection:bg-accent selection:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          {/* IMAGE GALLERY SECTION */}
+          <div className="lg:col-span-7 bg-white border border-primary/5 p-8 relative flex flex-col items-center justify-between">
+            <div className="relative group w-full flex flex-col items-center">
+              {/* Sold Out Overlay */}
+              {isSoldOut && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-30">
+                  <div className="bg-white text-primary px-8 py-3 text-[11px] font-black tracking-[0.25em] uppercase shadow-2xl">
+                    HẾT HÀNG
+                  </div>
+                </div>
+              )}
+
+              {/* TOP ACTIONS BAR */}
+              <div className="w-full flex justify-between items-center mb-6 z-10">
+                {/* COMPARE BUTTON */}
+                <button
+                  onClick={handleCompare}
+                  className={`flex items-center gap-1.5 px-4 h-9 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 ${
+                    isComparing
+                      ? "bg-accent text-white shadow-md"
+                      : "bg-[#111111] hover:bg-accent text-white"
+                  }`}
+                >
+                  <GitCompare size={12} />{" "}
+                  {isComparing ? "Đang so sánh" : "Thêm vào so sánh"}
+                </button>
+
+                {/* VIEW CONTROLS */}
+                <div className="flex gap-2 bg-secondary p-1 border border-primary/5">
+                  <button
+                    onClick={() => setCurrentImage("front")}
+                    className={`px-3 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      currentImage === "front"
+                        ? "bg-white text-primary shadow-sm"
+                        : "text-primary/40 hover:text-primary"
+                    }`}
+                  >
+                    Mặt trước
+                  </button>
+                  <button
+                    onClick={() => setCurrentImage("back")}
+                    className={`px-3 py-1.5 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      currentImage === "back"
+                        ? "bg-white text-primary shadow-sm"
+                        : "text-primary/40 hover:text-primary"
+                    }`}
+                  >
+                    Mặt sau
+                  </button>
+                </div>
+              </div>
+
+              {/* MAIN HERO IMAGE */}
+              <div className="relative aspect-[3/4] max-w-md w-full bg-secondary overflow-hidden">
+                <img
+                  src={
+                    currentImage === "front"
+                      ? product.imageUrlFront
+                      : product.imageUrlBack
+                  }
+                  alt={product.name}
+                  className="w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105"
+                  onClick={() => handleZoom(currentImage)}
+                />
+                
+                <div className="absolute bottom-4 right-4 p-3 bg-white/80 backdrop-blur-md rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ZoomIn size={16} className="text-primary" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* DETAILS PANELS */}
+          <div className="lg:col-span-5 flex flex-col justify-between">
+            <div className="space-y-8">
+              {/* Product title & pricing */}
+              <div>
+                <h2 className="text-3xl lg:text-4xl font-display font-black tracking-tight uppercase mb-4 text-primary">
+                  {product.name}
+                </h2>
+                
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl lg:text-3xl font-display font-black text-accent tracking-tight">
+                    {formatPrice(product.costPrice || product.price)}
+                  </span>
+                  {!isSoldOut && product.discountAmount > 0 && (
+                    <span className="text-sm text-primary/30 line-through font-medium">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Quiet Meta Stats */}
+              <div className="flex items-center gap-6 py-4 border-y border-primary/5 text-[10px] font-black tracking-widest text-primary/40 uppercase">
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={14} className="text-red-500" />
+                  <span>Đã bán: <span className="text-primary font-black">{(product.soldQuantity || 0).toLocaleString("vi-VN")}</span></span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Star className="text-red-500 fill-current" size={14} />
+                  <span>Đánh giá: <span className="text-primary font-black">{product.rating || "5.0"}</span></span>
+                </div>
+              </div>
+
+              {/* SIZE SELECT */}
+              <div>
+                <h3 className="font-display font-black text-[10px] tracking-[0.25em] uppercase mb-4 text-primary/40">
+                  Chọn kích cỡ
+                </h3>
+                <div className="flex gap-2.5 flex-wrap">
+                  {uniqueSizes.map((size) => (
+                    <button
+                      key={size.sizeName}
+                      onClick={() => setSelectedSize(size.sizeName)}
+                      disabled={size.quantity <= 0}
+                      className={`w-12 h-12 text-xs font-black transition-all duration-300 border ${
+                        selectedSize === size.sizeName
+                          ? "bg-primary border-primary text-white"
+                          : "border-primary/10 hover:border-primary/30 text-primary hover:bg-secondary"
+                      } ${
+                        size.quantity <= 0 ? "opacity-30 cursor-not-allowed line-through" : ""
+                      }`}
+                    >
+                      {size.sizeName}
+                    </button>
+                  ))}
+                  {uniqueSizes.length === 0 && <p className="text-xs text-primary/30 uppercase tracking-widest font-black">Không có sẵn kích cỡ nào</p>}
+                </div>
+              </div>
+
+              {/* QUANTITY */}
+              <div>
+                <h3 className="font-display font-black text-[10px] tracking-[0.25em] uppercase mb-4 text-primary/40">
+                  Số lượng
+                </h3>
+                <div className="inline-flex items-center border border-primary/10 h-12 bg-white">
+                  <button
+                    onClick={() => changeQuantity(-1)}
+                    disabled={isSoldOut}
+                    className="w-12 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="w-12 text-center text-xs font-black text-primary">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => changeQuantity(1)}
+                    disabled={isSoldOut}
+                    className="w-12 h-full flex items-center justify-center text-primary/60 hover:text-primary transition-colors disabled:opacity-30"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* ACTION CTA BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isSoldOut}
+                  className={`flex-1 h-13 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border ${
+                    isSoldOut
+                      ? "bg-primary/5 text-primary/20 border-primary/5 cursor-not-allowed"
+                      : "bg-white text-primary border-primary hover:bg-primary hover:text-white"
+                  }`}
+                >
+                  <ShoppingCart size={14} />{" "}
+                  {isSoldOut
+                    ? "Hết hàng"
+                    : isAddedToCart
+                    ? "Đã thêm vào giỏ"
+                    : "Thêm vào giỏ"}
+                </button>
+
+                <button
+                  onClick={handleBuyNow}
+                  disabled={isSoldOut}
+                  className={`flex-1 h-13 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                    isSoldOut
+                      ? "bg-primary/5 text-primary/20 cursor-not-allowed"
+                      : "bg-[#111111] hover:bg-accent text-white shadow-lg active:scale-98"
+                  }`}
+                >
+                  <CreditCard size={14} /> Mua ngay
+                </button>
+              </div>
+
+              {/* SPECIFICATION ACCORDIONS */}
+              <div className="pt-8 border-t border-primary/5 space-y-6">
+                <div>
+                  <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+                    Mô tả sản phẩm
+                  </h3>
+                  <p className="text-primary/60 text-xs leading-relaxed">{product.description}</p>
+                </div>
+
+                <div>
+                  <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+                    Chi tiết sản phẩm
+                  </h3>
+                  <ul className="grid grid-cols-2 gap-y-2.5 text-[11px] font-bold text-primary/50 uppercase tracking-wider">
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Form:</span> {product.form}</li>
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Chất liệu:</span> {product.material}</li>
+                    <li><span className="text-primary/30 mr-1.5 font-medium">Đơn vị:</span> {product.unit}</li>
+                  </ul>
+                </div>
+
+                {product.category?.imageUrl && (
+                  <div>
+                    <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-4 text-primary">
+                      Bảng thông số size
+                    </h3>
+                    <div className="border border-primary/5 bg-[#fafbf9] p-4">
+                      <img
+                        src={product.category.imageUrl}
+                        alt="Size Chart"
+                        className="w-full h-auto grayscale opacity-80"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RELATED RECOMMENDATIONS ROW */}
+        {otherProducts.length > 0 && (
+          <div className="mt-32 pt-16 border-t border-primary/5">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <span className="text-accent font-black text-[10px] tracking-[0.4em] uppercase mb-3 block">Có thể bạn quan tâm</span>
+                <h2 className="text-2xl lg:text-3xl font-display font-black text-primary tracking-tight uppercase">
+                  Sản phẩm tương tự
+                </h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {otherProducts.map((prod) => (
+                <ProductCard key={prod.id} product={prod} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ZOOM MODAL */}
+      {zoomImage && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 overflow-hidden transition-opacity duration-300 ease-in-out">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              ref={imageRef}
+              src={zoomImage}
+              alt="Zoomed campaign design"
+              className="cursor-grab active:cursor-grabbing transition-transform duration-200 ease-in-out max-h-[85vh] object-contain"
+              style={{
+                transform: `scale(${zoomLevel}) translate(${position.x}px, ${position.y}px)`,
+              }}
+              onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+            />
+
+            <button
+              onClick={() => setZoomImage(null)}
+              className="absolute top-6 right-6 bg-white hover:bg-accent text-primary hover:text-white p-3 transition-colors shadow-2xl"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* COMPARISON BAR */}
+      <CompareBar
+        compareList={compareList}
+        setCompareListState={setCompareListState}
+        formatPrice={formatPrice}
+      />
+    </div>
+  );
+};
+
+export default ProductDetail;
