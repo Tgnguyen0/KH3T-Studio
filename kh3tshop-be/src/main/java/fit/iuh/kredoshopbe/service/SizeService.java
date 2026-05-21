@@ -1,7 +1,6 @@
 package fit.iuh.kredoshopbe.service;
 
 import fit.iuh.kredoshopbe.entities.Size;
-import fit.iuh.kredoshopbe.enums.SizeName;
 import fit.iuh.kredoshopbe.exception.AppException;
 import fit.iuh.kredoshopbe.exception.ErrorCode;
 import fit.iuh.kredoshopbe.repository.SizeRepository;
@@ -24,8 +23,7 @@ public class SizeService {
     }
 
     public Size getSizeByName(String sizeName) {
-        SizeName nameSize = SizeName.valueOf(sizeName);
-        return sizeRepository.findByNameSize(nameSize)
+        return sizeRepository.findByNameSize(sizeName)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
     }
 

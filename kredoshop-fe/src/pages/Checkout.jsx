@@ -244,6 +244,21 @@ const Checkout = () => {
             }),
           });
         } else {
+          let cartId = null;
+          try {
+            const cartRes = await fetch(`http://localhost:8080/carts/account/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (cartRes.ok) {
+              const cartData = await cartRes.json();
+              cartId = cartData.result?.id;
+            }
+          } catch (err) {
+            console.error("Error fetching cart for checkout update:", err);
+          }
+
           for (const item of selectedCartItems) {
             // Create order detail
             await fetch(`http://localhost:8080/order-details/create`, {
@@ -269,6 +284,18 @@ const Checkout = () => {
                 Authorization: `Bearer ${token}`,
               },
             });
+
+            // Update cart totals on backend
+            if (cartId) {
+              await fetch(`http://localhost:8080/carts/update/${cartId}/delete`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ price: item.subtotal, quantity: item.quantity }),
+              });
+            }
           }
           localStorage.removeItem("cartItems");
           window.dispatchEvent(new Event("cartUpdated"));
@@ -294,12 +321,13 @@ const Checkout = () => {
             throw new Error(err.message || "Failed to create invoice");
           } else {
             const newInvoice = await res.json();
+            const finalAmount = product ? (product.costPrice * quantity + 30000) : summary.total;
             navigate(
-              `/payment?orderId=${orderData.id}&amount=${summary.total}&invoiceId=${newInvoice.id}&invoiceCode=${newInvoice.invoiceCode}`
+              `/payment?orderId=${orderData.id}&amount=${finalAmount}&invoiceId=${newInvoice.id}&invoiceCode=${newInvoice.invoiceCode}`
             );
           }
         } else {
-          navigate("/");
+          navigate("/orders");
         }
       }
     } catch (error) {

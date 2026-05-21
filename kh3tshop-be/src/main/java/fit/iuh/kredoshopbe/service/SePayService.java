@@ -29,23 +29,38 @@ public class SePayService {
             return new SePayResponse(true, "Transaction type not supported");
         }
         String invoiceCode = callbackRequest.getCode();
-
         if (invoiceCode == null || invoiceCode.isEmpty()) {
             String content = callbackRequest.getContent();
 
             if (content != null && !content.isEmpty()) {
-                // Bắt mã dạng cũ: INV20251206002
-                Pattern pattern = Pattern.compile("(INV\\d{11,})");
+                // Bắt mã có/không có dấu gạch ngang hoặc dấu cách: ví dụ INV-20260521-001, INV 20260521 001, INV20260521001
+                Pattern pattern = Pattern.compile("(INV[- ]?\\d{8}[- ]?\\d+)", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(content);
                 if (matcher.find()) {
                     invoiceCode = matcher.group(1);
                 }
             }
         }
-        if (invoiceCode != null && invoiceCode.matches("INV\\d{11,}")) {
-            String datePart = invoiceCode.substring(3, 11);
-            String indexPart = invoiceCode.substring(11);
-            invoiceCode = "INV-" + datePart + "-" + indexPart;
+        if (invoiceCode != null) {
+            // Chuẩn hóa: loại bỏ khoảng trắng, chuyển thành chữ hoa
+            invoiceCode = invoiceCode.replaceAll("\\s+", "").toUpperCase();
+
+            // Nếu là dạng không dấu gạch ngang (INV20260521001), chuyển thành dạng có dấu (INV-20260521-001)
+            if (invoiceCode.matches("INV\\d{11,}")) {
+                String datePart = invoiceCode.substring(3, 11);
+                String indexPart = invoiceCode.substring(11);
+                invoiceCode = "INV-" + datePart + "-" + indexPart;
+            } else if (invoiceCode.matches("INV-\\d{8}\\d+")) {
+                // Dạng lai như INV-20260521001 -> INV-20260521-001
+                String datePart = invoiceCode.substring(4, 12);
+                String indexPart = invoiceCode.substring(12);
+                invoiceCode = "INV-" + datePart + "-" + indexPart;
+            } else if (invoiceCode.matches("INV\\d{8}-\\d+")) {
+                // Dạng lai như INV20260521-001 -> INV-20260521-001
+                String datePart = invoiceCode.substring(3, 11);
+                String indexPart = invoiceCode.substring(12);
+                invoiceCode = "INV-" + datePart + "-" + indexPart;
+            }
         }
         Invoice invoice = invoiceRepository.findByInvoiceCode(invoiceCode);
         if (invoice == null) {

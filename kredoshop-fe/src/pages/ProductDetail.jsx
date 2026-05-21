@@ -107,7 +107,7 @@ const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
             to={compareUrl}
             onClick={() => {
               if (compareList.length < 2) {
-                toast.warning("Please select at least 2 products to compare.");
+                toast.warning("Vui lòng chọn ít nhất 2 sản phẩm để so sánh.");
                 return false; // Ngăn chặn điều hướng nếu < 2
               }
             }}
@@ -366,7 +366,7 @@ const ProductDetail = () => {
     if (hasSizes && !selectedSize) {
       return toast.warning("Vui lòng chọn kích cỡ");
     }
-    if (quantity < 1) return toast.warning("Quantity must be at least 1");
+    if (quantity < 1) return toast.warning("Số lượng tối thiểu là 1");
     navigate("/checkout", {
       state: { 
         userId: user.id, 
@@ -485,6 +485,11 @@ const ProductDetail = () => {
 
   sizeMap.forEach((value) => uniqueSizes.push(value));
   uniqueSizes.sort((a, b) => {
+    const aNum = parseFloat(a.sizeName);
+    const bNum = parseFloat(b.sizeName);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return aNum - bNum;
+    }
     const order = ["S", "M", "L", "XL"];
     return order.indexOf(a.sizeName) - order.indexOf(b.sizeName);
   });
@@ -494,6 +499,265 @@ const ProductDetail = () => {
   const isSoldOut = totalStock === 0;
 
   const isComparing = compareList.some((p) => p.id === product.id);
+
+  const renderSizeChart = () => {
+    if (!product || !product.sizeDetails || product.sizeDetails.length === 0) return null;
+
+    // Get unique size names for the product
+    const productSizes = Array.from(new Set(product.sizeDetails.map(sd => sd.sizeName.trim().toUpperCase())));
+    
+    // Sort sizes logically: letters S, M, L, XL, XXL first, then numbers
+    const sizeOrder = ["S", "M", "L", "XL", "XXL", "3XL", "ONESIZE"];
+    productSizes.sort((a, b) => {
+      const idxA = sizeOrder.indexOf(a);
+      const idxB = sizeOrder.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      
+      // Numeric sort
+      const numA = parseInt(a, 10);
+      const numB = parseInt(b, 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+
+    const categoryId = product.category?.id;
+    const productNameLower = (product.name || "").toLowerCase();
+
+    // Determine type: 1 = Top, 2 = Bottom, 4 = Shoes, 3 = Accessories
+    let type = 3; // default Accessories
+    if (categoryId === 1 || productNameLower.includes("áo") || productNameLower.includes("polo") || productNameLower.includes("sơ mi") || productNameLower.includes("thun") || productNameLower.includes("khoác") || productNameLower.includes("hoodie") || productNameLower.includes("sweater")) {
+      type = 1;
+    } else if (categoryId === 2 || productNameLower.includes("quần") || productNameLower.includes("jean") || productNameLower.includes("short") || productNameLower.includes("jogger")) {
+      type = 2;
+    } else if (categoryId === 4 || productNameLower.includes("giày") || productNameLower.includes("dép") || productNameLower.includes("sandal") || productNameLower.includes("sneaker")) {
+      type = 4;
+    }
+
+    if (type === 1) {
+      // Tops
+      const specs = {
+        "S": { chest: "92 cm", length: "68 cm", shoulder: "42 cm", height: "1m50 - 1m60", weight: "45 - 53 kg" },
+        "M": { chest: "98 cm", length: "70 cm", shoulder: "44 cm", height: "1m60 - 1m70", weight: "54 - 62 kg" },
+        "L": { chest: "104 cm", length: "72 cm", shoulder: "46 cm", height: "1m70 - 1m75", weight: "63 - 72 kg" },
+        "XL": { chest: "110 cm", length: "74 cm", shoulder: "48 cm", height: "1m75 - 1m80", weight: "73 - 82 kg" },
+        "XXL": { chest: "116 cm", length: "76 cm", shoulder: "50 cm", height: "1m80 - 1m85", weight: "83 - 90 kg" },
+        "3XL": { chest: "122 cm", length: "78 cm", shoulder: "52 cm", height: "1m85 - 1m90", weight: "91 - 100 kg" }
+      };
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+            Bảng thông số size (Áo)
+          </h3>
+          <div className="border border-primary/5 bg-[#fafbf9] rounded-sm overflow-hidden overflow-x-auto">
+            <table className="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr className="bg-primary/[0.03] border-b border-primary/5 font-bold uppercase tracking-wider text-primary/50">
+                  <th className="p-3">Kích cỡ</th>
+                  <th className="p-3">Vòng ngực</th>
+                  <th className="p-3">Chiều dài</th>
+                  <th className="p-3">Rộng vai</th>
+                  <th className="p-3">Chiều cao</th>
+                  <th className="p-3">Cân nặng</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary/5 text-primary/70 font-medium">
+                {productSizes.map((size) => {
+                  const spec = specs[size] || {
+                    chest: "Co giãn tốt",
+                    length: "Tiêu chuẩn",
+                    shoulder: "Tiêu chuẩn",
+                    height: "Phù hợp nhiều phom dáng",
+                    weight: "Phù hợp nhiều phom dáng"
+                  };
+                  const isSelected = selectedSize === size;
+                  return (
+                    <tr 
+                      key={size} 
+                      className={`transition-colors ${
+                        isSelected 
+                          ? "bg-accent/10 text-accent font-bold" 
+                          : "hover:bg-primary/[0.01]"
+                      }`}
+                    >
+                      <td className={`p-3 font-bold ${isSelected ? "text-accent" : "text-primary"}`}>{size}</td>
+                      <td className="p-3">{spec.chest}</td>
+                      <td className="p-3">{spec.length}</td>
+                      <td className="p-3">{spec.shoulder}</td>
+                      <td className="p-3">{spec.height}</td>
+                      <td className="p-3">{spec.weight}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <span className="text-[10px] text-primary/30 mt-2 block font-medium italic">
+            * Các số đo trên mang tính chất tham khảo. Vui lòng liên hệ hỗ trợ nếu cần tư vấn chi tiết hơn.
+          </span>
+        </div>
+      );
+    }
+
+    if (type === 2) {
+      // Bottoms
+      const specsLetter = {
+        "S": { waist: "72 cm", hips: "90 cm", length: "94 cm", height: "1m50 - 1m60", weight: "45 - 53 kg" },
+        "M": { waist: "76 cm", hips: "94 cm", length: "96 cm", height: "1m60 - 1m70", weight: "54 - 62 kg" },
+        "L": { waist: "80 cm", hips: "98 cm", length: "98 cm", height: "1m70 - 1m75", weight: "63 - 72 kg" },
+        "XL": { waist: "84 cm", hips: "102 cm", length: "100 cm", height: "1m75 - 1m80", weight: "73 - 82 kg" },
+        "XXL": { waist: "88 cm", hips: "106 cm", length: "102 cm", height: "1m80 - 1m85", weight: "83 - 90 kg" }
+      };
+
+      const getNumericSpec = (sizeStr) => {
+        const size = parseInt(sizeStr, 10);
+        if (isNaN(size)) return null;
+        const waist = 70 + (size - 28) * 2;
+        const hips = 88 + (size - 28) * 2;
+        const thigh = 50 + (size - 28) * 1;
+        const length = 90 + Math.floor((size - 28) / 2);
+        return {
+          waist: `${waist} - ${waist + 2} cm`,
+          hips: `${hips} - ${hips + 2} cm`,
+          thigh: `${thigh} cm`,
+          length: `${length} cm`
+        };
+      };
+
+      const isNumeric = productSizes.some(s => !isNaN(parseInt(s, 10)));
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+            Bảng thông số size (Quần)
+          </h3>
+          <div className="border border-primary/5 bg-[#fafbf9] rounded-sm overflow-hidden overflow-x-auto">
+            <table className="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr className="bg-primary/[0.03] border-b border-primary/5 font-bold uppercase tracking-wider text-primary/50">
+                  <th className="p-3">Kích cỡ</th>
+                  <th className="p-3">Vòng eo</th>
+                  <th className="p-3">Vòng mông</th>
+                  {isNumeric ? <th className="p-3">Vòng đùi</th> : <th className="p-3">Cân nặng phù hợp</th>}
+                  <th className="p-3">Chiều dài</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary/5 text-primary/70 font-medium">
+                {productSizes.map((size) => {
+                  let spec = specsLetter[size];
+                  if (!spec && isNumeric) {
+                    const numSpec = getNumericSpec(size);
+                    if (numSpec) {
+                      spec = {
+                        waist: numSpec.waist,
+                        hips: numSpec.hips,
+                        thigh: numSpec.thigh,
+                        length: numSpec.length
+                      };
+                    }
+                  }
+                  if (!spec) {
+                    spec = { waist: "Co giãn", hips: "Tiêu chuẩn", thigh: "Tiêu chuẩn", weight: "Tự do", length: "Tiêu chuẩn" };
+                  }
+                  
+                  const isSelected = selectedSize === size;
+                  return (
+                    <tr 
+                      key={size} 
+                      className={`transition-colors ${
+                        isSelected 
+                          ? "bg-accent/10 text-accent font-bold" 
+                          : "hover:bg-primary/[0.01]"
+                      }`}
+                    >
+                      <td className={`p-3 font-bold ${isSelected ? "text-accent" : "text-primary"}`}>{size}</td>
+                      <td className="p-3">{spec.waist}</td>
+                      <td className="p-3">{spec.hips}</td>
+                      {isNumeric ? (
+                        <td className="p-3">{spec.thigh || "Tiêu chuẩn"}</td>
+                      ) : (
+                        <td className="p-3">{spec.weight || spec.height || "Tiêu chuẩn"}</td>
+                      )}
+                      <td className="p-3">{spec.length}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <span className="text-[10px] text-primary/30 mt-2 block font-medium italic">
+            * Các số đo trên mang tính chất tham khảo. Vui lòng liên hệ hỗ trợ nếu cần tư vấn chi tiết hơn.
+          </span>
+        </div>
+      );
+    }
+
+    if (type === 4) {
+      // Shoes
+      const shoeSpecs = {
+        "38": "23.5 - 24.0 cm",
+        "39": "24.0 - 24.5 cm",
+        "40": "24.5 - 25.0 cm",
+        "41": "25.0 - 25.5 cm",
+        "42": "25.5 - 26.0 cm",
+        "43": "26.0 - 26.5 cm",
+        "44": "26.5 - 27.0 cm"
+      };
+
+      return (
+        <div className="mt-6">
+          <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+            Bảng thông số size (Giày / Dép)
+          </h3>
+          <div className="border border-primary/5 bg-[#fafbf9] rounded-sm overflow-hidden overflow-x-auto">
+            <table className="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr className="bg-primary/[0.03] border-b border-primary/5 font-bold uppercase tracking-wider text-primary/50">
+                  <th className="p-3">Kích cỡ</th>
+                  <th className="p-3">Chiều dài bàn chân</th>
+                  <th className="p-3">Hướng dẫn đo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary/5 text-primary/70 font-medium">
+                {productSizes.map((size) => {
+                  const footLength = shoeSpecs[size] || "Liên hệ hỗ trợ";
+                  const isSelected = selectedSize === size;
+                  return (
+                    <tr 
+                      key={size} 
+                      className={`transition-colors ${
+                        isSelected 
+                          ? "bg-accent/10 text-accent font-bold" 
+                          : "hover:bg-primary/[0.01]"
+                      }`}
+                    >
+                      <td className={`p-3 font-bold ${isSelected ? "text-accent" : "text-primary"}`}>{size}</td>
+                      <td className="p-3">{footLength}</td>
+                      <td className="p-3">Đo gót chân tới đầu ngón chân dài nhất</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // Default Accessories
+    return (
+      <div className="mt-6">
+        <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-3 text-primary">
+          Bảng thông số size (Phụ kiện)
+        </h3>
+        <div className="border border-primary/5 bg-[#fafbf9] p-4 text-[11px] font-bold text-primary/60 uppercase tracking-wider rounded-sm">
+          ONESIZE - Thiết kế phù hợp với tất cả các phom dáng tiêu chuẩn.
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-secondary selection:bg-accent selection:text-white">
@@ -582,7 +846,7 @@ const ProductDetail = () => {
                 
                 <div className="flex items-center gap-3">
                   <span className="text-2xl lg:text-3xl font-display font-black text-accent tracking-tight">
-                    {formatPrice(product.costPrice || product.price)}
+                     {formatPrice(product.costPrice || product.price)}
                   </span>
                   {!isSoldOut && product.discountAmount > 0 && (
                     <span className="text-sm text-primary/30 line-through font-medium">
@@ -708,21 +972,9 @@ const ProductDetail = () => {
                   </ul>
                 </div>
 
-                {product.category?.imageUrl && (
-                  <div>
-                    <h3 className="font-display font-black text-[11px] tracking-widest uppercase mb-4 text-primary">
-                      Bảng thông số size
-                    </h3>
-                    <div className="border border-primary/5 bg-[#fafbf9] p-4">
-                      <img
-                        src={product.category.imageUrl}
-                        alt="Size Chart"
-                        className="w-full h-auto grayscale opacity-80"
-                      />
-                    </div>
-                  </div>
-                )}
+                {renderSizeChart()}
               </div>
+
             </div>
           </div>
         </div>

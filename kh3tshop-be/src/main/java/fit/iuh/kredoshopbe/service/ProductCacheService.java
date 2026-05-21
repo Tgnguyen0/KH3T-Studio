@@ -18,7 +18,6 @@ public class ProductCacheService {
 
     public ProductCacheService(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        refreshCache(); // Load lần đầu khi khởi động
     }
 
     public synchronized List<Product> getAllProducts() {
