@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import fit.iuh.kredoshopbe.enums.SizeName;
 import lombok.ToString;
 
 import java.util.List;
@@ -20,9 +19,9 @@ public class Size {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Enumerated(EnumType.STRING)
+    
     @Column(name = "name_size", nullable = false)
-    private SizeName nameSize;
+    private String nameSize;
 
     @JsonIgnore
     @OneToMany(mappedBy = "size", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
