@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import ChatBot from "../components/ChatBot";
 import Contact from "../components/Contact";
-
+import { Link } from "react-router-dom";
 const About = () => {
     return (
         <div className="bg-[#F5F1EA] overflow-hidden">
@@ -49,9 +49,12 @@ const About = () => {
                         </p>
 
                         <div className="flex flex-wrap gap-5 mt-12">
-                            <button className="bg-white text-black px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all">
+                            <Link
+                                to="/product"
+                                className="bg-white text-black px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all inline-block"
+                            >
                                 Khám phá ngay
-                            </button>
+                            </Link>
 
                             <button className="flex items-center gap-3 text-white border border-white/20 px-8 py-4 rounded-full backdrop-blur-xl hover:bg-white/10 transition-all">
                                 <Play className="w-4 h-4 fill-white" />
