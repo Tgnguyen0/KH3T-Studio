@@ -104,7 +104,7 @@ export default function Orders() {
     }
   };
 
-  // ── summary counts ───────────────────────────────────────
+  // ── summary counts ──────────────────────────────────────
   const pendingCount   = orders.filter((o) => o.statusOrder === 'PENDING').length;
   const confirmedCount = orders.filter((o) => o.statusOrder === 'CONFIRMED').length;
   const totalRevenue   = orders.reduce((s, o) => s + (o.customerTrading?.totalAmount || 0), 0);
