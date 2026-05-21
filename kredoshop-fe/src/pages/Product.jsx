@@ -93,9 +93,24 @@ const Product = () => {
     };
   }, [products]);
 
-  // Read sort parameter from URL query on mount
+  // Read category, search, and sort parameters from URL query on mount / query change
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    
+    const catParam = params.get("category");
+    if (catParam) {
+      setSelectedCategory(catParam);
+    } else {
+      setSelectedCategory("all");
+    }
+
+    const searchParam = params.get("search");
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    } else {
+      setSearchTerm("");
+    }
+
     const sortParam = params.get("sort");
     if (sortParam === "bestselling" || sortParam === "newest") {
       setSortBy(sortParam);

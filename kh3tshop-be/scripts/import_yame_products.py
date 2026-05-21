@@ -68,22 +68,36 @@ def get_form_and_material(title, body_html):
         
     return form, material
 
-def main():
-    # 1. Fetch products from YaMe Shopify API (limit 100 to fetch additional shoes)
-    url = "https://yame.vn/products.json?limit=100"
+def fetch_from_url(url):
     try:
-        print("Downloading product data from YaMe.vn API...")
         req = urllib.request.Request(
             url, 
             headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         )
         with urllib.request.urlopen(req) as response:
             data = json.loads(response.read().decode('utf-8'))
-            products = data.get('products', [])
-            print(f"Successfully retrieved {len(products)} products from YaMe.vn")
+            return data.get('products', [])
     except Exception as e:
-        print(f"Error fetching YaMe API: {e}")
-        return
+        print(f"Error fetching {url}: {e}")
+        return []
+
+def main():
+    print("Downloading product data from YaMe.vn API...")
+    general_products = fetch_from_url("https://yame.vn/products.json?limit=120")
+    shoes_products = fetch_from_url("https://yame.vn/collections/giay/products.json?limit=50")
+    sandals_products = fetch_from_url("https://yame.vn/collections/dep/products.json?limit=50")
+    
+    # Merge and deduplicate by ID
+    all_fetched = general_products + shoes_products + sandals_products
+    seen_ids = set()
+    products = []
+    for p in all_fetched:
+        p_id = p.get('id')
+        if p_id not in seen_ids:
+            seen_ids.add(p_id)
+            products.append(p)
+            
+    print(f"Successfully retrieved and combined {len(products)} unique products from YaMe.vn")
 
     if not products:
         print("No products fetched. Exiting.")
