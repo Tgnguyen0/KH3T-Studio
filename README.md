@@ -1,4 +1,4 @@
-# KH3T Shop - Nền Tảng Thương Mại Điện Tử Thông Minh Tích Hợp AI
+# KREDO Shop - Nền Tảng Thương Mại Điện Tử Thông Minh Tích Hợp AI
 
 Chào mừng bạn đến với **KH3T Shop**, hệ thống cửa hàng mua sắm thời trang trực tuyến tích hợp trợ lý ảo thông minh Gemini AI và cổng thanh toán tự động qua mã QR ngân hàng. Dự án được phát triển theo mô hình tách biệt rõ ràng giữa **Backend (Spring Boot)** và **Frontend (React)**.
 

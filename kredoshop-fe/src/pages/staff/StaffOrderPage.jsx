@@ -3,7 +3,7 @@ import Orders from "./Orders";
 
 export default function StaffOrdersPage() {
   return (
-    <StaffDashboard>
+    <StaffDashboard defaultTab="orders">
       <Orders />
     </StaffDashboard>
   );

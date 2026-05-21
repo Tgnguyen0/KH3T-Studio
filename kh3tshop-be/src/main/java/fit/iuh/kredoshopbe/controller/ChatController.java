@@ -54,10 +54,10 @@ public class ChatController {
         String productContext = buildFullProductContextWithCostPrice();
 
         String shopInfo = """
-            === KH3T SHOP - Trợ lý dễ thương ===
+            === KREDO SHOP - Trợ lý dễ thương ===
             - Chỉ bán online, ship toàn quốc
             - Đổi trả miễn phí 7 ngày (lỗi NSX)
-            - Hotline/Zalo: 0903.456.789
+            - Hotline/Zalo: 0123.456.789
             - Giờ làm: 8h30 - 22h00 
             - Quy trình đặt hàng: Chọn áo/quần muốn mua, chọn size, nhập thông tin cá nhân để ship hàng, thanh toán qua ngân hàng, ví điện tử, tiền mặt, các thắc mắc khác liên hệ MrK qua zalo số 0794263939
             - Các câu hỏi khác liên hệ Mr Khánh gia qua zalo
@@ -67,7 +67,7 @@ public class ChatController {
                 : "Lịch sử chat gần đây (mới nhất ở trên):\n" + String.join("\n", history) + "\n";
 
         String finalPrompt = """
-            Bạn là cô trợ lý mua sắm SIÊU DỄ THƯƠNG của KH3T Shop
+            Bạn là cô trợ lý mua sắm SIÊU DỄ THƯƠNG của KREDO Shop
             Xưng "em", gọi khách là "anh/chị", dùng thật nhiều emoji
             Trả lời tự nhiên, ngắn gọn, tối đa 3 câu thôi nha!
 
