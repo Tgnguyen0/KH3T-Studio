@@ -16,7 +16,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import { Toaster } from "sonner";
 import QrPayment from "./pages/QrPayment";
-import ComparePage from "./pages/ComparePage.jsx";
+
 import ResetPassword from "./pages/ResetPassword";
 import StaffOrdersPage from "./pages/staff/StaffOrderPage";
 import StaffInvoicesPage from "./pages/staff/StaffInvoicePage";
@@ -44,7 +44,7 @@ function App() {
           <Route path="/policy" element={<Policy />} />
           <Route path="/product" element={<Product />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/compare" element={<ComparePage />} />
+
           <Route path="/wishlists" element={<WishList />} />
           <Route path="/wishlists/:id" element={<WishlistDetail />} />
           <Route path="/cart" element={<Cart />} />
