@@ -69,8 +69,8 @@ def get_form_and_material(title, body_html):
     return form, material
 
 def main():
-    # 1. Fetch products from YaMe Shopify API (limit 80 to have a rich database)
-    url = "https://yame.vn/products.json?limit=80"
+    # 1. Fetch products from YaMe Shopify API (limit 100 to fetch additional shoes)
+    url = "https://yame.vn/products.json?limit=100"
     try:
         print("Downloading product data from YaMe.vn API...")
         req = urllib.request.Request(
