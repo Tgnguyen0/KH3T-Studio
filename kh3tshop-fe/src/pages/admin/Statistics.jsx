@@ -2,7 +2,6 @@ import React from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Users, Package, ShoppingCart } from 'lucide-react';
 
 export default function Statistics() {
-  // Dữ liệu thống kê theo tháng
   const monthlyStats = [
     { month: 'Tháng 1', revenue: 35000000, orders: 45, customers: 120 },
     { month: 'Tháng 2', revenue: 42000000, orders: 58, customers: 145 },
@@ -12,8 +11,7 @@ export default function Statistics() {
     { month: 'Tháng 6', revenue: 48000000, orders: 71, customers: 165 }
   ];
 
-  // Sản phẩm bán chạy
-  const topProducts = [
+gi  const topProducts = [
     { name: 'Sản phẩm A', sales: 245, revenue: '₫12,250,000', trend: 'up' },
     { name: 'Sản phẩm B', sales: 198, revenue: '₫9,900,000', trend: 'up' },
     { name: 'Sản phẩm C', sales: 156, revenue: '₫7,800,000', trend: 'down' },

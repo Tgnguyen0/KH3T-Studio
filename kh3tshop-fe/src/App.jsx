@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes,Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -101,17 +101,37 @@ function App() {
 // Component điều hướng 404 thông minh
 const SmartRedirect = () => {
   const token = localStorage.getItem("accessToken");
+
+  console.log("TOKEN:", token);
+
   if (token) {
     try {
       const decoded = jwtDecode(token);
+
+      console.log("DECODED TOKEN:", decoded);
+
       const role = decoded.scope || decoded.role || decoded.authorities?.[0];
-      if (role === "ADMIN") return <Navigate to="/admin" replace />;
-      if (role === "STAFF") return <Navigate to="/staff/orders" replace />;
+
+      console.log("ROLE:", role);
+
+      if (role === "ADMIN") {
+        console.log("Redirect ADMIN");
+        return <Navigate to="/admin" replace />;
+      }
+
+      if (role === "STAFF") {
+        console.log("Redirect STAFF");
+        return <Navigate to="/staff/orders" replace />;
+      }
     } catch (e) {
-      // token lỗi → xóa luôn
+      console.log("TOKEN ERROR:", e);
+
       localStorage.removeItem("accessToken");
     }
   }
+
+  console.log("Redirect HOME");
+
   return <Navigate to="/" replace />;
 };
 

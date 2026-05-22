@@ -1,77 +1,109 @@
-import React from 'react';
-import { BarChart3, Umbrella, Users, Package, Settings, LogOut, Menu, X, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router';
-export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab }) {
+import React from "react";
+import {
+  BarChart3,
+  Umbrella,
+  Users,
+  Package,
+  LogOut,
+  Menu,
+  X,
+  TrendingUp,
+} from "lucide-react";
+import { useNavigate } from "react-router";
+
+export default function Sidebar({
+  sidebarOpen,
+  setSidebarOpen,
+  activeTab,
+  setActiveTab,
+}) {
   const navigate = useNavigate();
+
+  const menuItemClass = (tab) =>
+    `flex items-center gap-4 w-full px-4 py-3 rounded-xl transition-all duration-200
+     text-sm font-medium
+     ${
+       activeTab === tab
+         ? "bg-blue-600 text-white shadow-md"
+         : "text-gray-300 hover:bg-gray-800 hover:text-white"
+     }`;
+
+  const iconSize = 22;
+
   return (
-    <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 text-white transition-all duration-300 flex flex-col`}>
-      <div className="p-4 flex items-center justify-between">
-        {sidebarOpen && <h2 className="text-xl font-bold">Admin Panel</h2>}
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 hover:bg-gray-800 rounded">
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+    <div
+      className={`${
+        sidebarOpen ? "w-72" : "w-24"
+      } bg-gray-900 text-white transition-all duration-300 flex flex-col min-h-screen shadow-2xl`}
+    >
+      {/* HEADER */}
+      <div className="p-5 flex items-center justify-between border-b border-gray-800">
+        {sidebarOpen && (
+          <h2 className="text-2xl font-bold tracking-wide">Bảng Quản Trị</h2>
+        )}
+
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-3 hover:bg-gray-800 rounded-xl transition"
+        >
+          {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
+      {/* MENU */}
+      <nav className="flex-1 p-4 space-y-3">
         <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-            activeTab === 'dashboard' ? 'bg-blue-600' : 'hover:bg-gray-800'
-          }`}
+          onClick={() => setActiveTab("dashboard")}
+          className={menuItemClass("dashboard")}
         >
-          <BarChart3 size={20} />
+          <BarChart3 size={iconSize} />
           {sidebarOpen && <span>Dashboard</span>}
         </button>
 
         <button
-          onClick={() => setActiveTab('customers')}
-          className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-            activeTab === 'customers' ? 'bg-blue-600' : 'hover:bg-gray-800'
-          }`}
+          onClick={() => setActiveTab("customers")}
+          className={menuItemClass("customers")}
         >
-          <Users size={20} />
-          {sidebarOpen && <span>Customer</span>}
-        </button>
-
-         <button
-          onClick={() => setActiveTab('employees')}
-          className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-            activeTab === 'employees' ? 'bg-blue-600' : 'hover:bg-gray-800'
-          }`}
-        >
-          <Umbrella size={20} />
-          {sidebarOpen && <span>Employee</span>}
+          <Users size={iconSize} />
+          {sidebarOpen && <span>Khách hàng</span>}
         </button>
 
         <button
-          onClick={() => setActiveTab('products')}
-          className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-            activeTab === 'products' ? 'bg-blue-600' : 'hover:bg-gray-800'
-          }`}
+          onClick={() => setActiveTab("employees")}
+          className={menuItemClass("employees")}
         >
-          <Package size={20} />
-          {sidebarOpen && <span>Product</span>}
+          <Umbrella size={iconSize} />
+          {sidebarOpen && <span>Nhân viên</span>}
         </button>
 
         <button
-          onClick={() => setActiveTab('productDashboard')}
-          className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-            activeTab === 'productDashboard' ? 'bg-blue-600' : 'hover:bg-gray-800'
-          }`}
+          onClick={() => setActiveTab("products")}
+          className={menuItemClass("products")}
         >
-          <TrendingUp size={20} />
-          {sidebarOpen && <span>Product Dashboard</span>}
+          <Package size={iconSize} />
+          {sidebarOpen && <span>Sản phẩm</span>}
+        </button>
+
+        <button
+          onClick={() => setActiveTab("productDashboard")}
+          className={menuItemClass("productDashboard")}
+        >
+          <TrendingUp size={iconSize} />
+          {sidebarOpen && <span>Thống kê Sản phẩm</span>}
         </button>
       </nav>
 
-      <div className="p-4 border-t border-gray-800">
-        <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-red-600 transition mt-2"  
-          onClick={()=>{
-            localStorage.removeItem("accessToken")
-            navigate("/login")}}
+      {/* FOOTER */}
+      <div className="p-5 border-t border-gray-800">
+        <button
+          className="flex items-center gap-4 w-full px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 transition text-white font-medium"
+          onClick={() => {
+            localStorage.removeItem("accessToken");
+            navigate("/login");
+          }}
         >
-          <LogOut size={20} />
-          {sidebarOpen && <span>Log out</span>}
+          <LogOut size={iconSize} />
+          {sidebarOpen && <span>Đăng xuất</span>}
         </button>
       </div>
     </div>
