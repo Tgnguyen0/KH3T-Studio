@@ -1,6 +1,6 @@
 // File: src/pages/Product.jsx
-import { useState, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Search,
   ChevronDown,
@@ -17,6 +17,7 @@ import Contact from "../components/Contact";
 
 const Product = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const categoryTranslations = {
     top: "Áo thời trang",
@@ -93,29 +94,72 @@ const Product = () => {
     };
   }, [products]);
 
+  const isSyncingFromURL = useRef(false);
+
   // Read category, search, and sort parameters from URL query on mount / query change
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     
     const catParam = params.get("category");
-    if (catParam) {
-      setSelectedCategory(catParam);
-    } else {
-      setSelectedCategory("all");
-    }
+    const currentCat = catParam || "all";
 
     const searchParam = params.get("search");
-    if (searchParam) {
-      setSearchTerm(searchParam);
-    } else {
-      setSearchTerm("");
-    }
+    const currentSearch = searchParam || "";
 
     const sortParam = params.get("sort");
-    if (sortParam === "bestselling" || sortParam === "newest") {
-      setSortBy(sortParam);
+    const validSorts = ["price-low", "price-high", "newest", "bestselling"];
+    const currentSort = validSorts.includes(sortParam) ? sortParam : "default";
+
+    const needsUpdate =
+      selectedCategory !== currentCat ||
+      searchTerm !== currentSearch ||
+      sortBy !== currentSort;
+
+    if (needsUpdate) {
+      isSyncingFromURL.current = true;
+      if (selectedCategory !== currentCat) {
+        setSelectedCategory(currentCat);
+      }
+      if (searchTerm !== currentSearch) {
+        setSearchTerm(currentSearch);
+      }
+      if (sortBy !== currentSort) {
+        setSortBy(currentSort);
+      }
     }
   }, [location.search]);
+
+  // Synchronize filter/search state back to URL query parameters
+  useEffect(() => {
+    if (isSyncingFromURL.current) {
+      isSyncingFromURL.current = false;
+      return;
+    }
+
+    const currentParams = new URLSearchParams(location.search);
+    const currentCategory = currentParams.get("category") || "all";
+    const currentSearchTerm = currentParams.get("search") || "";
+    const currentSortBy = currentParams.get("sort") || "default";
+
+    if (
+      selectedCategory !== currentCategory ||
+      searchTerm !== currentSearchTerm ||
+      sortBy !== currentSortBy
+    ) {
+      const params = new URLSearchParams();
+      if (selectedCategory !== "all") {
+        params.set("category", selectedCategory);
+      }
+      if (searchTerm) {
+        params.set("search", searchTerm);
+      }
+      if (sortBy !== "default") {
+        params.set("sort", sortBy);
+      }
+      const newSearch = params.toString() ? `?${params.toString()}` : "";
+      navigate(`/product${newSearch}`, { replace: true });
+    }
+  }, [selectedCategory, searchTerm, sortBy, navigate, location.search]);
 
   // Fetch products
   useEffect(() => {
@@ -436,7 +480,7 @@ const Product = () => {
         {slides.map((slide, idx) => (
           <div
             key={idx}
-            className={`absolute inset-0 flex flex-col lg:flex-row transition-all duration-[1200ms] cubic-bezier(0.25, 1, 0.5, 1) ${
+            className={`absolute inset-0 flex flex-col lg:flex-row transition-all duration-[1200ms] ease-[cubic-bezier(0.25,1,0.5,1)] ${
               idx === activeSlide ? "opacity-100 translate-x-0 z-10" : "opacity-0 translate-x-8 z-0 pointer-events-none"
             }`}
           >

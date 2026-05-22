@@ -208,7 +208,11 @@ const Order = () => {
               const cfg = STATUS_CFG[order.statusOrder] || STATUS_CFG.PENDING;
               const Icon = cfg.icon;
               const isExpanded = expandedOrder === order.id;
-              const orderTotal = order.orderDetails.reduce((s, d) => s + d.totalPrice, 0) + 30000;
+              const subtotal = order.orderDetails.reduce((s, d) => s + d.totalPrice, 0);
+              const orderTotal = order.customerTrading?.totalAmount !== undefined && order.customerTrading?.totalAmount !== null
+                ? order.customerTrading.totalAmount
+                : (subtotal >= 1000000 ? subtotal : subtotal + 30000);
+              const shippingFee = orderTotal - subtotal;
               const isCancelled = order.statusOrder === "CANCELLED";
 
               return (
@@ -412,12 +416,14 @@ const Order = () => {
                         <div className="flex justify-between text-xs sm:text-sm font-bold text-primary/45 uppercase tracking-widest">
                           <span>Tạm tính</span>
                           <span className="text-primary font-black tabular-nums">
-                            {formatPrice(order.orderDetails.reduce((s, d) => s + d.totalPrice, 0))}
+                            {formatPrice(subtotal)}
                           </span>
                         </div>
                         <div className="flex justify-between text-xs sm:text-sm font-bold text-primary/45 uppercase tracking-widest">
                           <span>Phí vận chuyển</span>
-                          <span className="text-primary font-black">30.000 ₫</span>
+                          <span className="text-primary font-black">
+                            {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
+                          </span>
                         </div>
                         <div className="flex justify-between text-xs sm:text-sm font-bold text-primary/45 uppercase tracking-widest pt-3 border-t border-primary/8">
                           <span>Tổng cộng</span>

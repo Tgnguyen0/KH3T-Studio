@@ -9,7 +9,14 @@ public class SePayConfig {
     @Value("${sepay.api-key}")
     private String apiKey;
 
+    @Value("${sepay.webhook-token}")
+    private String webhookToken;
+
     public String getApiKey() {
         return apiKey;
+    }
+
+    public String getWebhookToken() {
+        return webhookToken;
     }
 }

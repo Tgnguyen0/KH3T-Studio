@@ -60,7 +60,7 @@ export default function Employees() {
   const openEdit = (account) => {
     setEditingAccount(account);
     setForm({
-      customer: { fullName: account.customer.fullName || "", phoneNumber: account.customer.phoneNumber || "", email: account.customer.email || "", gender: account.customer.gender || "", dateOfBirth: (account.customer.dateOfBirth || "").slice(0, 10) },
+      customer: { fullName: account.customer?.fullName || "", phoneNumber: account.customer?.phoneNumber || "", email: account.customer?.email || "", gender: account.customer?.gender || "", dateOfBirth: (account.customer?.dateOfBirth || "").slice(0, 10) },
       username: account.username || "", password: "", role: account.role || "", statusLogin: account.statusLogin || "",
     });
     setShowCreate(true);
@@ -213,12 +213,12 @@ export default function Employees() {
                     <tr key={c.id} className="hover:bg-secondary/40 transition-colors">
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 bg-primary text-white flex items-center justify-center font-display font-black text-[10px] flex-shrink-0">{c.customer.fullName?.charAt(0)}</div>
-                          <span className="text-[10px] font-black text-primary uppercase tracking-wide">{c.customer.fullName}</span>
+                          <div className="w-7 h-7 bg-primary text-white flex items-center justify-center font-display font-black text-[10px] flex-shrink-0">{c.customer?.fullName?.charAt(0) ?? c.username?.charAt(0) ?? "?"}</div>
+                          <span className="text-[10px] font-black text-primary uppercase tracking-wide">{c.customer?.fullName ?? c.username ?? "—"}</span>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60">{c.customer.email}</td>
-                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60 font-mono">{c.customer.phoneNumber}</td>
+                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60">{c.customer?.email ?? "—"}</td>
+                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60 font-mono">{c.customer?.phoneNumber ?? "—"}</td>
                       <td className="py-4 px-4">
                         <span className="px-2.5 py-1 border border-primary/10 bg-secondary text-[8px] font-black tracking-widest uppercase text-primary/60">{c.role}</span>
                       </td>
@@ -250,7 +250,7 @@ export default function Employees() {
       </div>
 
       {/* ── Detail Modal ── */}
-      {showDetail && selectedCustomer && (
+      {showDetail && selectedCustomer !== null && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-white max-w-2xl w-full shadow-2xl">
             <div className="bg-[#111111] px-8 py-6 flex justify-between items-center">

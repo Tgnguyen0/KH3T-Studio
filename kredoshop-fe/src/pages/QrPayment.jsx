@@ -20,7 +20,7 @@ const QrPayment = () => {
   const interval = useRef(null);
   const isPaidRef = useRef(false);
 
-  const qrCode = `https://qr.sepay.vn/img?acc=107876577018&bank=VietinBank&amount=${amount}&des=${invoiceCode}`;
+  const qrCode = `https://qr.sepay.vn/img?acc=107876577018&bank=VietinBank&amount=${amount}&des=SEVQR%20${invoiceCode}`;
 
   const handleFetchInvoiceById = async () => {
     if (isPaidRef.current) return;
@@ -340,11 +340,11 @@ const QrPayment = () => {
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[9px] font-bold text-primary/40 uppercase tracking-wider">Nội dung chuyển khoản</span>
                     <span className="font-black text-primary text-xs bg-accent/5 border border-accent/15 px-2.5 py-1 rounded-md select-all tracking-wider font-display">
-                      {invoiceCode}
+                      SEVQR {invoiceCode}
                     </span>
                   </div>
                   <button
-                    onClick={() => handleCopy(invoiceCode, "invoiceCode", "Nội dung chuyển khoản")}
+                    onClick={() => handleCopy(`SEVQR ${invoiceCode}`, "invoiceCode", "Nội dung chuyển khoản")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                       copiedField === "invoiceCode"
                         ? "bg-green-500/10 text-green-600 border border-green-500/20"
