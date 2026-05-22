@@ -277,7 +277,7 @@ export default function Invoices() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/*Footer*/}
       <div className="text-center pt-8 text-[9px] font-bold text-primary/20 uppercase tracking-[0.25em] max-w-7xl mx-auto px-8">
         © {new Date().getFullYear()} KREDO STUDIO. ALL RIGHTS RESERVED.
       </div>
