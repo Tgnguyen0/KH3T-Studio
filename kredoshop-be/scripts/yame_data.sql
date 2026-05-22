@@ -19,22 +19,31 @@ TRUNCATE TABLE `account`;
 TRUNCATE TABLE `customer`;
 
 -- Dumping data for table `customer`
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (2, '2024-10-01', '1998-03-14 00:00:00', 'leesin@example.com', 'Leesin', 'MALE', '0911111111', 'ACTIVE', '2024-10-01');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (3, '2024-10-02', '2000-07-21 00:00:00', 'halland@example.com', 'Erling Halland', 'MALE', '0903333444', 'ACTIVE', '2024-10-02');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (4, '2024-10-03', '1995-10-12 00:00:00', 'doku@example.com', 'Jeremy Doku', 'MALE', '0905555666', 'ACTIVE', '2024-10-03');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (5, '2024-10-04', '1999-01-01 00:00:00', 'vinicious@example.com', 'Vinicius Junior', 'FEMALE', '0907777888', 'ACTIVE', '2024-10-04');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (6, '2024-10-05', '1997-08-09 00:00:00', 'donnarumma@example.com', 'Donnarumma', 'MALE', '0911111333', 'ACTIVE', '2024-10-05');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (7, '2024-10-06', '2001-05-05 00:00:00', 'cr7@example.com', 'Cristiano Ronaldo', 'FEMALE', '0912222444', 'ACTIVE', '2024-10-06');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (8, '2024-10-07', '1996-11-25 00:00:00', 'foden@example.com', 'Phil Foden', 'MALE', '0913333555', 'ACTIVE', '2024-10-07');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (9, '2024-10-08', '1988-02-07 00:00:00', 'aguero@example.com', 'Sergio Aguero', 'MALE', '0914444666', 'INACTIVE', '2024-10-08');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (10, '2024-10-09', '1994-02-01 07:00:00', 'messi@example.com', 'Messi', 'MALE', '0915555777', 'ACTIVE', '2026-05-21');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (11, '2026-05-21', '2010-12-28 07:00:00', 'thanhpham.a2.2004@gmail.com', 'Nguyễn Văn A', 'MALE', '0342157847', 'ACTIVE', '2026-05-21');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (12, '2026-05-21', '2000-01-01 07:00:00', 'testuser123@example.com', 'Test User', 'MALE', '0987654321', 'ACTIVE', '2026-05-21');
-INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (13, '2026-05-21', '2004-10-06 07:00:00', 'kredouser1@gmail.com', 'Nguyen Van C', 'MALE', '0373008708', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (1, '2026-05-21', '1990-01-15 00:00:00', 'nguyenvana@example.com', 'Nguyễn Văn A', 'MALE', '0901111222', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (2, '2026-05-21', '1992-03-20 00:00:00', 'tranthi@example.com', 'Trần Thị B', 'FEMALE', '0902222333', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (3, '2026-05-21', '1988-07-05 00:00:00', 'lehoang@example.com', 'Lê Hoàng', 'MALE', '0903333444', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (4, '2026-05-21', '1995-09-12 00:00:00', 'phamthuy@example.com', 'Phạm Thúy', 'FEMALE', '0904444555', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (5, '2026-05-21', '1993-11-30 00:00:00', 'hoangminh@example.com', 'Hoàng Minh', 'MALE', '0905555666', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (6, '2026-05-21', '1991-02-25 00:00:00', 'ngocanh@example.com', 'Ngọc Anh', 'FEMALE', '0906666777', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (7, '2026-05-21', '1997-06-18 00:00:00', 'doanthanh@example.com', 'Đoàn Thanh', 'MALE', '0907777888', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (8, '2026-05-21', '1994-12-02 00:00:00', 'vuonglam@example.com', 'Vương Lâm', 'MALE', '0908888999', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (9, '2026-05-21', '1998-04-14 00:00:00', 'luonghai@example.com', 'Lương Hải', 'MALE', '0909999000', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (10, '2026-05-21', '1996-08-09 00:00:00', 'huynhmien@example.com', 'Huỳnh Miên', 'MALE', '0911111122', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (11, '2026-05-21', '1999-01-20 00:00:00', 'nguyenthao@example.com', 'Nguyễn Thảo', 'FEMALE', '0912222233', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (12, '2026-05-21', '1992-05-30 00:00:00', 'tranquoc@example.com', 'Trần Quốc', 'MALE', '0913333344', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (13, '2026-05-21', '1993-09-15 00:00:00', 'phamnam@example.com', 'Phạm Nam', 'MALE', '0914444455', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (14, '2026-05-21', '1995-11-22 00:00:00', 'lethanh@example.com', 'Lê Thành', 'MALE', '0915555566', 'ACTIVE', '2026-05-21');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (15, '2026-05-21', '1990-03-08 00:00:00', 'nguyentrang@example.com', 'Nguyễn Tràng', 'MALE', '0916666677', 'ACTIVE', '2026-05-21');
+-- Khách hàng thực (ID 16-20)
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (16, '2026-05-22', '1998-03-14 00:00:00', 'bich.ngoc.kredo@gmail.com', 'Trần Bích Ngọc', 'FEMALE', '0981234567', 'ACTIVE', '2026-05-22');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (17, '2026-05-22', '1995-07-22 00:00:00', 'minh.tuan.shop@gmail.com', 'Nguyễn Minh Tuấn', 'MALE', '0977654321', 'ACTIVE', '2026-05-22');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (18, '2026-05-22', '2000-11-05 00:00:00', 'thu.ha.fashion@gmail.com', 'Lê Thị Thu Hà', 'FEMALE', '0968123456', 'ACTIVE', '2026-05-22');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (19, '2026-05-22', '1993-04-18 00:00:00', 'quang.hung.vn@gmail.com', 'Phạm Quang Hùng', 'MALE', '0912876543', 'ACTIVE', '2026-05-22');
+INSERT INTO `customer` (`customer_id`, `create_at`, `date_of_birth`, `email`, `full_name`, `gender`, `phone_number`, `status`, `update_at`) VALUES (20, '2026-05-22', '1997-09-30 00:00:00', 'lan.phuong.kredo@gmail.com', 'Võ Lan Phương', 'FEMALE', '0933456789', 'ACTIVE', '2026-05-22');
 
 -- Dumping data for table `account`
-INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (1, '2024-10-01 00:00:00', '$2a$10$asqFiSnfasSX4/g2fPID4ec9hxDWHbXDDTlN7FEwRpUjGz4itBlPm', 'ADMIN', 'ACTIVE', '2024-10-01 00:00:00', 'admin', NULL);
-INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (2, '2024-10-01 00:00:00', '$2a$10$pdErrGmqR6k4c2cHmTVrCOoKtQmoR.frS.lAFbvU6e7/Cjbnt98Xi', 'USER', 'ACTIVE', '2024-10-01 00:00:00', 'Leesin', 2);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (1, CURRENT_TIMESTAMP, '$2a$10$eW5R6kMZ1xj6YzK9OeFheO1Q8wGkX3VYpL4d5a6b7c8d9e0f1g2h', 'STAFF', 'ACTIVE', CURRENT_TIMESTAMP, 'nv1', NULL);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (2, CURRENT_TIMESTAMP, '$2a$10$h1g2f3e4d5c6b7a8L9K0jIhGfEdcBaXwVuTsRqPoNmLkJiHgFe', 'STAFF', 'ACTIVE', CURRENT_TIMESTAMP, 'nv2', NULL);
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (3, '2024-10-02 00:00:00', '$2a$10$UwU6c/qJC6Tg9/ySe5RYLOCtH3pTHzakrVAV0hjRfWzNVCe2kyJni', 'USER', 'ACTIVE', '2024-10-02 00:00:00', 'Halland', 3);
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (4, '2024-10-03 00:00:00', '$2a$10$ezcfId8HGRycvLNNEQZdG.hLaSJ4xLvNoi0KRUkBU6tgu6vlKN2n2', 'USER', 'ACTIVE', '2024-10-03 00:00:00', 'Doku', 4);
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (5, '2024-10-04 00:00:00', '$2a$10$p1gJ9SJINENQKTZDp02jFOJVy3p3Aci2CNf1AOjR7.PylbyBtGzVm', 'USER', 'ACTIVE', '2024-10-04 00:00:00', 'Vinicious', 5);
@@ -46,6 +55,14 @@ INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_logi
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (11, '2026-05-21 00:00:00', '$2a$10$G049g0d9JY6MIsG/kKFTj.dK9DL6Wd/PL8xMnFjk.iq13l1koirEG', 'STAFF', 'ACTIVE', '2026-05-21 00:00:00', 'nhanvien2', 11);
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (12, '2026-05-21 00:00:00', '$2a$10$JcEyEq0wFzdKqwKhPq9FBOz6tp2S7BUzLAMXHtAEE0ePGCcIjWB0O', 'USER', 'ACTIVE', '2026-05-21 00:00:00', 'TestUser123', 12);
 INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (13, '2026-05-21 00:00:00', '$2a$10$ENn5hiNXwJeaHTmorU0zVOsQkol5TIHo2.1V68FAjmAuDTojnC/i6', 'USER', 'ACTIVE', '2026-05-21 00:00:00', 'kredouser1', 13);
+-- Tài khoản admin: username=admin, mật khẩu=123456
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (14, CURRENT_TIMESTAMP, '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, 'admin', NULL);
+-- Tài khoản cho khách hàng thực (ID 16-20), mật khẩu mặc định: Kredo@2026
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (15, '2026-05-22 00:00:00', '$2a$10$UwU6c/qJC6Tg9/ySe5RYLOCtH3pTHzakrVAV0hjRfWzNVCe2kyJni', 'USER', 'ACTIVE', '2026-05-22 00:00:00', 'bichngoc', 16);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (16, '2026-05-22 00:00:00', '$2a$10$ezcfId8HGRycvLNNEQZdG.hLaSJ4xLvNoi0KRUkBU6tgu6vlKN2n2', 'USER', 'ACTIVE', '2026-05-22 00:00:00', 'minhtuan', 17);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (17, '2026-05-22 00:00:00', '$2a$10$p1gJ9SJINENQKTZDp02jFOJVy3p3Aci2CNf1AOjR7.PylbyBtGzVm', 'USER', 'ACTIVE', '2026-05-22 00:00:00', 'thuha', 18);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (18, '2026-05-22 00:00:00', '$2a$10$.7Rcw1esqB3LUK.bgVxmo.7jbWjsuckn4rPd4lGniJJdzyHOCh05i', 'USER', 'ACTIVE', '2026-05-22 00:00:00', 'quanghung', 19);
+INSERT INTO `account` (`login_id`, `create_at`, `password`, `role`, `status_login`, `update_at`, `username`, `customer_id`) VALUES (19, '2026-05-22 00:00:00', '$2a$10$asqFiSnfasSX4/g2fPID4ec9hxDWHbXDDTlN7FEwRpUjGz4itBlPm', 'USER', 'ACTIVE', '2026-05-22 00:00:00', 'lanphuong', 20);
 
 -- Dumping data for table `address`
 INSERT INTO `address` (`id`, `delivery_address`, `delivery_note`, `province`, `account_id`) VALUES (1, '123 Đường Giải Phóng, Quận Hai Bà Trưng', 'Giao giờ hành chính', 'Hà Nội', 1);
@@ -519,5 +536,33 @@ INSERT INTO `customer_trading` (`trading_id`, `created_at`, `receiver_address`, 
 INSERT INTO `customer_trading` (`trading_id`, `created_at`, `receiver_address`, `receiver_email`, `receiver_name`, `receiver_phone`, `total_amount`, `trading_date`, `updated_at`) VALUES (9, '2026-05-21 13:55:15.996000', 'undefined, undefined', 'kredouser1@gmail.com', 'Nguyen Van C', '0373008708', 452450.0, '2026-05-21 13:55:15.996000', NULL);
 INSERT INTO `customer_trading` (`trading_id`, `created_at`, `receiver_address`, `receiver_email`, `receiver_name`, `receiver_phone`, `total_amount`, `trading_date`, `updated_at`) VALUES (10, '2026-05-21 13:58:18.790000', 'undefined, undefined', 'kredouser1@gmail.com', 'Nguyen Van C', '0373008708', 452450.0, '2026-05-21 13:58:18.790000', NULL);
 INSERT INTO `customer_trading` (`trading_id`, `created_at`, `receiver_address`, `receiver_email`, `receiver_name`, `receiver_phone`, `total_amount`, `trading_date`, `updated_at`) VALUES (11, '2026-05-21 13:58:56.966000', 'undefined, undefined', 'kredouser1@gmail.com', 'Phạm Ngọc Thành', '0373008708', 0.0, '2026-05-21 13:58:56.966000', NULL);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- New table for monthly sales data
+CREATE TABLE IF NOT EXISTS `monthly_sales` (
+  `month` DATE NOT NULL,
+  `revenue` DECIMAL(15,2) NOT NULL,
+  PRIMARY KEY (`month`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `monthly_sales` (`month`,`revenue`) VALUES
+('2026-01-01', 5000000.00),
+('2026-02-01', 6200000.00),
+('2026-03-01', 7100000.00),
+('2026-04-01', 8450000.00),
+('2026-05-01', 9300000.00);
+
+-- ============================================================
+-- Đặt hết hàng (quantity = 0) cho một số size cụ thể
+-- Khi tất cả size của một sản phẩm = 0, web sẽ hiển thị "Hết hàng"
+-- Sản phẩm 3 (Áo sơ mi Xám Trắng) - hết size M và L
+UPDATE `size_detail` SET `quantity` = 0 WHERE `product_id` = 3 AND `size_id` IN (2, 3);
+-- Sản phẩm 7 (Áo Polo Rêu 76) - hết tất cả size → báo Hết hàng
+UPDATE `size_detail` SET `quantity` = 0 WHERE `product_id` = 7;
+-- Sản phẩm 12 - hết size S và XL
+UPDATE `size_detail` SET `quantity` = 0 WHERE `product_id` = 12 AND `size_id` IN (1, 4);
+-- Đồng thời cập nhật cột quantity trên bảng product cho nhất quán
+UPDATE `product` SET `quantity` = 0 WHERE `product_id` = 7;
 
 SET FOREIGN_KEY_CHECKS = 1;

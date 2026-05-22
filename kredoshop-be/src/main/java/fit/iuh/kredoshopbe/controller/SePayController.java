@@ -22,6 +22,9 @@ public class SePayController {
             @RequestBody SePayRequest request,
             @RequestHeader(value = "Authorization", required = false) String authHeader
     ) {
+        System.out.println("[SePay Webhook] Nhận được callback request: " + request);
+        System.out.println("[SePay Webhook] Authorization header: " + authHeader);
+
         String apiKey = "KH3T_SHOP_KEY";
 
         if (authHeader != null && authHeader.startsWith("Apikey ")) {
@@ -29,6 +32,7 @@ public class SePayController {
         }
 
         SePayResponse response = sePayService.handleCallback(request, apiKey);
+        System.out.println("[SePay Webhook] Kết quả xử lý: success=" + response.isSuccess() + ", message=" + response.getMessage());
         return ResponseEntity.ok(response);
     }
 }

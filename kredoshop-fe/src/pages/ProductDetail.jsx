@@ -10,7 +10,6 @@ import {
   ZoomIn,
   Minus,
   Plus,
-  GitCompare,
   ShoppingBag,
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
@@ -18,114 +17,7 @@ import { toast } from "sonner";
 import ChatBot from "../components/ChatBot";
 import Contact from "../components/Contact";
 
-// --- GLOBAL UTILS FOR COMPARE LIST ---
-const getCompareList = () => {
-  const list = localStorage.getItem("compareList");
-  return list ? JSON.parse(list) : [];
-};
 
-const setCompareList = (list) => {
-  localStorage.setItem("compareList", JSON.stringify(list));
-};
-// ------------------------------------
-
-// --- COMPARISON BAR COMPONENT ---
-// Component hiển thị thanh so sánh cố định ở cuối trang
-const CompareBar = ({ compareList, setCompareListState, formatPrice }) => {
-  if (compareList.length === 0) return null;
-
-  // Hàm loại bỏ sản phẩm khỏi danh sách
-  const handleRemoveProduct = (productId, productName) => {
-    const newList = compareList.filter((p) => p.id !== productId);
-    setCompareList(newList); // Cập nhật localStorage
-    setCompareListState(newList); // Cập nhật state
-    toast.info(`${productName} đã xóa khỏi danh sách so sánh.`);
-  };
-
-  // Tạo URL cho trang so sánh
-  const compareUrl = `/compare?ids=${compareList.map((p) => p.id).join(",")}`;
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-40 p-4 transition-transform duration-300 ease-in-out">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* LEFT: Product List */}
-        <div className="flex items-center space-x-4 overflow-x-auto p-2">
-          {compareList.map((p) => (
-            <div
-              key={p.id}
-              className="relative flex-shrink-0 w-32 bg-gray-50 p-2 rounded-lg border border-gray-200"
-            >
-              {/* Product Image and Name */}
-              <Link
-                to={`/product/${p.id}`}
-                className="block text-center hover:opacity-80 transition-opacity"
-              >
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className="w-full h-20 object-contain mx-auto mb-1 rounded"
-                />
-                <p className="text-xs font-medium truncate">{p.name}</p>
-                <p className="text-sm font-bold text-red-500">
-                  {formatPrice(p.discount_amount || p.price)}
-                </p>
-              </Link>
-
-              {/* Remove Button */}
-              <button
-                onClick={() => handleRemoveProduct(p.id, p.name)}
-                className="absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 transition"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-
-          {/* Placeholders for remaining slots */}
-          {Array(4 - compareList.length)
-            .fill(0)
-            .map((_, index) => (
-              <div
-                key={`placeholder-${index}`}
-                className="flex-shrink-0 w-32 h-36 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm p-2"
-              >
-                <Plus size={20} className="mb-1" />
-                Thêm sản phẩm
-              </div>
-            ))}
-        </div>
-
-        {/* RIGHT: Status and Action Button */}
-        <div className="flex-shrink-0 ml-4 space-y-2 text-center">
-          <p className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-            {compareList.length} / 4 sản phẩm đã chọn
-          </p>
-          <p className="text-xs text-gray-500 italic">
-            Chọn 2-4 sản phẩm để so sánh
-          </p>
-          <Link
-            to={compareUrl}
-            onClick={() => {
-              if (compareList.length < 2) {
-                toast.warning("Vui lòng chọn ít nhất 2 sản phẩm để so sánh.");
-                return false; // Ngăn chặn điều hướng nếu < 2
-              }
-            }}
-            className={`flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-bold text-white transition-all ${
-              compareList.length >= 2
-                ? "bg-green-600 hover:bg-green-700 shadow-md"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
-            style={{ pointerEvents: compareList.length >= 2 ? "auto" : "none" }}
-          >
-            <GitCompare size={20} /> So sánh ({compareList.length})
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-};
-// ------------------------------------
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -148,8 +40,6 @@ const ProductDetail = () => {
   const [cart, setCart] = useState(null);
   const navigate = useNavigate();
 
-  const [compareList, setCompareListState] = useState(getCompareList());
-
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -163,6 +53,10 @@ const ProductDetail = () => {
       const data = await res.json();
       console.log("Tài khoản đang login: ", data.result);
       setUser(data.result);
+      if (data.result && data.result.id) {
+        localStorage.setItem("userId", data.result.id);
+        localStorage.setItem("user", JSON.stringify(data.result));
+      }
     } catch (error) {
       console.error("Lỗi fetch user", error);
     }
@@ -416,39 +310,7 @@ const ProductDetail = () => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
-  const handleCompare = () => {
-    // Đảm bảo product đã load xong
-    if (!product) return;
 
-    const currentProductInList = compareList.find((p) => p.id === product.id);
-    const newProductData = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      discount_amount: product.costPrice, // Sử dụng costPrice là giá đã giảm (sale price)
-      imageUrl: product.imageUrlFront, // Lấy ảnh front để hiển thị
-    };
-
-    if (currentProductInList) {
-      // Nếu đã có trong danh sách -> Xóa (Toggle off)
-      const newList = compareList.filter((p) => p.id !== product.id);
-      setCompareList(newList);
-      setCompareListState(newList);
-      toast.info(`${product.name} đã xóa khỏi danh sách so sánh.`);
-    } else {
-      // Nếu chưa có trong danh sách -> Thêm vào (Toggle on)
-      if (compareList.length < 4) {
-        const newList = [...compareList, newProductData];
-        setCompareList(newList);
-        setCompareListState(newList);
-        toast.success(
-          `${product.name} đã thêm vào danh sách so sánh (${newList.length}/4).`
-        );
-      } else {
-        toast.error("Chỉ được phép so sánh tối đa 4 sản phẩm.");
-      }
-    }
-  };
 
   if (loading) {
     return (
@@ -498,7 +360,33 @@ const ProductDetail = () => {
   const totalStock = uniqueSizes.reduce((sum, size) => sum + size.quantity, 0);
   const isSoldOut = totalStock === 0;
 
-  const isComparing = compareList.some((p) => p.id === product.id);
+  const getDiscountPercentage = () => {
+    if (!product.discountAmount || product.discountAmount <= 0) return 0;
+    if (product.discountAmount > 100) {
+      return Math.round((product.discountAmount / (product.price + product.discountAmount)) * 100);
+    }
+    return Math.round(product.discountAmount);
+  };
+
+  const getPrices = () => {
+    const hasDiscount = product.discountAmount > 0;
+    if (!hasDiscount) {
+      return { currentPrice: product.price, originalPrice: null };
+    }
+    if (product.discountAmount > 100) {
+      return {
+        currentPrice: product.price,
+        originalPrice: product.price + product.discountAmount
+      };
+    } else {
+      return {
+        currentPrice: product.costPrice || product.price,
+        originalPrice: product.price
+      };
+    }
+  };
+
+
 
   const renderSizeChart = () => {
     if (!product || !product.sizeDetails || product.sizeDetails.length === 0) return null;
@@ -776,20 +664,7 @@ const ProductDetail = () => {
               )}
 
               {/* TOP ACTIONS BAR */}
-              <div className="w-full flex justify-between items-center mb-6 z-10">
-                {/* COMPARE BUTTON */}
-                <button
-                  onClick={handleCompare}
-                  className={`flex items-center gap-1.5 px-4 h-9 text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-300 ${
-                    isComparing
-                      ? "bg-accent text-white shadow-md"
-                      : "bg-[#111111] hover:bg-accent text-white"
-                  }`}
-                >
-                  <GitCompare size={12} />{" "}
-                  {isComparing ? "Đang so sánh" : "Thêm vào so sánh"}
-                </button>
-
+              <div className="w-full flex justify-end items-center mb-6 z-10">
                 {/* VIEW CONTROLS */}
                 <div className="flex gap-2 bg-secondary p-1 border border-primary/5">
                   <button
@@ -824,7 +699,9 @@ const ProductDetail = () => {
                       : product.imageUrlBack
                   }
                   alt={product.name}
-                  className="w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105"
+                  className={`w-full h-full object-cover cursor-zoom-in transition-transform duration-500 hover:scale-105 ${
+                    isSoldOut ? "blur-[1px] opacity-60 grayscale-[40%]" : ""
+                  }`}
                   onClick={() => handleZoom(currentImage)}
                 />
                 
@@ -846,11 +723,16 @@ const ProductDetail = () => {
                 
                 <div className="flex items-center gap-3">
                   <span className="text-2xl lg:text-3xl font-display font-black text-accent tracking-tight">
-                     {formatPrice(product.costPrice || product.price)}
+                     {formatPrice(getPrices().currentPrice)}
                   </span>
-                  {!isSoldOut && product.discountAmount > 0 && (
+                  {!isSoldOut && getPrices().originalPrice && (
                     <span className="text-sm text-primary/30 line-through font-medium">
-                      {formatPrice(product.price)}
+                      {formatPrice(getPrices().originalPrice)}
+                    </span>
+                  )}
+                  {!isSoldOut && getDiscountPercentage() > 0 && (
+                    <span className="bg-red-500 text-white px-2 py-0.5 text-[9px] font-black tracking-widest uppercase">
+                      -{getDiscountPercentage()}%
                     </span>
                   )}
                 </div>
@@ -1025,12 +907,7 @@ const ProductDetail = () => {
         </div>
       )}
 
-      {/* COMPARISON BAR */}
-      <CompareBar
-        compareList={compareList}
-        setCompareListState={setCompareListState}
-        formatPrice={formatPrice}
-      />
+
     </div>
   );
 };

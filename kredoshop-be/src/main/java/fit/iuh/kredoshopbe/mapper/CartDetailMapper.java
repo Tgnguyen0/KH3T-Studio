@@ -14,6 +14,7 @@ public interface CartDetailMapper {
     @Mapping(source = "sizeDetail.size.nameSize", target = "sizeName")
     @Mapping(source = "product.imageUrlFront", target = "productImage")
     @Mapping(source = "price_at_time", target = "priceAtTime")
+    @Mapping(source = "selected", target = "isSelected")
     CartDetailResponse toCartDetailResponse(CartDetail cartDetail);
 
 

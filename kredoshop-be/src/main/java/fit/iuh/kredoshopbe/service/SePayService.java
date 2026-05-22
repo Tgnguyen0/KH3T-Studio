@@ -22,7 +22,7 @@ public class SePayService {
     private InvoiceRepository invoiceRepository;
 
     public SePayResponse handleCallback(SePayRequest callbackRequest, String authorizationHeader) {
-        if (!sePayConfig.getApiKey().equals(authorizationHeader)) {
+        if (!sePayConfig.getWebhookToken().equals(authorizationHeader)) {
             return new SePayResponse(false, "Unauthorized callback " + authorizationHeader);
         }
         if (!"in".equalsIgnoreCase(callbackRequest.getTransferType())) {

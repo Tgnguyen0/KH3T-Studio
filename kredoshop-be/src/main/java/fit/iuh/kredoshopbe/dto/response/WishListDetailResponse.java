@@ -18,5 +18,7 @@ public class WishListDetailResponse {
     private String productName;
     private String productImage;
     private Double productPrice;
+    private Double productCostPrice;
+    private Integer productQuantity;
     private Integer discountAmount;
 }

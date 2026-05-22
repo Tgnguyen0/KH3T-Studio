@@ -34,4 +34,4 @@ logs/
 **/.env
 
 # Credentials
-kh3tshop-be/src/main/resources/credentials.json
+kredoshop-be/src/main/resources/credentials.json

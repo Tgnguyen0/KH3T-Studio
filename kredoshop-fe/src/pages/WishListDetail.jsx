@@ -49,9 +49,9 @@ export default function WishlistDetail() {
           name: item.productName,
           imageUrlFront: item.productImage,
           price: item.productPrice,
-          costPrice: item.productCostPrice || item.productPrice,
+          costPrice: item.productCostPrice !== undefined ? item.productCostPrice : item.productPrice,
           discountAmount: item.discountAmount || 0,
-          quantity: 1,
+          quantity: item.productQuantity !== undefined ? item.productQuantity : 1,
           rating: 4.5,
         }));
         setProducts(productList);

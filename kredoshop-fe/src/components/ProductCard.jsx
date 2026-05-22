@@ -45,6 +45,32 @@ const ProductCard = ({
     }).format(price);
   };
 
+  const getDiscountPercentage = () => {
+    if (!product.discountAmount || product.discountAmount <= 0) return 0;
+    if (product.discountAmount > 100) {
+      return Math.round((product.discountAmount / (product.price + product.discountAmount)) * 100);
+    }
+    return Math.round(product.discountAmount);
+  };
+
+  const getPrices = () => {
+    const hasDiscount = product.discountAmount > 0;
+    if (!hasDiscount) {
+      return { currentPrice: product.price, originalPrice: null };
+    }
+    if (product.discountAmount > 100) {
+      return {
+        currentPrice: product.price,
+        originalPrice: product.price + product.discountAmount
+      };
+    } else {
+      return {
+        currentPrice: product.costPrice || product.price,
+        originalPrice: product.price
+      };
+    }
+  };
+
   const isSoldOut = product.quantity === 0;
 
   const goToDetail = (e) => {
@@ -104,7 +130,9 @@ const ProductCard = ({
     return (
       <>
         <div
-          className="bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative flex gap-6 p-5 hover:shadow-[0_15px_35px_rgba(0,0,0,0.02)]"
+          className={`bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative flex gap-6 p-5 hover:shadow-[0_15px_35px_rgba(0,0,0,0.02)] ${
+            isSoldOut ? "opacity-60 grayscale-[40%]" : ""
+          }`}
           onClick={goToDetail}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -114,7 +142,9 @@ const ProductCard = ({
             <img
               src={imageSrc}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out"
+              className={`w-full h-full object-cover transition-transform duration-700 ease-out ${
+                isSoldOut ? "blur-[1px] opacity-75" : ""
+              }`}
             />
 
             {/* SOLD OUT */}
@@ -127,9 +157,9 @@ const ProductCard = ({
             )}
 
             {/* DISCOUNT TAG */}
-            {!isSoldOut && product.discountAmount > 0 && (
+            {!isSoldOut && getDiscountPercentage() > 0 && (
               <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase">
-                -{product.discountAmount}%
+                -{getDiscountPercentage()}%
               </div>
             )}
 
@@ -196,11 +226,11 @@ const ProductCard = ({
             <div className="flex items-center justify-between pt-4 border-t border-primary/5">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-display font-black text-accent tracking-tight">
-                  {formatPrice(product.costPrice || product.price)}
+                  {formatPrice(getPrices().currentPrice)}
                 </span>
-                {!isSoldOut && product.discountAmount > 0 && (
+                {!isSoldOut && getPrices().originalPrice && (
                   <span className="text-xs text-primary/30 line-through font-medium">
-                    {formatPrice(product.price)}
+                    {formatPrice(getPrices().originalPrice)}
                   </span>
                 )}
               </div>
@@ -260,7 +290,9 @@ const ProductCard = ({
   return (
     <>
       <div
-        className="bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.03)] flex flex-col h-full"
+        className={`bg-white rounded-none border border-primary/5 hover:border-primary/20 transition-all duration-500 group cursor-pointer relative hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.03)] flex flex-col h-full ${
+          isSoldOut ? "opacity-60 grayscale-[40%]" : ""
+        }`}
         onClick={goToDetail}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -270,7 +302,9 @@ const ProductCard = ({
           <img
             src={imageSrc}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out"
+            className={`w-full h-full object-cover transition-transform duration-700 ease-out ${
+              isSoldOut ? "blur-[1px] opacity-75" : ""
+            }`}
           />
 
           {/* SOLD OUT */}
@@ -283,9 +317,9 @@ const ProductCard = ({
           )}
 
           {/* DISCOUNT */}
-          {!isSoldOut && product.discountAmount > 0 && (
+          {!isSoldOut && getDiscountPercentage() > 0 && (
             <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase z-10">
-              -{product.discountAmount}%
+              -{getDiscountPercentage()}%
             </div>
           )}
 
@@ -380,11 +414,11 @@ const ProductCard = ({
           <div className="flex items-center justify-between pt-3 border-t border-primary/5">
             <div>
               <p className="text-base font-display font-black text-accent tracking-tight">
-                {formatPrice(product.costPrice || product.price)}
+                {formatPrice(getPrices().currentPrice)}
               </p>
-              {!isSoldOut && product.discountAmount > 0 && (
+              {!isSoldOut && getPrices().originalPrice && (
                 <p className="text-xs text-primary/30 line-through font-medium">
-                  {formatPrice(product.price)}
+                  {formatPrice(getPrices().originalPrice)}
                 </p>
               )}
             </div>

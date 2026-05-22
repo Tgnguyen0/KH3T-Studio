@@ -233,31 +233,7 @@ const ChatBot = () => {
                         ))}
                       </div>
                     )}
-                    {msg.compareIds && msg.compareIds.length >= 2 && (
-                      <div className="mt-3">
-                        <a
-                          href={`/compare?ids=${msg.compareIds.join(',')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group block p-3.5 bg-gradient-to-r from-violet-50 to-indigo-50 hover:from-violet-100 hover:to-indigo-100 rounded-xl border border-violet-100 hover:border-violet-300 hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center text-violet-500">
-                                <Sparkles className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <p className="font-semibold text-violet-700 text-xs group-hover:text-violet-800 transition-colors">
-                                  So sánh {msg.compareIds.length} sản phẩm
-                                </p>
-                                <p className="text-[10px] text-gray-500 mt-0.5">Xem phom dáng, chất liệu, kích cỡ, giá cả...</p>
-                              </div>
-                            </div>
-                            <ArrowRight className="w-4 h-4 text-violet-400 group-hover:text-violet-600 transition-colors transform group-hover:translate-x-1 duration-300" />
-                          </div>
-                        </a>
-                      </div>
-                    )}
+
                   </div>
                 </div>
               )}

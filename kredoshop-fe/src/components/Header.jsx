@@ -53,9 +53,15 @@ const Header = () => {
         if (response.ok) {
           const data = await response.json();
           setAccount(data.result);
+          if (data.result && data.result.id) {
+            localStorage.setItem("userId", data.result.id);
+            localStorage.setItem("user", JSON.stringify(data.result));
+          }
         } else {
           // Token invalid or expired
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("user");
           setAccount(null);
         }
       } catch (error) {
@@ -125,6 +131,8 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
     setAccount(null);
     setCartCount(0);
     toast.success("Đã đăng xuất thành công");
@@ -134,14 +142,24 @@ const Header = () => {
   const submitSearch = () => {
     if (searchValue.trim()) {
       navigate(`/product?search=${encodeURIComponent(searchValue.trim())}`);
-      setIsSearchOpen(false);
-      setSearchValue("");
+    } else {
+      navigate("/product");
     }
+    setIsSearchOpen(false);
+    setSearchValue("");
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       submitSearch();
+    }
+  };
+
+  const handleMainSearchClick = () => {
+    if (isSearchOpen) {
+      submitSearch();
+    } else {
+      setIsSearchOpen(true);
     }
   };
 
@@ -218,7 +236,7 @@ const Header = () => {
             {/* Search */}
             <div className="relative" ref={searchRef}>
                <button 
-                 onClick={() => setIsSearchOpen(!isSearchOpen)}
+                 onClick={handleMainSearchClick}
                  className="text-primary/60 hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary/80"
                >
                  <Search size={18} />
@@ -268,10 +286,10 @@ const Header = () => {
                   className="flex items-center gap-2 p-1 pl-1 pr-3 bg-secondary rounded-full hover:bg-gray-100 transition-all border border-primary/5"
                 >
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-black border border-accent/30 overflow-hidden">
-                    {account.customer?.fullName?.charAt(0) || <User size={14} />}
+                    {account.customer?.fullName?.charAt(0) || account.username?.charAt(0) || <User size={14} />}
                   </div>
                   <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-primary truncate max-w-[80px]">
-                    {account.customer?.fullName?.split(' ').pop()}
+                    {account.customer?.fullName?.split(' ')?.pop() || account.username || ""}
                   </span>
                   <ChevronDown
                     size={14}
@@ -289,7 +307,7 @@ const Header = () => {
                         Tài khoản
                       </p>
                       <p className="text-sm font-black text-primary truncate">
-                        {account.customer?.fullName}
+                        {account.customer?.fullName || account.username}
                       </p>
                       <p className="text-[10px] text-primary/40 truncate font-medium">
                         {account.username}

@@ -42,6 +42,8 @@ const StaffRoute = ({ children }) => {
     console.error("Invalid or expired token:", error);
     alert("Your session is invalid or has expired. Please log in again.");
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
     return <Navigate to="/login" replace />;
   }
 };

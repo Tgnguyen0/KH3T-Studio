@@ -1,6 +1,6 @@
 # KREDO Shop - Nền Tảng Thương Mại Điện Tử Thông Minh Tích Hợp AI
 
-Chào mừng bạn đến với **KH3T Shop**, hệ thống cửa hàng mua sắm thời trang trực tuyến tích hợp trợ lý ảo thông minh Gemini AI và cổng thanh toán tự động qua mã QR ngân hàng. Dự án được phát triển theo mô hình tách biệt rõ ràng giữa **Backend (Spring Boot)** và **Frontend (React)**.
+Chào mừng bạn đến với **KREDO Shop**, hệ thống cửa hàng mua sắm thời trang trực tuyến tích hợp trợ lý ảo thông minh Gemini AI và cổng thanh toán tự động qua mã QR ngân hàng. Dự án được phát triển theo mô hình tách biệt rõ ràng giữa **Backend (Spring Boot)** và **Frontend (React)**.
 
 ---
 
@@ -69,7 +69,7 @@ Chúng tôi đã cấu hình sẵn tệp [docker-compose.yml](file:///c:/Users/t
 ### Cách 2: Setup Database Thủ Công bằng tay
 Nếu máy bạn đã cài sẵn MySQL và Redis cục bộ:
 1. Mở phần mềm quản lý MySQL (như MySQL Workbench, DBeaver hoặc Navicat) và tạo một database mới tên là `kredo_studio`.
-2. Kiểm tra thông tin đăng nhập trong file cấu hình [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/src/main/resources/application.properties):
+2. Kiểm tra thông tin đăng nhập trong file cấu hình [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kredoshop-be/src/main/resources/application.properties):
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/kredo_studio?createDatabaseIfNotExist=true
    spring.datasource.username=root
@@ -79,15 +79,15 @@ Nếu máy bạn đã cài sẵn MySQL và Redis cục bộ:
 3. Khởi động dịch vụ Redis trên cổng mặc định `6379` của máy.
 
 ### Import Dữ Liệu Mẫu (Seed Data)
-Sau khi database hoạt động, chạy các file script SQL nằm trong thư mục `kh3tshop-be/scripts` theo thứ tự sau để khởi tạo cấu trúc và dữ liệu sản phẩm:
-1. Chạy file [JPA.sql](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/scripts/JPA.sql) để tạo toàn bộ bảng và dữ liệu cơ bản.
-2. Chạy file [new_products.sql](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/scripts/new_products.sql) để thêm sản phẩm phong phú và thực tế vào cửa hàng.
+Sau khi database hoạt động, chạy các file script SQL nằm trong thư mục `kredoshop-be/scripts` theo thứ tự sau để khởi tạo cấu trúc và dữ liệu sản phẩm:
+1. Chạy file [JPA.sql](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kredoshop-be/scripts/JPA.sql) để tạo toàn bộ bảng và dữ liệu cơ bản.
+2. Chạy file [new_products.sql](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kredoshop-be/scripts/new_products.sql) để thêm sản phẩm phong phú và thực tế vào cửa hàng.
 
 ---
 
 ## 🔑 4. Cấu Hình Các API Bên Ngoài (External APIs & Webhooks)
 
-Để các tính năng đặc biệt của Kredo Shop hoạt động chính xác, bạn cần bổ sung các cấu hình API tương ứng trong file [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/src/main/resources/application.properties).
+Để các tính năng đặc biệt của KREDO Shop hoạt động chính xác, bạn cần bổ sung các cấu hình API tương ứng trong file [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kredoshop-be/src/main/resources/application.properties).
 
 ### A. Đồng bộ Hóa đơn với Cổng Thanh Toán SePay (Cách chạy Webhook khi ở Local)
 Khi khách hàng quét mã QR chuyển khoản, hệ thống SePay sẽ gửi tín hiệu callback (Webhook) về server của bạn để cập nhật trạng thái hóa đơn là **Đã thanh toán** trong database.
@@ -141,7 +141,7 @@ Hệ thống gửi thư tự động qua giao thức SMTP của Google:
 ### Khởi Chạy Backend (Spring Boot)
 1. Mở terminal và di chuyển vào thư mục backend:
    ```bash
-   cd kh3tshop-be
+   cd kredoshop-be
    ```
 2. Build và chạy ứng dụng Spring Boot:
    * Trên Windows:

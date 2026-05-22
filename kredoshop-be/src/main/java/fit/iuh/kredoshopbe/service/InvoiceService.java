@@ -1,5 +1,6 @@
 package fit.iuh.kredoshopbe.service;
 
+import fit.iuh.kredoshopbe.configuration.SePayConfig;
 import fit.iuh.kredoshopbe.dto.request.CreateInvoiceRequest;
 import fit.iuh.kredoshopbe.dto.response.InvoiceResponse;
 import fit.iuh.kredoshopbe.dto.response.PaymentStatisticResponse;
@@ -7,6 +8,8 @@ import fit.iuh.kredoshopbe.entities.Invoice;
 import fit.iuh.kredoshopbe.entities.Order;
 
 import fit.iuh.kredoshopbe.enums.PaymentMethod;
+import fit.iuh.kredoshopbe.enums.StatusPayment;
+import fit.iuh.kredoshopbe.enums.StatusOrdering;
 import fit.iuh.kredoshopbe.exception.AppException;
 import fit.iuh.kredoshopbe.exception.ErrorCode;
 
@@ -16,6 +19,11 @@ import fit.iuh.kredoshopbe.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +43,8 @@ public class InvoiceService {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
     private final OrderRepository orderRepository;
+    private final RestTemplate restTemplate;
+    private final SePayConfig sePayConfig;
 
     @Transactional
     public InvoiceResponse createInvoice(CreateInvoiceRequest request) {
@@ -233,6 +243,63 @@ public class InvoiceService {
     public InvoiceResponse getInvoiceById(int id) {
         Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.INVOICE_NOT_FOUND));
+
+        if (invoice.getPaymentStatus() != StatusPayment.PAID && invoice.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
+            checkSePayPaymentDirectly(invoice);
+        }
+
         return invoiceMapper.toInvoiceMapper(invoice);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void checkSePayPaymentDirectly(Invoice invoice) {
+        try {
+            String url = "https://userapi.sepay.vn/v2/transactions?limit=20";
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + sePayConfig.getApiKey());
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Map<String, Object> body = response.getBody();
+                if ("success".equals(body.get("status"))) {
+                    List<Map<String, Object>> data = (List<Map<String, Object>>) body.get("data");
+                    if (data != null && !data.isEmpty()) {
+                        // Chuẩn hóa mã hóa đơn mục tiêu (bỏ dấu gạch ngang, dấu cách và đưa về chữ hoa)
+                        String targetCodeNormalized = invoice.getInvoiceCode().replaceAll("[- ]", "").toUpperCase();
+
+                        for (Map<String, Object> tx : data) {
+                            String content = (String) tx.get("transaction_content");
+                            if (content == null) continue;
+
+                            // Chuẩn hóa nội dung giao dịch nhận được từ ngân hàng
+                            String contentNormalized = content.replaceAll("[- ]", "").toUpperCase();
+
+                            if (contentNormalized.contains(targetCodeNormalized)) {
+                                Object amountInObj = tx.get("amount_in");
+                                double amountIn = 0;
+                                if (amountInObj instanceof Number) {
+                                    amountIn = ((Number) amountInObj).doubleValue();
+                                }
+                                if (amountIn >= invoice.getTotalAmount()) {
+                                    invoice.setPaymentStatus(StatusPayment.PAID);
+                                    invoice.setUpdatedAt(new Date());
+                                    invoiceRepository.save(invoice);
+
+                                    Order order = invoice.getOrder();
+                                    if (order != null) {
+                                        order.setStatusOrder(StatusOrdering.CONFIRMED);
+                                        orderRepository.save(order);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SePay Polling] Lỗi khi tự động kiểm tra giao dịch: " + e.getMessage());
+        }
     }
 }

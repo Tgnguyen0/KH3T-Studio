@@ -3,17 +3,17 @@ import { Package, Plus, Eye, Edit2, Trash2, Download, RefreshCw, Search, Filter 
 import AdminChatBot from '../../components/AdminChatBot';
 
 export default function Products({ initialFilter = 'ALL' }) {
-  const [products, setProducts]           = useState([]);
-  const [categories, setCategories]       = useState([]);
-  const [showModal, setShowModal]         = useState(false);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailProduct, setDetailProduct] = useState(null);
-  const [filterStock, setFilterStock]     = useState("ALL");
-  const [searchTerm, setSearchTerm]       = useState("");
+  const [filterStock, setFilterStock] = useState("ALL");
+  const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("ALL");
-  const [filterStatus, setFilterStatus]   = useState("ALL");
-  const [sortOption, setSortOption]       = useState("newest");
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [sortOption, setSortOption] = useState("newest");
 
   const [formData, setFormData] = useState({
     name: "", description: "", categoryId: "", price: 0, costPrice: 0, discountAmount: 0,
@@ -238,7 +238,16 @@ export default function Products({ initialFilter = 'ALL' }) {
                     <td className="py-4 px-4">
                       <span className="px-2.5 py-1 border border-primary/10 bg-secondary text-[8px] font-black tracking-widest uppercase text-primary/60">{p.category?.name || "N/A"}</span>
                     </td>
-                    <td className="py-4 px-4 font-display font-black text-xs text-primary">{formatCurrency(p.price)}</td>
+                    <td className="py-4 px-4 font-display font-black text-xs text-primary">
+                      {p.discountAmount > 0 ? (
+                        <div className="flex flex-col">
+                          <span className="text-accent">{formatCurrency(p.costPrice)}</span>
+                          <span className="text-[10px] text-primary/30 line-through font-normal mt-0.5">{formatCurrency(p.price)}</span>
+                        </div>
+                      ) : (
+                        <span>{formatCurrency(p.price)}</span>
+                      )}
+                    </td>
                     <td className="py-4 px-4">
                       <span className={`px-2.5 py-1 border text-[8px] font-black tracking-widest uppercase ${p.quantity > 10 ? "border-primary/10 bg-secondary text-primary/60" : p.quantity > 0 ? "text-amber-700 bg-amber-50 border-amber-100" : "text-red-700 bg-red-50 border-red-100"}`}>
                         {p.quantity > 0 ? `${p.quantity} cái` : "Hết hàng"}
@@ -299,9 +308,9 @@ export default function Products({ initialFilter = 'ALL' }) {
                   <div className="bg-white border border-primary/5 p-6">
                     <div className="grid grid-cols-2 gap-5">
                       {[
-                        { label: "Giá bán", value: formatCurrency(detailProduct.price) },
-                        { label: "Giá gốc", value: formatCurrency(detailProduct.costPrice) },
-                        { label: "Giảm giá", value: `${detailProduct.discountAmount?.toLocaleString()} đ` },
+                        { label: "Giá niêm yết", value: formatCurrency(detailProduct.price) },
+                        { label: "Giá bán thực tế", value: formatCurrency(detailProduct.costPrice) },
+                        { label: "Giảm giá", value: `${detailProduct.discountAmount?.toLocaleString()}%` },
                         { label: "Đã bán", value: `${detailProduct.soldQuantity} ${detailProduct.unit}` },
                         { label: "Chất liệu", value: detailProduct.material },
                         { label: "Kiểu dáng", value: detailProduct.form || "N/A" },
@@ -401,16 +410,37 @@ export default function Products({ initialFilter = 'ALL' }) {
                 <h3 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase pb-3 border-b border-primary/5">Giá & Kho</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                   {[
-                    { label: "Giá vốn (VNĐ)", key: "price" },
-                    { label: "Giá bán (VNĐ)", key: "costPrice", disabled: true },
-                    { label: "Giảm giá", key: "discountAmount" },
+                    { label: "Giá bán niêm yết (VNĐ)", key: "price" },
+                    { label: "Giá bán thực tế (VNĐ)", key: "costPrice", disabled: true },
+                    { label: "Giảm giá (%)", key: "discountAmount" },
                     { label: "Tổng tồn kho", key: "quantity", readOnly: true },
-                  ].map(item => (
-                    <div key={item.key}>
-                      <label className={labelCls}>{item.label}</label>
-                      <input type="number" className={`${inputCls} ${item.disabled ? "opacity-50" : ""}`} value={formData[item.key]} readOnly={item.readOnly} disabled={item.disabled} onChange={e => !item.readOnly && !item.disabled && setFormData({ ...formData, [item.key]: Number(e.target.value) })} />
-                    </div>
-                  ))}
+                  ].map(item => {
+                    let val = formData[item.key];
+                    if (item.key === "costPrice") {
+                      val = formData.price - (formData.price * formData.discountAmount / 100);
+                    }
+                    return (
+                      <div key={item.key}>
+                        <label className={labelCls}>{item.label}</label>
+                        <input 
+                          type="number" 
+                          className={`${inputCls} ${item.disabled ? "opacity-50" : ""}`} 
+                          value={val} 
+                          readOnly={item.readOnly} 
+                          disabled={item.disabled} 
+                          onChange={e => {
+                            if (item.readOnly || item.disabled) return;
+                            const numVal = Number(e.target.value);
+                            setFormData(prev => {
+                              const updated = { ...prev, [item.key]: numVal };
+                              updated.costPrice = updated.price - (updated.price * updated.discountAmount / 100);
+                              return updated;
+                            });
+                          }} 
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
