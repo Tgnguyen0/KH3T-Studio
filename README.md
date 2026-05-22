@@ -87,7 +87,7 @@ Sau khi database hoạt động, chạy các file script SQL nằm trong thư m�
 
 ## 🔑 4. Cấu Hình Các API Bên Ngoài (External APIs & Webhooks)
 
-Để các tính năng đặc biệt của KH3T Shop hoạt động chính xác, bạn cần bổ sung các cấu hình API tương ứng trong file [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/src/main/resources/application.properties).
+Để các tính năng đặc biệt của Kredo Shop hoạt động chính xác, bạn cần bổ sung các cấu hình API tương ứng trong file [application.properties](file:///c:/Users/thanh/Desktop/wwwJava/DoAn/kh3tshop-be/src/main/resources/application.properties).
 
 ### A. Đồng bộ Hóa đơn với Cổng Thanh Toán SePay (Cách chạy Webhook khi ở Local)
 Khi khách hàng quét mã QR chuyển khoản, hệ thống SePay sẽ gửi tín hiệu callback (Webhook) về server của bạn để cập nhật trạng thái hóa đơn là **Đã thanh toán** trong database.
@@ -158,7 +158,7 @@ Hệ thống gửi thư tự động qua giao thức SMTP của Google:
 ### Khởi Chạy Frontend (React + Vite)
 1. Mở terminal mới và di chuyển vào thư mục frontend:
    ```bash
-   cd kh3tshop-fe
+   cd kredoshop-fe
    ```
 2. Cài đặt các gói thư viện cần thiết:
    ```bash
