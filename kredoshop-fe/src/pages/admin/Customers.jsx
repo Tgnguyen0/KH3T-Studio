@@ -1,782 +1,362 @@
 import React, { useState, useEffect } from "react";
-import {
-  FaUser,
-  FaEdit,
-  FaPlus,
-  FaTrash,
-  FaEnvelope,
-  FaStar,
-  FaEye,
-  FaMailBulk,
-  FaBan,
-  FaCheck,
-} from "react-icons/fa";
+import { Users, Plus, Eye, Edit2, Ban, Check, Mail, RefreshCw, Search } from "lucide-react";
 import AdminChatBot from '../../components/AdminChatBot';
+
 export default function Customers() {
-  const [accounts, setAccounts] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [accounts, setAccounts]           = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [showDetail, setShowDetail] = useState(false);
-  const [searchName, setSearchName] = useState("");
-  const [statusFilter, setStatusFilter] = useState(""); // "", ACTIVE, LOCKED
-  // Create / Edit state
-  const [showCreate, setShowCreate] = useState(false);
+  const [showDetail, setShowDetail]       = useState(false);
+  const [showCreate, setShowCreate]       = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
+  const [searchName, setSearchName]       = useState("");
+  const [statusFilter, setStatusFilter]   = useState("");
+  const [loading, setLoading]             = useState(false);
+  const [error, setError]                 = useState(null);
+  const token = localStorage.getItem("accessToken");
 
   const [form, setForm] = useState({
-    username: "",
-    password: "",
-    customer: {
-      fullName: "",
-      phoneNumber: "",
-      email: "",
-      gender: "",
-
-      dateOfBirth: "",
-    },
-    role: "",
-    statusLogin: "",
+    username: "", password: "",
+    customer: { fullName: "", phoneNumber: "", email: "", gender: "", dateOfBirth: "" },
+    role: "", statusLogin: "",
   });
 
-  // Loading / error
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const token = localStorage.getItem("accessToken");
-  // Load customer list
-  useEffect(() => {
-    loadCustomers();
-  }, []);
+  useEffect(() => { loadCustomers(); }, []);
 
   const loadCustomers = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      // tạo query string
       const params = new URLSearchParams();
       if (searchName) params.append("name", searchName);
       if (statusFilter) params.append("status", statusFilter);
       params.append("role", "USER");
-      const res = await fetch(
-        `http://localhost:8080/accounts?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
+      const res = await fetch(`http://localhost:8080/accounts?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
       if (!res.ok) throw new Error("Failed to load accounts");
       const data = await res.json();
-
-      setAccounts(data.result); // nếu response dạng ApiResponse
-    } catch (err) {
-      console.error(err);
-      alert("Lỗi khi tải danh sách tài khoản");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openDetail = (account) => {
-    setSelectedCustomer(account.customer);
-    setShowDetail(true);
-  };
-
-  const openCreate = () => {
-    setEditingAccount(null);
-    setForm({
-      customer: {
-        fullName: "",
-        phoneNumber: "",
-        email: "",
-        gender: "MALE",
-        dateOfBirth: "",
-      },
-      username: "",
-      password: "",
-      role: "USER",
-      statusLogin: "ACTIVE",
-    });
-    setShowCreate(true);
-  };
-
-  const openEdit = (account) => {
-    const rawDate = account.customer.dateOfBirth || "";
-    const formattedDate = rawDate ? rawDate.slice(0, 10) : ""; // lấy yyyy-mm-dd
-
-    setEditingAccount(account);
-    setForm({
-      customer: {
-        fullName: account.customer.fullName || "",
-        phoneNumber: account.customer.phoneNumber || "",
-        email: account.customer.email || "",
-        gender: account.customer.gender || "",
-        dateOfBirth: formattedDate,
-      },
-      username: account.username || "",
-      password: "",
-      role: account.role || "",
-      statusLogin: account.statusLogin || "",
-    });
-    setShowCreate(true);
+      setAccounts(data.result);
+    } catch (err) { alert("Lỗi khi tải danh sách tài khoản"); }
+    finally { setLoading(false); }
   };
 
   const handleChange = (path, value) => {
-    setForm((prev) => {
+    setForm(prev => {
       const keys = path.split(".");
       const updated = { ...prev };
-
       let obj = updated;
-      for (let i = 0; i < keys.length - 1; i++) {
-        obj[keys[i]] = { ...obj[keys[i]] };
-        obj = obj[keys[i]];
-      }
+      for (let i = 0; i < keys.length - 1; i++) { obj[keys[i]] = { ...obj[keys[i]] }; obj = obj[keys[i]]; }
       obj[keys[keys.length - 1]] = value;
-
       return updated;
     });
   };
 
-  const createCustomer = async () => {
-    // Validate cơ bản
-    if (!form.customer.fullName || !form.customer.email) {
-      alert("Vui lòng nhập đầy đủ họ tên và email");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const res = await fetch(`http://localhost:8080/accounts/admin/add`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: form.username,
-          password: form.password,
-          customer: {
-            fullName: form.customer.fullName,
-            phoneNumber: form.customer.phoneNumber,
-            email: form.customer.email,
-            gender: form.customer.gender,
-            dateOfBirth: form.customer.dateOfBirth, // yyyy-mm-dd
-          },
-          role: form.role,
-          statusLogin: form.statusLogin,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`Create failed: ${res.status}`);
-
-      await loadCustomers();
-      setShowCreate(false);
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Lỗi khi tạo khách hàng");
-    } finally {
-      setLoading(false);
-    }
+  const openCreate = () => {
+    setEditingAccount(null);
+    setForm({ customer: { fullName: "", phoneNumber: "", email: "", gender: "MALE", dateOfBirth: "" }, username: "", password: "", role: "USER", statusLogin: "ACTIVE" });
+    setShowCreate(true);
   };
 
-  const updateCustomer = async () => {
-    if (!editingAccount) return;
-
-    try {
-      setLoading(true);
-
-      const res = await fetch(
-        `http://localhost:8080/accounts/admin/update/${editingAccount.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: form.username,
-            password: form.password || undefined, // nếu bỏ trống thì không gửi password
-            customer: {
-              fullName: form.customer.fullName,
-              phoneNumber: form.customer.phoneNumber,
-              email: form.customer.email,
-              gender: form.customer.gender,
-              dateOfBirth: form.customer.dateOfBirth, // yyyy-mm-dd
-            },
-            role: form.role,
-            statusLogin: form.statusLogin,
-          }),
-        },
-      );
-
-      if (!res.ok) throw new Error(`Update failed: ${res.status}`);
-
-      await loadCustomers();
-      setShowCreate(false);
-      setEditingAccount(null);
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Lỗi khi cập nhật tài khoản");
-    } finally {
-      setLoading(false);
-    }
+  const openEdit = (account) => {
+    setEditingAccount(account);
+    setForm({
+      customer: { fullName: account.customer.fullName || "", phoneNumber: account.customer.phoneNumber || "", email: account.customer.email || "", gender: account.customer.gender || "", dateOfBirth: (account.customer.dateOfBirth || "").slice(0, 10) },
+      username: account.username || "", password: "", role: account.role || "", statusLogin: account.statusLogin || "",
+    });
+    setShowCreate(true);
   };
 
-  const toggleAccountStatus = async (account) => {
+  const submitForm = async () => {
+    if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
     try {
       setLoading(true);
+      const url = editingAccount ? `http://localhost:8080/accounts/admin/update/${editingAccount.id}` : `http://localhost:8080/accounts/admin/add`;
+      const method = editingAccount ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      if (!res.ok) throw new Error(`Failed: ${res.status}`);
+      await loadCustomers(); setShowCreate(false); setEditingAccount(null);
+    } catch (err) { alert(err.message); }
+    finally { setLoading(false); }
+  };
 
-      // đổi trạng thái
+  const toggleStatus = async (account) => {
+    try {
+      setLoading(true);
       const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
-
-      const res = await fetch(
-        `http://localhost:8080/accounts/admin/update/${account.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: account.username,
-            role: account.role,
-            statusLogin: newStatus,
-
-            customer: {
-              fullName: account.customer.fullName,
-              phoneNumber: account.customer.phoneNumber,
-              email: account.customer.email,
-              gender: account.customer.gender,
-              dateOfBirth: account.customer.dateOfBirth,
-            },
-          }),
-        },
-      );
-
-      if (!res.ok) {
-        throw new Error(`Update status failed: ${res.status}`);
-      }
-
+      const res = await fetch(`http://localhost:8080/accounts/admin/update/${account.id}`, {
+        method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ ...account, statusLogin: newStatus, customer: account.customer }),
+      });
+      if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadCustomers();
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "Lỗi khi cập nhật trạng thái");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const submitForm = () => {
-    if (editingAccount) updateCustomer();
-    else createCustomer();
+    } catch (err) { alert(err.message); }
+    finally { setLoading(false); }
   };
 
   const sendEmail = async () => {
     try {
-      // KHÔNG thêm Content-Type, KHÔNG thêm body
-      const res = await fetch(
-        `http://localhost:8080/customers/email/sale/all`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        alert(data.result); // Thông báo thành công
-      } else {
-        alert("Lỗi khi gọi API: " + res.status);
-      }
-    } catch (error) {
-      alert("Lỗi kết nối hoặc timeout: " + error);
-    }
+      const res = await fetch(`http://localhost:8080/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) { const data = await res.json(); alert(data.result); }
+      else alert("Lỗi khi gọi API: " + res.status);
+    } catch (error) { alert("Lỗi kết nối: " + error); }
   };
 
+  const activeCount = accounts.filter(a => a.statusLogin === "ACTIVE").length;
+  const lockedCount = accounts.filter(a => a.statusLogin === "LOCKED").length;
+
+  const inputCls = "w-full bg-secondary p-3 text-xs font-semibold focus:ring-1 focus:ring-red-500 focus:outline-none border border-primary/5";
+  const labelCls = "text-[9px] font-black tracking-widest text-primary/40 uppercase mb-1.5 block";
+
   return (
-    <div className="min-h-screen bg-[#f5f7fb]">
-      <div className="max-w-[1600px] mx-auto px-3 py-7 space-y-5">
-        {/* HEADER */}
-        <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#4f46e5] via-[#7c3aed] to-[#9333ea] p-8 shadow-2xl">
-          <div className="absolute inset-0 bg-black/10"></div>
+    <div className="min-h-screen bg-secondary selection:bg-red-500 selection:text-white pb-16">
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
-                <FaUser className="text-white text-4xl" />
-              </div>
-
-              <div>
-                <h1 className="text-4xl font-bold font-black text-white tracking-tight">
-                  Quản lý khách hàng
-                </h1>
-
-                <p className="text-white/80 text-base mt-2">
-                  Quản lý khách hàng hiện đại & chuyên nghiệp
-                </p>
-              </div>
-            </div>
-
-            {/* BUTTONS */}
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={openCreate}
-                className="w-[220px] h-[56px] rounded-2xl bg-white text-[#5b21b6] text-sm font-semibold flex items-center justify-center gap-3 shadow-xl hover:scale-105 transition-all duration-300"
-              >
-                <FaPlus className="text-sm" />
-                Thêm Khách Hàng
-              </button>
-
-              <button
-                onClick={sendEmail}
-                className="w-[220px] h-[56px] rounded-2xl bg-black/20 backdrop-blur-md border border-white/20 text-white text-sm font-semibold flex items-center justify-center gap-3 hover:bg-black/30 transition-all duration-300"
-              >
-                <FaMailBulk className="text-sm" />
-                Gửi Email
-              </button>
-            </div>
+      {/* ── Header ── */}
+      <div className="bg-[#111111] text-white border-b border-white/10 mb-12">
+        <div className="max-w-7xl mx-auto px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <span className="text-red-500 text-[9px] font-black tracking-[0.4em] uppercase">QUẢN LÝ HỆ THỐNG — KREDO STUDIO</span>
+            <h1 className="text-3xl lg:text-4xl font-display font-black text-white mt-2 uppercase tracking-tight">Khách hàng</h1>
+            <p className="text-white/40 text-[10px] font-bold tracking-widest uppercase mt-2">Quản lý tài khoản & thông tin khách hàng</p>
           </div>
-        </div>
-
-        {/* SEARCH */}
-        <div className="bg-white rounded-[30px] p-6 shadow-lg border border-gray-100">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px_170px] gap-5">
-            <input
-              type="text"
-              placeholder="Tìm kiếm khách hàng..."
-              className="w-full h-13 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500 transition-all text-sm text-gray-700 font-medium"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-            />
-
-            <select
-              className="h-13 rounded-2xl border border-gray-200 px-4 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500 bg-white text-sm font-medium"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="">Tất cả trạng thái</option>
-              <option value="ACTIVE">Hoạt động</option>
-              <option value="LOCKED">Đã khóa</option>
-            </select>
-
-            <button
-              onClick={loadCustomers}
-              className="h-13 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] transition-all duration-300"
-            >
-              Áp dụng
+          <div className="flex items-center gap-3">
+            <button onClick={openCreate} className="flex items-center gap-2 px-5 py-3 bg-red-500 hover:bg-red-600 text-white text-[10px] font-black tracking-widest uppercase transition-colors">
+              <Plus size={14} /> Thêm mới
+            </button>
+            <button onClick={loadCustomers} className="flex items-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-white text-[10px] font-black tracking-widest uppercase transition-colors border border-white/10">
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Làm mới
             </button>
           </div>
         </div>
+      </div>
 
-        {/* LOADING */}
-        {loading && (
-          <div className="bg-white rounded-3xl shadow-lg p-5 border border-gray-100 flex items-center gap-4">
-            <div className="w-5 h-5 border-[3px] border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="max-w-7xl mx-auto px-8 space-y-12">
 
-            <span className="font-medium text-gray-700 text-sm">
-              Đang tải dữ liệu...
-            </span>
+        {/* ── KPI Cards ── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { icon: Users, label: "Tổng khách hàng", value: accounts.length, tag: "Toàn bộ" },
+            { icon: Check, label: "Đang hoạt động", value: activeCount, tag: "Active", tagCls: "text-emerald-700 bg-emerald-50 border-emerald-100" },
+            { icon: Ban, label: "Đã khóa", value: lockedCount, tag: "Locked", tagCls: "text-red-700 bg-red-50 border-red-100" },
+          ].map(({ icon: Icon, label, value, tag, tagCls }) => (
+            <div key={label} className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all">
+              <div className="flex items-start justify-between mb-4">
+                <div className="bg-secondary p-3 text-red-500"><Icon className="w-5 h-5" /></div>
+                <span className={`px-2.5 py-1 border text-[8px] font-black tracking-widest uppercase ${tagCls || "border-primary/15 text-primary/40"}`}>{tag}</span>
+              </div>
+              <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">{label}</p>
+              <p className="text-xl font-display font-black text-primary mt-1">{value.toLocaleString()}</p>
+              <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">Kredo Studio</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Filters ── */}
+        <div className="bg-white border border-primary/5 p-8">
+          <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
+            <Search className="w-4 h-4 text-red-500" />
+            <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">Bộ lọc tìm kiếm</h2>
           </div>
-        )}
-
-        {/* ERROR */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-3xl p-5 text-red-600 font-medium text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* TABLE */}
-        <div className="bg-white rounded-[32px] shadow-xl border border-gray-100 overflow-hidden">
-          {/* TABLE HEADER */}
-          <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-[24px] font-black text-gray-800">
-              Danh Sách Khách Hàng
-            </h2>
-
-            <div className="min-w-[140px] px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg text-center">
-              <p className="text-[11px] font-medium text-white/80 uppercase tracking-wider">
-                Tổng số khách hàng
-              </p>
-
-              <h3 className="text-2xl font-black text-white leading-none mt-1">
-                {accounts.length}
-              </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex flex-col space-y-1.5">
+              <label className={labelCls}>Tên khách hàng</label>
+              <input type="text" value={searchName} onChange={e => setSearchName(e.target.value)} placeholder="Tìm kiếm..." className={inputCls} />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <label className={labelCls}>Trạng thái</label>
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={inputCls}>
+                <option value="">Tất cả</option>
+                <option value="ACTIVE">Hoạt động</option>
+                <option value="LOCKED">Đã khóa</option>
+              </select>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <label className={labelCls}>Thao tác</label>
+              <button onClick={loadCustomers} className="w-full bg-[#111111] hover:bg-red-500 text-white p-3 text-[10px] font-black tracking-widest uppercase transition-colors">
+                Áp dụng
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* TABLE */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              {/* THEAD */}
-              <thead className="bg-[#f8fafc] border-b border-gray-100">
-                <tr>
-                  <th className="px-8 py-4 text-left text-[12px] whitespace-nowrap font-bold text-gray-500 uppercase tracking-wider">
-                    Khách hàng
-                  </th>
+        {/* ── Table ── */}
+        <div className="bg-white border border-primary/5 p-8">
+          <div className="flex items-center justify-between mb-8 pb-3 border-b border-primary/5">
+            <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">👤 Danh sách khách hàng</h2>
+            <span className="text-[9px] font-bold text-primary/30 uppercase tracking-widest">{accounts.length} tài khoản</span>
+          </div>
 
-                  <th className="px-8 py-4 text-left text-[12px] whitespace-nowrap font-bold text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-
-                  <th className="px-8 py-4 text-left text-[12px] whitespace-nowrap font-bold text-gray-500 uppercase tracking-wider">
-                    Điện thoại
-                  </th>
-
-                  <th className="px-8 py-4 text-left text-[12px] whitespace-nowrap font-bold text-gray-500 uppercase tracking-wider">
-                    Trạng thái
-                  </th>
-
-                  <th className="px-8 py-4 text-center text-[12px] whitespace-nowrap font-bold text-gray-500 uppercase tracking-wider">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-
-              {/* BODY */}
-              <tbody>
-                {accounts
-                  .filter((c) => c.id !== 1)
-                  .map((c) => (
-                    <tr
-                      key={c.id}
-                      className="border-t border-gray-100 hover:bg-violet-50/50 transition-all duration-300"
-                    >
-                      {/* USER */}
-                      <td className="px-5 py-5">
-                        <div className="flex items-center gap-4">
-                          <h3 className="font-semibold text-gray-800 text-sm">
-                            {c.customer.fullName}
-                          </h3>
+          {loading ? (
+            <div className="flex items-center justify-center h-48">
+              <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : accounts.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-[10px] font-black tracking-widest uppercase text-primary/30">Không có khách hàng nào</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-primary/10">
+                    {["Họ tên", "Email", "Điện thoại", "Trạng thái", "Hành động"].map(h => (
+                      <th key={h} className="py-4 px-4 text-[9px] font-black text-primary/40 uppercase tracking-widest">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-primary/5">
+                  {accounts.filter(c => c.id !== 1).map(c => (
+                    <tr key={c.id} className="hover:bg-secondary/40 transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 bg-primary text-white flex items-center justify-center font-display font-black text-[10px] flex-shrink-0">
+                            {c.customer.fullName?.charAt(0)}
+                          </div>
+                          <span className="text-[10px] font-black text-primary uppercase tracking-wide">{c.customer.fullName}</span>
                         </div>
                       </td>
-
-                      {/* EMAIL */}
-                      <td className="px-8 py-5">
-                        <span className="font-medium text-gray-700 text-sm">
-                          {c.customer.email}
-                        </span>
-                      </td>
-
-                      {/* PHONE */}
-                      <td className="px-8 py-5">
-                        <span className="font-medium text-gray-700 text-sm">
-                          {c.customer.phoneNumber}
-                        </span>
-                      </td>
-
-                      {/* STATUS */}
-                      <td className="px-5 py-5">
-                        <span
-                          className={`px-4 py-1.5 rounded-xl text-[11px] font-bold ${
-                            c.statusLogin === "ACTIVE"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
+                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60">{c.customer.email}</td>
+                      <td className="py-4 px-4 text-[10px] font-bold text-primary/60 font-mono">{c.customer.phoneNumber}</td>
+                      <td className="py-4 px-4">
+                        <span className={`px-2.5 py-1 border text-[8px] font-black tracking-widest uppercase ${c.statusLogin === "ACTIVE" ? "text-emerald-700 bg-emerald-50 border-emerald-100" : "text-red-700 bg-red-50 border-red-100"}`}>
                           {c.statusLogin === "ACTIVE" ? "Hoạt động" : "Đã khóa"}
                         </span>
                       </td>
-
-                      {/* ACTION */}
-                      <td className="px-8 py-5">
-                        <div className="flex items-center justify-center gap-3">
-                          <button
-                            onClick={() => openDetail(c)}
-                            className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white transition-all duration-300 flex items-center justify-center"
-                          >
-                            <FaEye size={15} />
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => { setSelectedCustomer(c.customer); setShowDetail(true); }} className="flex items-center gap-1.5 px-3 py-2 bg-secondary hover:bg-[#111111] hover:text-white text-primary text-[9px] font-black tracking-widest uppercase transition-all border border-primary/5">
+                            <Eye size={12} /> Xem
                           </button>
-
-                          <button
-                            onClick={() => openEdit(c)}
-                            className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all duration-300 flex items-center justify-center"
-                          >
-                            <FaEdit size={15} />
+                          <button onClick={() => openEdit(c)} className="flex items-center gap-1.5 px-3 py-2 bg-secondary hover:bg-[#111111] hover:text-white text-primary text-[9px] font-black tracking-widest uppercase transition-all border border-primary/5">
+                            <Edit2 size={12} /> Sửa
                           </button>
-
-                          <button
-                            onClick={() => toggleAccountStatus(c)}
-                            className={`w-10 h-10 rounded-xl transition-all duration-300 flex items-center justify-center
-    ${
-      c.statusLogin === "ACTIVE"
-        ? "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
-        : "bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white"
-    }
-  `}
-                          >
-                            {c.statusLogin === "ACTIVE" ? (
-                              <FaBan size={15} />
-                            ) : (
-                              <FaCheck size={15} />
-                            )}
+                          <button onClick={() => toggleStatus(c)} className={`flex items-center gap-1.5 px-3 py-2 text-[9px] font-black tracking-widest uppercase transition-all ${c.statusLogin === "ACTIVE" ? "bg-red-50 hover:bg-red-500 text-red-600 hover:text-white border border-red-100" : "bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-emerald-100"}`}>
+                            {c.statusLogin === "ACTIVE" ? <><Ban size={12} /> Khóa</> : <><Check size={12} /> Mở</>}
                           </button>
                         </div>
                       </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
-
-            {/* EMPTY */}
-            {accounts.length === 0 && !loading && (
-              <div className="py-24 flex flex-col items-center justify-center text-center">
-                <div className="w-24 h-24 rounded-full bg-violet-100 flex items-center justify-center mb-6">
-                  <FaUser className="text-violet-500 text-4xl" />
-                </div>
-
-                <h3 className="text-2xl font-black text-gray-700">
-                  Không có khách hàng
-                </h3>
-
-                <p className="text-gray-500 mt-2 text-sm">
-                  Không tìm thấy dữ liệu phù hợp
-                </p>
-              </div>
-            )}
-          </div>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* DETAIL MODAL */}
+      {/* ── Detail Modal ── */}
       {showDetail && selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-5">
-          <div className="w-full max-w-3xl rounded-[32px] overflow-hidden bg-white shadow-2xl animate-in fade-in zoom-in duration-300">
-            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-6 flex items-center justify-between">
-              <h2 className="text-3xl font-black text-white">
-                Chi Tiết Khách Hàng
-              </h2>
-
-              <button
-                onClick={() => setShowDetail(false)}
-                className="w-12 h-12 rounded-2xl bg-white/20 text-white text-2xl hover:bg-white/30 transition"
-              >
-                ×
-              </button>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white max-w-2xl w-full shadow-2xl">
+            <div className="bg-[#111111] px-8 py-6 flex justify-between items-center">
+              <div>
+                <span className="text-red-500 text-[9px] font-black tracking-[0.4em] uppercase">Chi tiết</span>
+                <h2 className="text-2xl font-display font-black text-white mt-1 uppercase">Khách hàng</h2>
+              </div>
+              <button onClick={() => setShowDetail(false)} className="p-2 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xl">×</button>
             </div>
-
-            <div className="p-10">
-              <div className="flex items-center gap-6 mb-10">
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center text-4xl font-black shadow-xl">
-                  {selectedCustomer.fullName?.charAt(0)}
+            <div className="p-8 bg-secondary space-y-6">
+              <div className="bg-white border border-primary/5 p-6">
+                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-primary/5">
+                  <div className="w-12 h-12 bg-primary text-white flex items-center justify-center font-display font-black text-xl">
+                    {selectedCustomer.fullName?.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-display font-black text-sm text-primary uppercase tracking-tight">{selectedCustomer.fullName}</p>
+                    <p className="text-[9px] font-bold text-primary/40 uppercase tracking-widest">Khách hàng</p>
+                  </div>
                 </div>
-
-                <div>
-                  <h3 className="text-3xl font-black text-gray-800">
-                    {selectedCustomer.fullName}
-                  </h3>
-
-                  <p className="text-gray-500 mt-1">Customer Information</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-3xl p-6">
-                  <p className="text-gray-500 mb-2">Email</p>
-                  <h4 className="font-bold text-lg text-gray-800">
-                    {selectedCustomer.email}
-                  </h4>
-                </div>
-
-                <div className="bg-gray-50 rounded-3xl p-6">
-                  <p className="text-gray-500 mb-2">Số điện thoại</p>
-                  <h4 className="font-bold text-lg text-gray-800">
-                    {selectedCustomer.phoneNumber}
-                  </h4>
-                </div>
-
-                <div className="bg-gray-50 rounded-3xl p-6">
-                  <p className="text-gray-500 mb-2">Giới tính</p>
-                  <h4 className="font-bold text-lg text-gray-800">
-                    {selectedCustomer.gender}
-                  </h4>
-                </div>
-
-                <div className="bg-gray-50 rounded-3xl p-6">
-                  <p className="text-gray-500 mb-2">Ngày sinh</p>
-                  <h4 className="font-bold text-lg text-gray-800">
-                    {selectedCustomer.dateOfBirth || "Chưa có"}
-                  </h4>
+                <div className="grid grid-cols-2 gap-6">
+                  {[
+                    { label: "Email", value: selectedCustomer.email },
+                    { label: "Điện thoại", value: selectedCustomer.phoneNumber },
+                    { label: "Giới tính", value: selectedCustomer.gender },
+                    { label: "Ngày sinh", value: selectedCustomer.dateOfBirth || "Chưa có" },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className={labelCls}>{label}</p>
+                      <p className="text-sm font-bold text-primary">{value}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
+            </div>
+            <div className="bg-white border-t border-primary/5 px-8 py-5 flex justify-end">
+              <button onClick={() => setShowDetail(false)} className="px-6 py-3 bg-[#111111] text-white text-[10px] font-black tracking-widest uppercase hover:bg-red-500 transition-colors">Đóng</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* CREATE / EDIT MODAL */}
+      {/* ── Create/Edit Modal ── */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-5">
-          <div className="bg-white w-full max-w-5xl rounded-[32px] overflow-hidden shadow-2xl max-h-[95vh] overflow-y-auto">
-            <div className="sticky top-0 z-20 bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-6 flex items-center justify-between">
-              <h2 className="text-3xl font-black text-white">
-                {editingAccount ? "Cập Nhật Khách Hàng" : "Tạo Khách Hàng"}
-              </h2>
-
-              <button
-                onClick={() => {
-                  setShowCreate(false);
-                  setEditingAccount(null);
-                }}
-                className="w-12 h-12 rounded-2xl bg-white/20 text-white text-2xl hover:bg-white/30 transition"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="p-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* LEFT */}
-              <div className="space-y-5">
-                <h3 className="text-2xl font-black text-gray-800 mb-6">
-                  Thông Tin Cá Nhân
-                </h3>
-
-                {[
-                  {
-                    label: "Họ tên",
-                    value: form.customer.fullName,
-                    path: "customer.fullName",
-                  },
-                  {
-                    label: "Email",
-                    value: form.customer.email,
-                    path: "customer.email",
-                  },
-                  {
-                    label: "Số điện thoại",
-                    value: form.customer.phoneNumber,
-                    path: "customer.phoneNumber",
-                  },
-                ].map((item, i) => (
-                  <div key={i}>
-                    <label className="block mb-2 font-bold text-gray-700">
-                      {item.label}
-                    </label>
-
-                    <input
-                      className="w-full h-14 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500"
-                      value={item.value}
-                      onChange={(e) => handleChange(item.path, e.target.value)}
-                    />
-                  </div>
-                ))}
-
-                <div>
-                  <label className="block mb-2 font-bold text-gray-700">
-                    Giới tính
-                  </label>
-
-                  <select
-                    className="w-full h-14 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500"
-                    value={form.customer.gender}
-                    onChange={(e) =>
-                      handleChange("customer.gender", e.target.value)
-                    }
-                  >
-                    <option value="MALE">Nam</option>
-                    <option value="FEMALE">Nữ</option>
-                    <option value="OTHER">Khác</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block mb-2 font-bold text-gray-700">
-                    Ngày sinh
-                  </label>
-
-                  <input
-                    type="date"
-                    className="w-full h-14 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500"
-                    value={form.customer.dateOfBirth}
-                    onChange={(e) =>
-                      handleChange("customer.dateOfBirth", e.target.value)
-                    }
-                  />
-                </div>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl">
+            <div className="bg-[#111111] px-8 py-6 flex justify-between items-center flex-shrink-0">
+              <div>
+                <span className="text-red-500 text-[9px] font-black tracking-[0.4em] uppercase">{editingAccount ? "Cập nhật" : "Tạo mới"}</span>
+                <h2 className="text-2xl font-display font-black text-white mt-1 uppercase">{editingAccount ? "Cập nhật khách hàng" : "Tạo khách hàng"}</h2>
               </div>
-
-              {/* RIGHT */}
-              <div className="space-y-5">
-                <h3 className="text-2xl font-black text-gray-800 mb-6">
-                  Thông Tin Tài Khoản
-                </h3>
-
-                {[
-                  {
-                    label: "Username",
-                    value: form.username,
-                    path: "username",
-                  },
-                  {
-                    label: "Password",
-                    value: form.password,
-                    path: "password",
-                    type: "password",
-                  },
-                  {
-                    label: "Role",
-                    value: form.role,
-                    path: "role",
-                  },
-                ].map((item, i) => (
-                  <div key={i}>
-                    <label className="block mb-2 font-bold text-gray-700">
-                      {item.label}
-                    </label>
-
-                    <input
-                      type={item.type || "text"}
-                      className="w-full h-14 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500"
-                      value={item.value}
-                      onChange={(e) => handleChange(item.path, e.target.value)}
-                    />
+              <button onClick={() => { setShowCreate(false); setEditingAccount(null); }} className="p-2 hover:bg-white/10 text-white/60 hover:text-white transition-colors text-xl">×</button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-8 bg-secondary">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white border border-primary/5 p-6 space-y-5">
+                  <h3 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase pb-3 border-b border-primary/5">Thông tin cá nhân</h3>
+                  {[
+                    { label: "Họ tên", path: "customer.fullName", value: form.customer.fullName },
+                    { label: "Email", path: "customer.email", value: form.customer.email },
+                    { label: "Điện thoại", path: "customer.phoneNumber", value: form.customer.phoneNumber },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <label className={labelCls}>{item.label}</label>
+                      <input className={inputCls} value={item.value} onChange={e => handleChange(item.path, e.target.value)} />
+                    </div>
+                  ))}
+                  <div>
+                    <label className={labelCls}>Giới tính</label>
+                    <select className={inputCls} value={form.customer.gender} onChange={e => handleChange("customer.gender", e.target.value)}>
+                      <option value="MALE">Nam</option>
+                      <option value="FEMALE">Nữ</option>
+                      <option value="OTHER">Khác</option>
+                    </select>
                   </div>
-                ))}
-
-                <div>
-                  <label className="block mb-2 font-bold text-gray-700">
-                    Trạng thái
-                  </label>
-
-                  <select
-                    className="w-full h-14 rounded-2xl border border-gray-200 px-5 outline-none focus:ring-4 focus:ring-violet-200 focus:border-violet-500"
-                    value={form.statusLogin}
-                    onChange={(e) =>
-                      handleChange("statusLogin", e.target.value)
-                    }
-                  >
-                    <option value="ACTIVE">Hoạt động</option>
-                    <option value="LOCKED">Khóa</option>
-                  </select>
+                  <div>
+                    <label className={labelCls}>Ngày sinh</label>
+                    <input type="date" className={inputCls} value={form.customer.dateOfBirth} onChange={e => handleChange("customer.dateOfBirth", e.target.value)} />
+                  </div>
+                </div>
+                <div className="bg-white border border-primary/5 p-6 space-y-5">
+                  <h3 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase pb-3 border-b border-primary/5">Thông tin tài khoản</h3>
+                  {[
+                    { label: "Username", path: "username", value: form.username },
+                    { label: "Password", path: "password", value: form.password, type: "password" },
+                    { label: "Role", path: "role", value: form.role },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <label className={labelCls}>{item.label}</label>
+                      <input type={item.type || "text"} className={inputCls} value={item.value} onChange={e => handleChange(item.path, e.target.value)} />
+                    </div>
+                  ))}
+                  <div>
+                    <label className={labelCls}>Trạng thái</label>
+                    <select className={inputCls} value={form.statusLogin} onChange={e => handleChange("statusLogin", e.target.value)}>
+                      <option value="ACTIVE">Hoạt động</option>
+                      <option value="LOCKED">Khóa</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className="px-10 py-7 bg-gray-50 border-t flex justify-end gap-4">
-              <button
-                onClick={() => {
-                  setShowCreate(false);
-                  setEditingAccount(null);
-                }}
-                className="px-8 py-4 rounded-2xl border border-gray-300 font-bold hover:bg-gray-100 transition"
-              >
-                Hủy
-              </button>
-
-              <button
-                onClick={submitForm}
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black shadow-xl hover:scale-105 transition-all duration-300"
-              >
-                {editingAccount ? "Lưu Thay Đổi" : "Tạo Mới"}
+            <div className="bg-white border-t border-primary/5 px-8 py-5 flex justify-end gap-3 flex-shrink-0">
+              <button onClick={() => { setShowCreate(false); setEditingAccount(null); }} className="px-6 py-3 border border-primary/10 text-primary/60 hover:text-primary text-[10px] font-black tracking-widest uppercase transition-colors bg-white">Hủy</button>
+              <button onClick={submitForm} disabled={loading} className="flex items-center gap-2 px-6 py-3 bg-[#111111] hover:bg-red-500 text-white text-[10px] font-black tracking-widest uppercase transition-colors disabled:opacity-60">
+                {editingAccount ? "Lưu thay đổi" : "Tạo mới"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <AdminChatBot />
     </div>
   );
 }
