@@ -1,62 +1,46 @@
+// File: src/pages/admin/ProductDashboard.jsx
+// Style: mirrors Dashboard.jsx exactly — bg-secondary, #111111 header, red-500 accent, font-display font-black tracking uppercase
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Package, AlertTriangle, TrendingUp, Download,
-  Calendar, ChevronRight, Star, Sparkles, CheckCircle,
-  Clock, AlertCircle, PieChart as PieIcon, BarChart3
+  Calendar, Star, CheckCircle, Clock, AlertCircle,
+  PieChart as PieIcon, BarChart3, Sparkles, ChevronRight,
 } from 'lucide-react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, PieChart, Pie, Cell
+  AreaChart, Area, PieChart, Pie, Cell,
 } from 'recharts';
 
-// --- MOCK DATA & CONSTANTS ---
+// ─── constants ───────────────────────────────────────────────
+const COLORS = ['#ef4444', '#111111', '#6b7280', '#f59e0b', '#8b5cf6'];
+
 const satisfactionData = [
   { star: 5, count: 450, percent: 70 },
   { star: 4, count: 120, percent: 20 },
-  { star: 3, count: 50, percent: 8 },
-  { star: 2, count: 10, percent: 2 },
+  { star: 3, count: 50,  percent: 8  },
+  { star: 2, count: 10,  percent: 2  },
 ];
 
-const COLORS = ['#4f46e5', '#06b6d4', '#f59e0b', '#ec4899', '#8b5cf6'];
-
+// ─── component ───────────────────────────────────────────────
 const ProductDashboard = ({ onNavigate }) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem('accessToken');
 
-  // --- STATE ---
-  const [timeFilter, setTimeFilter] = useState('week');
-  const [type, setType] = useState("week");
-  const [topProducts, setTopProducts] = useState([]);
-  const [chartData, setChartData] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
-  const [statsData, setStatsData] = useState([
-    {
-      id: 'total',
-      title: "Tổng sản phẩm",
-      value: "...",
-      icon: Package,
-      color: "bg-blue-500",
-      filterType: "ALL",
-      isClickable: true
-    },
-    {
-      id: 'lowstock',
-      title: "Cảnh báo hết sản phẩm",
-      value: "...",
-      icon: AlertTriangle,
-      color: "bg-orange-500",
-      filterType: "LOW_STOCK",
-      isClickable: true
-    }
+  const [timeFilter,    setTimeFilter]    = useState('week');
+  const [type,          setType]          = useState('week');
+  const [topProducts,   setTopProducts]   = useState([]);
+  const [chartData,     setChartData]     = useState([]);
+  const [categoryData,  setCategoryData]  = useState([]);
+  const [statsData,     setStatsData]     = useState([
+    { id: 'total',    title: 'Tổng sản phẩm',          value: '...', icon: Package,       color: 'bg-[#111111]', filterType: 'ALL',       isClickable: true },
+    { id: 'lowstock', title: 'Cảnh báo hết sản phẩm',  value: '...', icon: AlertTriangle, color: 'bg-red-500',   filterType: 'LOW_STOCK', isClickable: true },
   ]);
 
-  // --- HELPERS ---
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-  };
+  const formatCurrency = (v) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
 
-  // --- EFFECTS ---
+  // ─── API calls ───────────────────────────────────────────
   useEffect(() => {
     fetchTopProducts();
     fetchSetData();
@@ -64,469 +48,312 @@ const ProductDashboard = ({ onNavigate }) => {
     getCategoryRevenue();
   }, [type, timeFilter]);
 
-  // --- API CALLS ---
   const getCategoryRevenue = async () => {
     try {
-      const response = await fetch("http://localhost:8080/categories/category-revenue", {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+      const res  = await fetch('http://localhost:8080/categories/category-revenue', {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error("Failed");
-      const data = await response.json();
-      
-      const formatted = data.result.map((item, index) => ({
-        ...item,
-        revenueFormatted: formatCurrency(item.revenue),
-        color: COLORS[index % COLORS.length] // Gán màu sắc
-      }));
-      setCategoryData(formatted);
-    } catch (error) {
-      console.error("API ERROR:", error);
-      // Fallback data fake để UI đẹp khi không có API
+      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      setCategoryData(data.result.map((item, i) => ({ ...item, color: COLORS[i % COLORS.length] })));
+    } catch {
       setCategoryData([
-        { name: "Electronics", revenue: 50000000, color: COLORS[0] },
-        { name: "Fashion", revenue: 30000000, color: COLORS[1] },
-        { name: "Home", revenue: 15000000, color: COLORS[2] },
+        { name: 'Áo thun',  revenue: 50000000, color: COLORS[0] },
+        { name: 'Áo sơ mi', revenue: 30000000, color: COLORS[1] },
+        { name: 'Quần',     revenue: 15000000, color: COLORS[2] },
       ]);
     }
   };
 
   const fetchTopProducts = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/products/top-trending?type=${type}`);
+      const res  = await fetch(`http://localhost:8080/products/top-trending?type=${type}`);
       const data = await res.json();
       setTopProducts(data);
-    } catch (error) {
-      setTopProducts([]); // Fallback empty
-    }
+    } catch { setTopProducts([]); }
   };
 
   const fetchSetData = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/products/stats`, {
-        headers: { "Authorization": `Bearer ${token}` },
+      const res  = await fetch('http://localhost:8080/products/stats', {
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setStatsData(prev => prev.map(item => {
-        if (item.id === "total") return { ...item, value: data.result?.totalProducts || 0 };
-        if (item.id === "lowstock") return { ...item, value: data.result?.lowStock || 0 };
+        if (item.id === 'total')    return { ...item, value: data.result?.totalProducts || 0 };
+        if (item.id === 'lowstock') return { ...item, value: data.result?.lowStock || 0 };
         return item;
       }));
-    } catch (error) {
-        // Silent fail or default values
-    }
+    } catch {}
   };
 
   const fetchProfit = async (filter) => {
     try {
-      const res = await fetch(`http://localhost:8080/invoices/${filter}`);
+      const res  = await fetch(`http://localhost:8080/invoices/${filter}`);
       const data = await res.json();
-
-      const mapDayToEN = (dayEn) => {
-        const days = { "MONDAY": "Mon", "TUESDAY": "Tue", "WEDNESDAY": "Wed", "THURSDAY": "Thu", "FRIDAY": "Fri", "SATURDAY": "Sat", "SUNDAY": "Sun" };
-        return days[dayEn] || dayEn;
-      };
-
-      const formatted = data.map((item) => {
-        let rawValue = typeof item.profit === 'string' ? parseFloat(item.profit.replace(/,/g, '')) : item.profit;
-        let displayName = filter === "week" ? mapDayToEN(item.day) : (filter === "month" ? `M${item.month}` : `${item.year}`);
-        
-        return {
-          name: displayName,
-          profitRaw: rawValue || 0,
-          profitFormatted: new Intl.NumberFormat('en-US').format(rawValue || 0)
-        };
-      });
-      setChartData(formatted);
-    } catch (e) {
-      console.error(e);
-      // Fake data for chart visualization if API fails
-      setChartData(Array.from({length: 7}, (_, i) => ({ name: `Day ${i+1}`, profitRaw: Math.random() * 1000000 })));
+      const mapDay = (d) => ({ MONDAY: 'T2', TUESDAY: 'T3', WEDNESDAY: 'T4', THURSDAY: 'T5', FRIDAY: 'T6', SATURDAY: 'T7', SUNDAY: 'CN' }[d] || d);
+      setChartData(data.map((item) => {
+        const raw = typeof item.profit === 'string' ? parseFloat(item.profit.replace(/,/g, '')) : item.profit;
+        const name = filter === 'week' ? mapDay(item.day) : filter === 'month' ? `T${item.month}` : `${item.year}`;
+        return { name, profitRaw: raw || 0 };
+      }));
+    } catch {
+      setChartData(Array.from({ length: 7 }, (_, i) => ({ name: `T${i + 2}`, profitRaw: Math.random() * 1000000 })));
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-8 font-sans text-slate-900">
-      <div className="max-w-[1600px] mx-auto space-y-8">
-        {/* --- 1. HEADER SECTION --- */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-          {/* LEFT */}
-          <div className="flex items-center gap-5">
-            <div className="w-14 h-14 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
-              <Sparkles className="text-white" size={28} />
-            </div>
+    <div className="min-h-screen bg-secondary selection:bg-red-500 selection:text-white pb-16">
 
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">
-                Tổng quan hệ thống
-              </h1>
-              <p className="text-slate-500 mt-1 flex items-center gap-2 text-sm font-medium">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                Trạng thái hệ thống: Hoạt động ổn định
-              </p>
-            </div>
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div className="bg-[#111111] text-white border-b border-white/10 mb-12">
+        <div className="max-w-7xl mx-auto px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <span className="text-red-500 text-[9px] font-black tracking-[0.4em] uppercase">PHÂN TÍCH SẢN PHẨM — KREDO STUDIO</span>
+            <h1 className="text-3xl lg:text-4xl font-display font-black text-white mt-2 uppercase tracking-tight">
+              THỐNG KÊ KHO SẢN PHẨM
+            </h1>
+            <p className="text-white/40 text-[10px] font-bold tracking-widest uppercase mt-2">Phân tích hiệu suất sản phẩm & tồn kho</p>
           </div>
-
-          {/* RIGHT */}
-          <div className="flex gap-3 flex-wrap">
-            <button className="flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
-              <Calendar size={18} />
-              <span>Chọn ngày</span>
-            </button>
-
-            <button className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all hover:-translate-y-1">
-              <Download size={18} />
-              <span>Xuất báo cáo</span>
-            </button>
+          <div className="md:text-right">
+            <span className="text-white/30 text-[9px] font-bold tracking-widest uppercase block mb-1">Cập nhật lần cuối</span>
+            <span className="text-lg font-display font-black text-red-500">{new Date().toLocaleTimeString('vi-VN')}</span>
           </div>
         </div>
+      </div>
 
-        {/* --- 2. KPI CARDS --- */}
+      <div className="max-w-7xl mx-auto px-8 space-y-12">
+
+        {/* ── KPI Cards ────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {statsData.map((item) => (
             <div
               key={item.id}
-              onClick={() =>
-                item.isClickable && onNavigate && onNavigate(item.filterType)
-              }
-              className="group relative overflow-hidden bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => item.isClickable && onNavigate && onNavigate(item.filterType)}
+              className="bg-white border border-primary/5 p-6 hover:border-primary/15 transition-all cursor-pointer group"
             >
-              {/* icon background */}
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <item.icon size={90} className="text-current" />
-              </div>
-
-              {/* content */}
-              <div className="flex items-center justify-between relative z-10">
-                <div>
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    {item.title}
-                  </p>
-
-                  <h3 className="text-4xl font-extrabold text-slate-800">
-                    {item.value}
-                  </h3>
+              <div className="flex items-start justify-between mb-4">
+                <div className={`${item.color} p-3 text-white`}>
+                  <item.icon className="w-5 h-5" />
                 </div>
-
-                <div
-                  className={`w-14 h-14 rounded-2xl ${item.color} flex items-center justify-center text-white shadow-lg`}
-                >
-                  <item.icon size={24} strokeWidth={2.5} />
+                <div className="flex items-center gap-1 px-2 py-0.5 border border-primary/15 text-[8px] font-black uppercase tracking-wider text-primary/40">
+                  XEM CHI TIẾT <ChevronRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
-
-              {/* footer */}
-              <div className="mt-5 flex items-center gap-1 text-sm font-semibold text-indigo-600 group-hover:gap-2 transition-all">
-                <span>Xem chi tiết</span>
-                <ChevronRight size={16} />
-              </div>
+              <p className="text-[10px] font-bold text-primary/40 uppercase tracking-widest">{item.title}</p>
+              <p className="text-xl font-display font-black text-primary mt-1">{item.value}</p>
+              <span className="text-[9px] text-red-500 font-semibold tracking-wider block mt-2 uppercase">Nhấn để xem chi tiết</span>
             </div>
           ))}
         </div>
 
-        {/* --- 3. MAIN PROFIT CHART --- */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div>
-              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <BarChart3 className="text-indigo-600" size={24} />
-                Phân tích Lợi nhuận
-              </h2>
-              <p className="text-sm text-slate-500 mt-1">
-                Hiệu suất Doanh thu so với Chi phí theo thời gian
-              </p>
+        {/* ── Profit Chart ─────────────────────────────────── */}
+        <div className="bg-white border border-primary/5 p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-3 border-b border-primary/5">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-4 h-4 text-red-500" />
+              <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">📊 PHÂN TÍCH LỢI NHUẬN THEO THỜI GIAN</h2>
             </div>
-            <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
-              {["week", "month", "year"].map((t) => (
+            <div className="flex gap-1.5">
+              {[
+                { key: 'week',  label: 'TUẦN'  },
+                { key: 'month', label: 'THÁNG' },
+                { key: 'year',  label: 'NĂM'   },
+              ].map((t) => (
                 <button
-                  key={t}
-                  onClick={() => setTimeFilter(t)}
-                  className={`px-4 py-2 text-sm font-bold rounded-lg capitalize transition-all ${timeFilter === t ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                  key={t.key}
+                  onClick={() => setTimeFilter(t.key)}
+                  className={`px-4 py-2 text-[9px] font-black tracking-widest uppercase transition-all border ${
+                    timeFilter === t.key
+                      ? 'bg-[#111111] text-white border-[#111111]'
+                      : 'bg-secondary text-primary/60 border-primary/5 hover:bg-accent hover:text-white hover:border-accent'
+                  }`}
                 >
-                  {t === "week" && "Tuần"}
-                  {t === "month" && "Tháng"}
-                  {t === "year" && "Năm"}
+                  {t.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="h-[350px] w-full">
+          <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    <stop offset="5%"  stopColor="#ef4444" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}    />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#f1f5f9"
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  tickFormatter={(val) => `${val / 1000}k`}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1ee" />
+                <XAxis dataKey="name"      stroke="#111111" style={{ fontSize: '9px', fontWeight: 'bold' }} />
+                <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} stroke="#111111" style={{ fontSize: '9px', fontWeight: 'bold' }} />
                 <Tooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  }}
-                  formatter={(val) => [
-                    `${new Intl.NumberFormat("vi-VN").format(val)}`,
-                    "Lợi nhuận",
-                  ]}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid rgba(17,17,17,0.1)', borderRadius: '0px', fontSize: '11px', fontFamily: 'monospace' }}
+                  formatter={(v) => [new Intl.NumberFormat('vi-VN').format(v) + '₫', 'Lợi nhuận']}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="profitRaw"
-                  stroke="#6366f1"
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorProfit)"
-                />
+                <Area type="monotone" dataKey="profitRaw" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" name="Lợi nhuận" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* --- 4. DOANH THU THEO DANH MỤC & ĐÁNH GIÁ KHÁCH HÀNG --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* LEFT: Doanh thu theo danh mục */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8 flex flex-col">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <PieIcon className="text-indigo-600" size={24} />
-              Doanh thu theo danh mục
-            </h2>
+        {/* ── Category Revenue + Satisfaction ──────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            <div className="flex flex-col md:flex-row items-center gap-8 h-full">
-              {/* PIE CHART */}
-              <div className="w-full md:w-1/2 h-[250px] relative">
+          {/* Doanh thu theo danh mục */}
+          <div className="bg-white border border-primary/5 p-8">
+            <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
+              <PieIcon className="w-4 h-4 text-red-500" />
+              <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">🗂️ DOANH THU THEO DANH MỤC</h2>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Pie */}
+              <div className="w-full md:w-1/2 h-[220px] relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={categoryData}
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="revenue"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color || COLORS[index % COLORS.length]}
-                        />
+                    <Pie data={categoryData} innerRadius={55} outerRadius={75} paddingAngle={4} dataKey="revenue">
+                      {categoryData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color || COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
-
-                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Tooltip
+                      formatter={(v) => formatCurrency(v)}
+                      contentStyle={{ backgroundColor: '#ffffff', border: '1px solid rgba(17,17,17,0.1)', borderRadius: '0px', fontSize: '11px', fontFamily: 'monospace' }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
-
-                {/* CENTER TEXT */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-slate-700">
-                    {categoryData.length} danh mục
+                  <span className="text-[10px] font-black text-primary/40 uppercase tracking-widest text-center">
+                    {categoryData.length}<br />DANH MỤC
                   </span>
                 </div>
               </div>
 
-              {/* LIST */}
+              {/* List */}
               <div className="w-full md:w-1/2 space-y-3">
-                {categoryData.slice(0, 4).map((cat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                      <span className="text-sm font-medium text-slate-700">
-                        {cat.name}
-                      </span>
+                {categoryData.slice(0, 5).map((cat, i) => (
+                  <div key={i} className="p-3 bg-secondary border border-primary/5 hover:border-primary/15 transition-all">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2" style={{ backgroundColor: cat.color, display: 'inline-block' }} />
+                        <span className="text-[10px] font-black text-primary uppercase tracking-wider">{cat.name}</span>
+                      </div>
                     </div>
-
-                    <span className="text-sm font-bold text-slate-900">
-                      {new Intl.NumberFormat("vi-VN", {
-                        notation: "compact",
-                      }).format(cat.revenue)}{" "}
-                      ₫
-                    </span>
+                    <p className="text-xs font-display font-black text-accent mt-1">
+                      {new Intl.NumberFormat('vi-VN', { notation: 'compact' }).format(cat.revenue)}₫
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Đánh giá khách hàng */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <Star className="text-amber-500" size={24} fill="currentColor" />
-              Mức độ hài lòng khách hàng
-            </h2>
+          {/* Đánh giá khách hàng */}
+          <div className="bg-white border border-primary/5 p-8">
+            <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
+              <Star className="w-4 h-4 text-red-500" />
+              <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">⭐ MỨC ĐỘ HÀI LÒNG KHÁCH HÀNG</h2>
+            </div>
 
             <div className="flex items-center gap-6 mb-8">
-              {/* SCORE BOX */}
-              <div className="flex-none text-center p-6 bg-amber-50 rounded-2xl border border-amber-100">
-                <h3 className="text-5xl font-extrabold text-amber-500 mb-1">
-                  4.8
-                </h3>
-
-                <div className="flex gap-1 justify-center mb-2">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star
-                      key={s}
-                      size={14}
-                      className="text-amber-400 fill-amber-400"
-                    />
+              {/* Score */}
+              <div className="flex-none text-center p-6 bg-secondary border border-primary/5">
+                <h3 className="text-4xl font-display font-black text-primary mb-1">4.8</h3>
+                <div className="flex gap-0.5 justify-center mb-2">
+                  {[1,2,3,4,5].map((s) => (
+                    <Star key={s} size={12} className="text-red-500 fill-red-500" />
                   ))}
                 </div>
-
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
-                  Điểm trung bình
-                </p>
+                <p className="text-[9px] font-black text-primary/30 uppercase tracking-widest">Điểm TB</p>
               </div>
 
-              {/* BARS */}
+              {/* Bars */}
               <div className="flex-1 space-y-3">
-                {satisfactionData.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-slate-600 w-4">
-                      {item.star}
-                    </span>
-
-                    <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                {satisfactionData.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="text-[10px] font-black text-primary/40 w-3">{item.star}</span>
+                    <div className="flex-1 h-2 bg-secondary overflow-hidden rounded-none">
                       <div
-                        className="h-full bg-amber-400 rounded-full shadow-sm transition-all"
-                        style={{ width: `${item.percent}%` }}
+                        className="h-full bg-[#111111] transition-all duration-500"
+                        style={{ width: `${item.percent}%`, backgroundColor: item.percent >= 50 ? '#ef4444' : '#111111' }}
                       />
                     </div>
-
-                    <span className="text-xs font-medium text-slate-400 w-10 text-right">
-                      {item.percent}%
-                    </span>
+                    <span className="text-[9px] font-bold text-primary/30 w-8 text-right">{item.percent}%</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* AI INSIGHT */}
-            <div className="p-4 bg-indigo-50 rounded-2xl flex items-start gap-3 border border-indigo-100">
-              <div className="mt-1 bg-white p-1.5 rounded-full shadow-sm">
-                <Sparkles size={16} className="text-indigo-600" />
-              </div>
-
-              <div>
-                <h4 className="text-sm font-bold text-indigo-900">
-                  Gợi ý từ AI
-                </h4>
-
-                <p className="text-sm text-indigo-700/80 leading-relaxed mt-1">
-                  Khách hàng đánh giá tích cực nhất về “Giao hàng nhanh”. Bạn
-                  nên nhấn mạnh điều này trong chiến dịch marketing.
-                </p>
+            {/* AI insight */}
+            <div className="p-4 bg-secondary border border-primary/5">
+              <div className="flex items-start gap-3">
+                <div className="bg-white p-1.5 border border-primary/5 flex-shrink-0">
+                  <Sparkles size={14} className="text-red-500" />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">GỢI Ý TỪ HỆ THỐNG</h4>
+                  <p className="text-[10px] font-bold text-primary/50 leading-relaxed uppercase tracking-wide">
+                    Khách hàng đánh giá tích cực nhất về "Giao hàng nhanh". Nên nhấn mạnh điều này trong chiến dịch marketing.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- 5. SẢN PHẨM BÁN CHẠY & TÌNH TRẠNG KHO --- */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* LEFT: Top Products */}
-          <div className="xl:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
-            {/* HEADER */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-800">
-                Sản phẩm bán chạy
-              </h2>
+        {/* ── Top Products + Inventory ──────────────────────── */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
+          {/* Top products table */}
+          <div className="xl:col-span-2 bg-white border border-primary/5 p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-3 border-b border-primary/5">
+              <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">🔥 SẢN PHẨM BÁN CHẠY NHẤT</h2>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                className="bg-slate-50 border-none text-sm font-bold text-slate-600 py-2 px-4 rounded-xl focus:ring-2 focus:ring-indigo-200 cursor-pointer"
+                className="bg-secondary p-2.5 text-[9px] font-black text-primary uppercase tracking-widest border border-primary/5 focus:ring-1 focus:ring-red-500 focus:outline-none"
               >
-                <option value="week">Theo tuần</option>
-                <option value="month">Theo tháng</option>
+                <option value="week">THEO TUẦN</option>
+                <option value="month">THEO THÁNG</option>
               </select>
             </div>
 
-            {/* TABLE */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto select-none">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                    <th className="pb-4 pl-2">Sản phẩm</th>
-                    <th className="pb-4">Danh mục</th>
-                    <th className="pb-4">Doanh số</th>
-                    <th className="pb-4 text-right pr-2">Xu hướng</th>
+                  <tr className="border-b border-primary/10">
+                    {['#', 'SẢN PHẨM', 'DANH MỤC', 'DOANH SỐ', 'XU HƯỚNG'].map((h) => (
+                      <th key={h} className="py-4 px-4 text-[9px] font-black text-primary/40 uppercase tracking-widest">{h}</th>
+                    ))}
                   </tr>
                 </thead>
-
-                <tbody className="text-sm">
-                  {topProducts.length > 0 ? (
-                    topProducts.map((prod, idx) => (
-                      <tr
-                        key={idx}
-                        className="group hover:bg-slate-50 transition-colors"
-                      >
-                        {/* PRODUCT */}
-                        <td className="py-4 pl-2 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg shadow-inner overflow-hidden">
-                            {prod.img ? (
-                              <img
-                                src={prod.img}
-                                alt={prod.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              "📦"
-                            )}
+                <tbody className="divide-y divide-primary/5">
+                  {topProducts.length > 0 ? topProducts.map((prod, i) => (
+                    <tr key={i} className="hover:bg-secondary/40 transition-colors">
+                      <td className="py-4 px-4 text-[10px] font-black text-primary/30 font-mono">{String(i + 1).padStart(2, '0')}</td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 bg-secondary border border-primary/5 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {prod.img
+                              ? <img src={prod.img} alt={prod.name} className="w-full h-full object-cover" />
+                              : <Package size={14} className="text-primary/30" />
+                            }
                           </div>
-
-                          <span className="font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">
-                            {prod.name}
-                          </span>
-                        </td>
-
-                        {/* CATEGORY */}
-                        <td className="py-4 text-slate-500">{prod.category}</td>
-
-                        {/* SALES */}
-                        <td className="py-4 font-semibold text-slate-800">
-                          {prod.sales}
-                        </td>
-
-                        {/* TREND */}
-                        <td className="py-4 text-right pr-2">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
-                            <TrendingUp size={12} />
-                            {prod.trend}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
+                          <span className="text-[10px] font-black text-primary uppercase tracking-wide">{prod.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-[10px] font-bold text-primary/40 uppercase tracking-wider">{prod.category}</td>
+                      <td className="py-4 px-4 font-display font-black text-xs text-primary">{prod.sales}</td>
+                      <td className="py-4 px-4">
+                        <span className="flex items-center gap-1 px-2.5 py-1 border text-[8px] font-black tracking-widest uppercase text-emerald-700 bg-emerald-50 border-emerald-100 w-fit">
+                          <TrendingUp size={10} /> {prod.trend}
+                        </span>
+                      </td>
+                    </tr>
+                  )) : (
                     <tr>
-                      <td
-                        colSpan="4"
-                        className="text-center py-10 text-slate-400"
-                      >
+                      <td colSpan={5} className="py-12 text-center text-[10px] font-black text-primary/20 uppercase tracking-widest">
                         Không có dữ liệu
                       </td>
                     </tr>
@@ -536,76 +363,50 @@ const ProductDashboard = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* RIGHT: Inventory */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8 flex flex-col justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-800 mb-6">
-                Tình trạng kho hàng
-              </h2>
-
-              <div className="space-y-6">
-                {[
-                  {
-                    label: "Tồn kho khả dụng",
-                    val: "85%",
-                    color: "bg-emerald-500",
-                    bg: "bg-emerald-50",
-                    icon: CheckCircle,
-                    text: "text-emerald-600",
-                  },
-                  {
-                    label: "Cảnh báo sắp hết hàng",
-                    val: "12%",
-                    color: "bg-amber-500",
-                    bg: "bg-amber-50",
-                    icon: AlertCircle,
-                    text: "text-amber-600",
-                  },
-                  {
-                    label: "Hàng tồn / khó bán",
-                    val: "3%",
-                    color: "bg-rose-500",
-                    bg: "bg-rose-50",
-                    icon: Clock,
-                    text: "text-rose-600",
-                  },
-                ].map((item, i) => (
-                  <div key={i}>
-                    {/* LABEL */}
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className={`p-1.5 rounded-lg ${item.bg}`}>
-                          <item.icon size={16} className={item.text} />
-                        </div>
-                        <span className="text-sm font-semibold text-slate-600">
-                          {item.label}
-                        </span>
-                      </div>
-
-                      <span className="font-bold text-slate-800">
-                        {item.val}
-                      </span>
-                    </div>
-
-                    {/* BAR */}
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${item.color} rounded-full transition-all`}
-                        style={{ width: item.val }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Inventory status */}
+          <div className="bg-white border border-primary/5 p-8 flex flex-col">
+            <div className="flex items-center gap-3 mb-8 pb-3 border-b border-primary/5">
+              <Package className="w-4 h-4 text-red-500" />
+              <h2 className="text-xs font-display font-black tracking-[0.2em] text-primary uppercase">📦 TÌNH TRẠNG KHO</h2>
             </div>
 
-            {/* BUTTON */}
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <button className="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-indigo-600 transition-colors shadow-lg shadow-slate-200">
-                Quản lý kho hàng
+            <div className="flex-1 space-y-6">
+              {[
+                { label: 'TỒN KHO KHẢ DỤNG',      val: '85%', w: 85, icon: CheckCircle,  cls: 'text-emerald-700 bg-emerald-50 border-emerald-100', bar: '#111111' },
+                { label: 'CẢNH BÁO SẮP HẾT HÀNG', val: '12%', w: 12, icon: AlertCircle,  cls: 'text-amber-700 bg-amber-50 border-amber-100',   bar: '#f59e0b' },
+                { label: 'HÀNG TỒN / KHÓ BÁN',    val: '3%',  w: 3,  icon: Clock,        cls: 'text-red-700 bg-red-50 border-red-100',          bar: '#ef4444' },
+              ].map((item, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-1.5 py-1 border text-[8px] font-black uppercase tracking-wider ${item.cls}`}>
+                        <item.icon size={10} className="inline" />
+                      </span>
+                      <span className="text-[9px] font-black text-primary/50 uppercase tracking-widest">{item.label}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-primary">{item.val}</span>
+                  </div>
+                  <div className="h-1.5 bg-secondary overflow-hidden">
+                    <div className="h-full transition-all duration-500" style={{ width: `${item.w}%`, backgroundColor: item.bar }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-primary/5">
+              <button
+                onClick={() => navigate('/admin/products')}
+                className="w-full py-3 bg-[#111111] hover:bg-accent text-white text-[10px] font-black tracking-widest uppercase transition-colors"
+              >
+                QUẢN LÝ KHO HÀNG
               </button>
             </div>
           </div>
+        </div>
+
+        {/* ── Footer ───────────────────────────────────────── */}
+        <div className="text-center pt-8 text-[9px] font-bold text-primary/20 uppercase tracking-[0.25em]">
+          © {new Date().getFullYear()} KREDO STUDIO RETAIL REPORT. ALL RIGHTS RESERVED.
         </div>
       </div>
     </div>
