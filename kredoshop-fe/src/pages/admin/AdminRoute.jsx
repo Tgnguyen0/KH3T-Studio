@@ -17,6 +17,8 @@ const AdminRoute = ({ children }) => {
 
     if (decodedToken.exp < currentTime) {
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("user");
 
       return <Navigate to="/login" replace />;
     }
@@ -26,6 +28,8 @@ const AdminRoute = ({ children }) => {
 
     if (userRole !== "ADMIN") {
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("user");
 
       return <Navigate to="/" replace />;
     }
@@ -33,6 +37,8 @@ const AdminRoute = ({ children }) => {
     return children;
   } catch (error) {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
 
     return <Navigate to="/login" replace />;
   }

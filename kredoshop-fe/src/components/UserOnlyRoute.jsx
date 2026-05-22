@@ -26,6 +26,8 @@ const UserOnlyRoute = ({ children }) => {
     } catch (error) {
         console.error("Invalid or expired token:", error);
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         alert("Your session has expired or is invalid. Please log in again.");
         return <Navigate to="/login" replace />;
     }

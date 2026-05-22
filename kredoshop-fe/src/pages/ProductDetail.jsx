@@ -53,6 +53,10 @@ const ProductDetail = () => {
       const data = await res.json();
       console.log("Tài khoản đang login: ", data.result);
       setUser(data.result);
+      if (data.result && data.result.id) {
+        localStorage.setItem("userId", data.result.id);
+        localStorage.setItem("user", JSON.stringify(data.result));
+      }
     } catch (error) {
       console.error("Lỗi fetch user", error);
     }

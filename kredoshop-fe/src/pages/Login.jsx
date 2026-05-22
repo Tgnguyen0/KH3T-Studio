@@ -40,6 +40,24 @@ const Login = () => {
           const token = result.result.token;
           localStorage.setItem("accessToken", token);
           
+          try {
+            const userRes = await fetch("http://localhost:8080/accounts/myinfor", {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            if (userRes.ok) {
+              const userData = await userRes.json();
+              if (userData && userData.result) {
+                localStorage.setItem("userId", userData.result.id);
+                localStorage.setItem("user", JSON.stringify(userData.result));
+              }
+            }
+          } catch (userErr) {
+            console.error("Error fetching user details on login:", userErr);
+          }
+
           const decodedToken = jwtDecode(token);
           const userRole = decodedToken.scope;
 

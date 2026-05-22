@@ -65,6 +65,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setAct
           className="w-full flex items-center gap-3.5 p-3.5 hover:bg-accent text-white/60 hover:text-white transition-all font-display font-black text-[10px] tracking-widest uppercase rounded-none"
           onClick={() => {
             localStorage.removeItem("accessToken");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("user");
             navigate("/login");
           }}
         >

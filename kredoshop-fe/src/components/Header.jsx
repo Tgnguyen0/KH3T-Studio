@@ -53,9 +53,15 @@ const Header = () => {
         if (response.ok) {
           const data = await response.json();
           setAccount(data.result);
+          if (data.result && data.result.id) {
+            localStorage.setItem("userId", data.result.id);
+            localStorage.setItem("user", JSON.stringify(data.result));
+          }
         } else {
           // Token invalid or expired
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("user");
           setAccount(null);
         }
       } catch (error) {
@@ -125,6 +131,8 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
     setAccount(null);
     setCartCount(0);
     toast.success("Đã đăng xuất thành công");

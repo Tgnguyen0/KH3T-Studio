@@ -8,11 +8,11 @@
         <!--  lookup parent from repository  -->
     </parent>
     <groupId>fit.iuh</groupId>
-    <artifactId>kh3tshop-be</artifactId>
+    <artifactId>kredoshop-be</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>kh3tshop-be</name>
-    <description>kh3tshop-be</description>
+    <name>kredoshop-be</name>
+    <description>kredoshop-be</description>
     <url/>
     <licenses>
         <license/>

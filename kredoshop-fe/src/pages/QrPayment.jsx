@@ -10,6 +10,8 @@ const QrPayment = () => {
   const params = new URLSearchParams(search);
   const navigate = useNavigate();
   const [copiedField, setCopiedField] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [invoiceData, setInvoiceData] = useState(null);
 
   const orderId = params.get("orderId");
   const amount = params.get("amount");
@@ -32,6 +34,7 @@ const QrPayment = () => {
       });
       const invoice = await res.json();
       console.log("new invoice", invoice);
+      setInvoiceData(invoice);
       if (invoice.paymentStatus === "PAID") {
         isPaidRef.current = true;
         clearInterval(interval.current);
@@ -45,7 +48,7 @@ const QrPayment = () => {
         });
 
         toast.success("Thanh toán thành công! KREDO cảm ơn quý khách.");
-        navigate("/orders");
+        setPaymentSuccess(true);
       }
     } catch (error) {
       console.log("Invoice not found", error);
@@ -99,6 +102,70 @@ const QrPayment = () => {
     }
   };
 
+
+  if (paymentSuccess) {
+    return (
+      <div className="min-h-screen bg-secondary py-16 px-4 sm:px-6 lg:px-8 selection:bg-accent selection:text-white flex flex-col items-center justify-center relative">
+        <div className="max-w-md w-full mx-auto animate-scale-blur bg-white rounded-3xl overflow-hidden shadow-2xl border border-primary/5 p-8 md:p-10 text-center relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Success Tick */}
+          <div className="mx-auto w-24 h-24 mb-6 flex items-center justify-center rounded-full bg-green-50 border-4 border-green-100">
+            <img src={dauTick} alt="Thành công" className="w-12 h-12 object-contain" />
+          </div>
+
+          <h1 className="text-2xl font-display font-black tracking-tight text-primary uppercase">
+            Thanh Toán Thành Công
+          </h1>
+          <p className="text-[10px] font-bold text-green-600 uppercase tracking-[0.2em] mt-2">
+            Đơn hàng đã được xác nhận tự động
+          </p>
+
+          {/* Invoice Summary Box */}
+          <div className="mt-8 p-6 rounded-2xl bg-secondary/50 border border-primary/5 text-left space-y-3.5">
+            <div className="flex justify-between items-center text-xs font-bold text-primary/45 uppercase tracking-widest pb-3 border-b border-primary/5">
+              <span>Mã hóa đơn</span>
+              <span className="text-primary font-black font-display tracking-wider select-all">
+                {invoiceCode || (invoiceData && invoiceData.invoiceCode) || "—"}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-xs font-bold text-primary/45 uppercase tracking-widest pb-3 border-b border-primary/5">
+              <span>Số tiền đã thanh toán</span>
+              <span className="text-accent font-black tracking-wide text-sm">
+                {Number(amount).toLocaleString("vi-VN")} VNĐ
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-xs font-bold text-primary/45 uppercase tracking-widest pb-3 border-b border-primary/5">
+              <span>Phương thức</span>
+              <span className="text-primary font-black uppercase">Chuyển khoản QR</span>
+            </div>
+            <div className="flex justify-between items-center text-xs font-bold text-primary/45 uppercase tracking-widest">
+              <span>Trạng thái</span>
+              <span className="px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-[9px] font-black uppercase tracking-wider">
+                ĐÃ THANH TOÁN
+              </span>
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              onClick={() => navigate("/orders")}
+              className="w-full py-4 bg-[#111111] hover:bg-accent text-white text-xs font-black tracking-[0.35em] uppercase transition-all duration-300 shadow-md cursor-pointer"
+            >
+              Xem lịch sử mua hàng
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="w-full py-4 border border-primary/10 text-primary bg-white hover:bg-secondary text-xs font-black tracking-[0.35em] uppercase transition-all duration-300 cursor-pointer"
+            >
+              Về trang chủ
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-secondary py-16 px-4 sm:px-6 lg:px-8 selection:bg-accent selection:text-white flex flex-col items-center justify-center relative">
