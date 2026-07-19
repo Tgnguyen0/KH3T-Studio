@@ -1,0 +1,963 @@
+diff --git a/kredoshop-be/pom.xml b/kredoshop-be/pom.xml
+index 099f7d7..9b701ec 100644
+--- a/kredoshop-be/pom.xml
++++ b/kredoshop-be/pom.xml
+@@ -76,6 +76,11 @@
+             <artifactId>mysql-connector-j</artifactId>
+             <scope>runtime</scope>
+         </dependency>
++        <dependency>
++            <groupId>org.postgresql</groupId>
++            <artifactId>postgresql</artifactId>
++            <scope>runtime</scope>
++        </dependency>
+         <dependency>
+             <groupId>org.projectlombok</groupId>
+             <artifactId>lombok</artifactId>
+diff --git a/kredoshop-be/src/main/java/fit/iuh/kredoshopbe/configuration/SecurityConfig.java b/kredoshop-be/src/main/java/fit/iuh/kredoshopbe/configuration/SecurityConfig.java
+index a933749..f37d4f9 100644
+--- a/kredoshop-be/src/main/java/fit/iuh/kredoshopbe/configuration/SecurityConfig.java
++++ b/kredoshop-be/src/main/java/fit/iuh/kredoshopbe/configuration/SecurityConfig.java
+@@ -1,5 +1,6 @@
+ package fit.iuh.kredoshopbe.configuration;
+ 
++import org.springframework.beans.factory.annotation.Value;
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
+ import org.springframework.http.HttpMethod;
+@@ -60,11 +61,13 @@ public class SecurityConfig {
+         return new CorsFilter(source);
+     }
+ 
+-    // Giữ nguyên CorsConfigurationSource của bạn
++    @Value("${app.cors.allowed-origins:http://localhost:5173}")
++    private String allowedOrigins;
++
+     @Bean
+     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+         CorsConfiguration config = new CorsConfiguration();
+-        config.setAllowedOrigins(List.of("http://localhost:5173")); 
++        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+         config.setAllowedHeaders(List.of("*"));
+         config.setAllowCredentials(true);
+@@ -84,12 +87,12 @@ public class SecurityConfig {
+         return authenticationConverter;
+     }
+ 
+-    private static final String SIGNER_KEY =
+-            "c8e09fddda9e192d16c485affabc61c9f4bca77a60c19d448f3a6e8475b9f0a4e0d1f69bca8d21f1123b8f0f8a0b8d12";
++    @Value("${jwt.signer.key}")
++    private String signerKey;
+ 
+     @Bean
+     JwtDecoder jwtDecoder() {
+-        SecretKeySpec keySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
++        SecretKeySpec keySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
+         return NimbusJwtDecoder
+                 .withSecretKey(keySpec)
+                 .macAlgorithm(MacAlgorithm.HS512)
+diff --git a/kredoshop-be/src/main/resources/application.properties b/kredoshop-be/src/main/resources/application.properties
+index d2bd05d..fc02bf3 100644
+--- a/kredoshop-be/src/main/resources/application.properties
++++ b/kredoshop-be/src/main/resources/application.properties
+@@ -1,21 +1,21 @@
+ spring.application.name=kredoshop-be
+ server.port=8080
+ 
+-spring.datasource.url=jdbc:mysql://localhost:3306/kredo_studio?createDatabaseIfNotExist=true
+-spring.datasource.username=root
+-spring.datasource.password=123456
+-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
++spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/kredo_studio?createDatabaseIfNotExist=true}
++spring.datasource.username=${DB_USERNAME:root}
++spring.datasource.password=${DB_PASSWORD:123456}
++spring.datasource.driver-class-name=${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+ 
+ spring.jpa.hibernate.ddl-auto=update
+ spring.jpa.show-sql=true
+ spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
++spring.jpa.properties.hibernate.dialect=${DB_DIALECT:org.hibernate.dialect.MySQLDialect}
+ 
+ # Gmail SMTP
+ spring.mail.host=smtp.gmail.com
+ spring.mail.port=587
+-spring.mail.username=thanhpham.a2.2004@gmail.com
+-spring.mail.password=zmoinpnzmqdiyqxz
++spring.mail.username=${MAIL_USERNAME}
++spring.mail.password=${MAIL_PASSWORD}
+ spring.mail.properties.mail.smtp.auth=true
+ spring.mail.properties.mail.smtp.starttls.enable=true
+ spring.mail.properties.mail.smtp.starttls.required=true
+@@ -23,12 +23,16 @@ spring.mail.properties.mail.smtp.connectiontimeout=5000
+ spring.mail.properties.mail.smtp.timeout=5000
+ spring.mail.properties.mail.smtp.writetimeout=5000
+ 
+-jwt.password.reset.secret=c8e09fddda9e192d16c485affabc61c9f4bca77a60c19d448f3a6e8475b9f0a4e0d1f69bca8d21f1123b8f0f8a0b8d12
++jwt.password.reset.secret=${JWT_RESET_SECRET}
+ jwt.password.reset.expiration=900000
++jwt.signer.key=${JWT_SIGNER_KEY}
+ 
+ #API Key AI...
+-gemini.api.key=AIzaSyDyMOAd1yX3HGl2dFY2CTgPczgOv3GPmrE
++gemini.api.key=${GEMINI_API_KEY}
+ 
+-#Sepay thanh toán
+-sepay.api-key=VKWARMYTG2TXKSQHBVBPEIIZLS5ZUFNAGTENBDJM94VNKWSN6LRM1UOYRO53MWFJ
+-sepay.webhook-token=spsk_live_SHcAdLFTRFAQxy8xJqrNMYzNPiVPoJoC
++#Sepay thanh toan
++sepay.api-key=${SEPAY_API_KEY}
++sepay.webhook-token=${SEPAY_WEBHOOK_TOKEN}
++
++# Allowed frontend origin(s) for CORS, comma-separated
++app.cors.allowed-origins=${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+diff --git a/kredoshop-fe/.gitignore b/kredoshop-fe/.gitignore
+index a547bf3..b50664c 100644
+--- a/kredoshop-fe/.gitignore
++++ b/kredoshop-fe/.gitignore
+@@ -11,6 +11,9 @@ node_modules
+ dist
+ dist-ssr
+ *.local
++.env
++.env.*
++!.env.example
+ 
+ # Editor directories and files
+ .vscode/*
+diff --git a/kredoshop-fe/src/components/AdminChatBot.jsx b/kredoshop-fe/src/components/AdminChatBot.jsx
+index d561f3e..a2a70c2 100644
+--- a/kredoshop-fe/src/components/AdminChatBot.jsx
++++ b/kredoshop-fe/src/components/AdminChatBot.jsx
+@@ -51,7 +51,7 @@ const AdminChatBot = () => {
+     setInput("");
+     setLoading(true);
+     try {
+-      const res = await fetch("http://localhost:8080/admin-chat/ask", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/admin-chat/ask`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+diff --git a/kredoshop-fe/src/components/ChatBot.jsx b/kredoshop-fe/src/components/ChatBot.jsx
+index db5c489..7c65cdf 100644
+--- a/kredoshop-fe/src/components/ChatBot.jsx
++++ b/kredoshop-fe/src/components/ChatBot.jsx
+@@ -67,7 +67,7 @@ const ChatBot = () => {
+   try {
+     const token = localStorage.getItem("accessToken");
+ 
+-    const res = await fetch("http://localhost:8080/chat/ask", {
++    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/chat/ask`, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+diff --git a/kredoshop-fe/src/components/Header.jsx b/kredoshop-fe/src/components/Header.jsx
+index 55a4c28..b864617 100644
+--- a/kredoshop-fe/src/components/Header.jsx
++++ b/kredoshop-fe/src/components/Header.jsx
+@@ -45,7 +45,7 @@ const Header = () => {
+         return;
+       }
+       try {
+-        const response = await fetch("http://localhost:8080/accounts/myinfor", {
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
+           headers: {
+             Authorization: `Bearer ${token}`,
+           },
+@@ -74,7 +74,7 @@ const Header = () => {
+   useEffect(() => {
+     const fetchCategories = async () => {
+       try {
+-        const response = await fetch("http://localhost:8080/categories");
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`);
+         if (response.ok) {
+           const data = await response.json();
+           setCategories(data.result || []);
+@@ -94,7 +94,7 @@ const Header = () => {
+       }
+       try {
+         const response = await fetch(
+-          `http://localhost:8080/carts/account/${account.id}`
++          `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${account.id}`
+         );
+         if (response.ok) {
+           const data = await response.json();
+diff --git a/kredoshop-fe/src/components/ProductCard.jsx b/kredoshop-fe/src/components/ProductCard.jsx
+index eb90474..929cc2d 100644
+--- a/kredoshop-fe/src/components/ProductCard.jsx
++++ b/kredoshop-fe/src/components/ProductCard.jsx
+@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
+ import { useState, useEffect } from "react";
+ import WishlistSelectorModal from "./WishListSelector";
+ 
+-const API_BASE = "http://localhost:8080";
++const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+ 
+ const api = {
+   async get(url) {
+diff --git a/kredoshop-fe/src/components/WishListSelector.jsx b/kredoshop-fe/src/components/WishListSelector.jsx
+index a260b4d..12e9b0e 100644
+--- a/kredoshop-fe/src/components/WishListSelector.jsx
++++ b/kredoshop-fe/src/components/WishListSelector.jsx
+@@ -2,7 +2,7 @@ import React from "react";
+ import { X, Plus, Heart, Check, Loader2 } from "lucide-react";
+ import { toast } from "sonner";
+ 
+-const API_BASE = "http://localhost:8080";
++const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+ 
+ const api = {
+   get: async (url) => {
+diff --git a/kredoshop-fe/src/pages/Cart.jsx b/kredoshop-fe/src/pages/Cart.jsx
+index 7ce35c2..799744b 100644
+--- a/kredoshop-fe/src/pages/Cart.jsx
++++ b/kredoshop-fe/src/pages/Cart.jsx
+@@ -40,7 +40,7 @@ const Cart = () => {
+   const fetchUser = async () => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+@@ -57,7 +57,7 @@ const Cart = () => {
+   const fetchCart = async () => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/carts/account/${user.id}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${user.id}`, {
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+@@ -70,7 +70,7 @@ const Cart = () => {
+   const hanldeFetchCart = async () => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/cart-details/cart/${cart.id}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/cart/${cart.id}`, {
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+@@ -90,7 +90,7 @@ const Cart = () => {
+     setCartItems(updatedItems);
+     try {
+       const token = localStorage.getItem("accessToken");
+-      await fetch(`http://localhost:8080/cart-details/${cartDetailId}/select`, {
++      await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/select`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         body: JSON.stringify({ selected: updatedItems.find((i) => i.id === cartDetailId).selected }),
+@@ -103,13 +103,13 @@ const Cart = () => {
+   const handleToggleIncrease = async (cartDetailId, priceAtTime) => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/cart-details/${cartDetailId}/increase-quantity`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/increase-quantity`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+       setCartItems((prev) => prev.map((item) => item.id === cartDetailId ? { ...item, ...data } : item));
+-      const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/increase`, {
++      const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/increase`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         body: JSON.stringify({ price: priceAtTime }),
+@@ -121,7 +121,7 @@ const Cart = () => {
+   const handleToggleDecrease = async (cartDetailId, priceAtTime) => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/cart-details/${cartDetailId}/decrease-quantity`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/decrease-quantity`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+@@ -131,7 +131,7 @@ const Cart = () => {
+       } else {
+         setCartItems((prev) => prev.map((item) => item.id === cartDetailId ? { ...item, ...data } : item));
+       }
+-      const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/decrease`, {
++      const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/decrease`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         body: JSON.stringify({ price: priceAtTime }),
+@@ -143,13 +143,13 @@ const Cart = () => {
+   const handleDelete = async (cartDetailId, quantity, subtotal) => {
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/cart-details/delete/${cartDetailId}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/delete/${cartDetailId}`, {
+         method: "DELETE",
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       if (res.ok) {
+         setCartItems(cartItems.filter((item) => item.id !== cartDetailId));
+-        const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/delete`, {
++        const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/delete`, {
+           method: "PUT",
+           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+           body: JSON.stringify({ price: subtotal, quantity }),
+diff --git a/kredoshop-fe/src/pages/Checkout.jsx b/kredoshop-fe/src/pages/Checkout.jsx
+index 8cc3624..699b1af 100644
+--- a/kredoshop-fe/src/pages/Checkout.jsx
++++ b/kredoshop-fe/src/pages/Checkout.jsx
+@@ -76,7 +76,7 @@ const Checkout = () => {
+     const fetchAddresses = async () => {
+       try {
+         const token = localStorage.getItem("accessToken");
+-        const res = await fetch(`http://localhost:8080/addresses/${userId}`, {
++        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/${userId}`, {
+           headers: {
+             "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
+@@ -106,7 +106,7 @@ const Checkout = () => {
+   useEffect(() => {
+     const handleFetchCustomer = async () => {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/customers/${userId}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/${userId}`, {
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${token}`,
+@@ -251,7 +251,7 @@ const Checkout = () => {
+       }
+ 
+       const res = await fetch(
+-        "http://localhost:8080/customer-trading/create",
++        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customer-trading/create`,
+         {
+           method: "POST",
+           headers: {
+@@ -283,7 +283,7 @@ const Checkout = () => {
+         };
+       }
+ 
+-      const orderRes = await fetch("http://localhost:8080/orders/create", {
++      const orderRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/create`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+@@ -300,7 +300,7 @@ const Checkout = () => {
+         toast.success("Đặt hàng thành công!!");
+       }
+       if (product) {
+-        await fetch(`http://localhost:8080/order-details/create`, {
++        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/order-details/create`, {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+@@ -318,7 +318,7 @@ const Checkout = () => {
+       } else {
+         let cartId = null;
+         try {
+-          const cartRes = await fetch(`http://localhost:8080/carts/account/${userId}`, {
++          const cartRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${userId}`, {
+             headers: {
+               Authorization: `Bearer ${token}`,
+             },
+@@ -333,7 +333,7 @@ const Checkout = () => {
+ 
+         for (const item of selectedCartItems) {
+           // Create order detail
+-          await fetch(`http://localhost:8080/order-details/create`, {
++          await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/order-details/create`, {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+@@ -350,7 +350,7 @@ const Checkout = () => {
+           });
+ 
+           // DELETE from backend cart
+-          await fetch(`http://localhost:8080/cart-details/delete/${item.id}`, {
++          await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/delete/${item.id}`, {
+             method: "DELETE",
+             headers: {
+               Authorization: `Bearer ${token}`,
+@@ -359,7 +359,7 @@ const Checkout = () => {
+ 
+           // Update cart totals on backend
+           if (cartId) {
+-            await fetch(`http://localhost:8080/carts/update/${cartId}/delete`, {
++            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cartId}/delete`, {
+               method: "PUT",
+               headers: {
+                 "Content-Type": "application/json",
+@@ -380,7 +380,7 @@ const Checkout = () => {
+           paymentMethod: "BANK_TRANSFER",
+           paymentStatus: "UNPAID",
+         };
+-        const res = await fetch("http://localhost:8080/invoices", {
++        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`, {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+@@ -428,7 +428,7 @@ const Checkout = () => {
+         delivery_address: finalDeliveryAddress,
+         delivery_note: formAddress.delivery_note,
+       };
+-      const res = await fetch(`http://localhost:8080/addresses/add`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/add`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+@@ -452,7 +452,7 @@ const Checkout = () => {
+ 
+         // Fetch updated address list
+         const resAddress = await fetch(
+-          `http://localhost:8080/addresses/${userId}`,
++          `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/${userId}`,
+           {
+             headers: {
+               "Content-Type": "application/json",
+diff --git a/kredoshop-fe/src/pages/ForgetPassword.jsx b/kredoshop-fe/src/pages/ForgetPassword.jsx
+index 6f22f1a..c8ab407 100644
+--- a/kredoshop-fe/src/pages/ForgetPassword.jsx
++++ b/kredoshop-fe/src/pages/ForgetPassword.jsx
+@@ -19,7 +19,7 @@ const ForgotPassword = () => {
+     const loadingToast = toast.loading("Đang gửi yêu cầu...");
+ 
+     try {
+-      const response = await fetch("http://localhost:8080/auth/forgot-password", {
++      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/auth/forgot-password`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+diff --git a/kredoshop-fe/src/pages/Home.jsx b/kredoshop-fe/src/pages/Home.jsx
+index 5767b90..ff0e634 100644
+--- a/kredoshop-fe/src/pages/Home.jsx
++++ b/kredoshop-fe/src/pages/Home.jsx
+@@ -31,8 +31,8 @@ const Home = () => {
+     const fetchData = async () => {
+       try {
+         const [prodRes, catRes] = await Promise.all([
+-          fetch("http://localhost:8080/products"),
+-          fetch("http://localhost:8080/categories")
++          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`),
++          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`)
+         ]);
+ 
+         let allProducts = [];
+diff --git a/kredoshop-fe/src/pages/Login.jsx b/kredoshop-fe/src/pages/Login.jsx
+index 92b8509..04fbb12 100644
+--- a/kredoshop-fe/src/pages/Login.jsx
++++ b/kredoshop-fe/src/pages/Login.jsx
+@@ -25,7 +25,7 @@ const Login = () => {
+     const loadingToast = toast.loading("Đang xác thực...");
+ 
+     try {
+-      const response = await fetch("http://localhost:8080/auth/login", {
++      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/auth/login`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+@@ -41,7 +41,7 @@ const Login = () => {
+           localStorage.setItem("accessToken", token);
+           
+           try {
+-            const userRes = await fetch("http://localhost:8080/accounts/myinfor", {
++            const userRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
+               headers: {
+                 "Content-Type": "application/json",
+                 Authorization: `Bearer ${token}`,
+diff --git a/kredoshop-fe/src/pages/Order.jsx b/kredoshop-fe/src/pages/Order.jsx
+index f25572c..270a9b1 100644
+--- a/kredoshop-fe/src/pages/Order.jsx
++++ b/kredoshop-fe/src/pages/Order.jsx
+@@ -25,7 +25,7 @@ const Order = () => {
+ 
+       let currentUserId = localStorage.getItem("userId");
+       if (!currentUserId) {
+-        const userRes = await fetch("http://localhost:8080/accounts/myinfor", {
++        const userRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
+           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         });
+         if (userRes.ok) {
+@@ -43,7 +43,7 @@ const Order = () => {
+         return;
+       }
+ 
+-      const res = await fetch(`http://localhost:8080/orders/account/${currentUserId}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/account/${currentUserId}`, {
+         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+@@ -112,7 +112,7 @@ const Order = () => {
+                 toast.dismiss(t);
+                 try {
+                   const token = localStorage.getItem("accessToken");
+-                  await fetch(`http://localhost:8080/orders/status/${id}`, {
++                  await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${id}`, {
+                     method: "PUT",
+                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                     body: JSON.stringify({ statusOrder: "CANCELLED" }),
+diff --git a/kredoshop-fe/src/pages/Product.jsx b/kredoshop-fe/src/pages/Product.jsx
+index bc0a15a..1670702 100644
+--- a/kredoshop-fe/src/pages/Product.jsx
++++ b/kredoshop-fe/src/pages/Product.jsx
+@@ -166,7 +166,7 @@ const Product = () => {
+     const fetchProducts = async () => {
+       try {
+         setLoading(true);
+-        const response = await fetch("http://localhost:8080/products");
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`);
+         if (response.ok) {
+           const data = await response.json();
+           setProducts(data.result || []);
+@@ -184,7 +184,7 @@ const Product = () => {
+   useEffect(() => {
+     const fetchCategories = async () => {
+       try {
+-        const response = await fetch("http://localhost:8080/categories");
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`);
+         if (response.ok) {
+           const data = await response.json();
+           const rawCategories = data.result || [];
+diff --git a/kredoshop-fe/src/pages/ProductDetail.jsx b/kredoshop-fe/src/pages/ProductDetail.jsx
+index 5e78f20..6566d54 100644
+--- a/kredoshop-fe/src/pages/ProductDetail.jsx
++++ b/kredoshop-fe/src/pages/ProductDetail.jsx
+@@ -44,7 +44,7 @@ const ProductDetail = () => {
+     try {
+       const token = localStorage.getItem("accessToken");
+ 
+-      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${token}`,
+@@ -73,7 +73,7 @@ const ProductDetail = () => {
+     try {
+       const token = localStorage.getItem("accessToken");
+       const res = await fetch(
+-        `http://localhost:8080/carts/account/${user.id}`,
++        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${user.id}`,
+         {
+           headers: {
+             "Content-Type": "application/json",
+@@ -99,7 +99,7 @@ const ProductDetail = () => {
+     const fetchProduct = async () => {
+       try {
+         setLoading(true);
+-        const response = await fetch(`http://localhost:8080/products/${id}`);
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${id}`);
+         if (response.ok) {
+           const data = await response.json();
+           // Dữ liệu SoldQuantity được lấy trực tiếp từ data.result (ProductResponse)
+@@ -120,7 +120,7 @@ const ProductDetail = () => {
+   useEffect(() => {
+     const fetchOtherProducts = async () => {
+       try {
+-        const response = await fetch("http://localhost:8080/products");
++        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`);
+         if (response.ok) {
+           const data = await response.json();
+           let products = data.result || [];
+@@ -213,7 +213,7 @@ const ProductDetail = () => {
+       };
+ 
+       const res = await fetch(
+-        `http://localhost:8080/cart-details/add-to-cart`,
++        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/add-to-cart`,
+         {
+           method: "POST",
+           headers: {
+@@ -231,7 +231,7 @@ const ProductDetail = () => {
+       };
+ 
+       const resCart = await fetch(
+-        `http://localhost:8080/carts/update/${cart.id}`,
++        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}`,
+         {
+           method: "PUT",
+           headers: {
+diff --git a/kredoshop-fe/src/pages/Profile.jsx b/kredoshop-fe/src/pages/Profile.jsx
+index 9e2742f..f5eda0c 100644
+--- a/kredoshop-fe/src/pages/Profile.jsx
++++ b/kredoshop-fe/src/pages/Profile.jsx
+@@ -5,7 +5,7 @@ import { toast } from "sonner";
+ import ChatBot from "../components/ChatBot";
+ import Contact from "../components/Contact";
+ 
+-const API_BASE = "http://localhost:8080";
++const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+ 
+ // --- API CLIENT ---
+ const api = {
+diff --git a/kredoshop-fe/src/pages/QrPayment.jsx b/kredoshop-fe/src/pages/QrPayment.jsx
+index 2415802..15239b0 100644
+--- a/kredoshop-fe/src/pages/QrPayment.jsx
++++ b/kredoshop-fe/src/pages/QrPayment.jsx
+@@ -26,7 +26,7 @@ const QrPayment = () => {
+     if (isPaidRef.current) return;
+     try {
+       const token = localStorage.getItem("accessToken");
+-      const res = await fetch(`http://localhost:8080/invoices/${invoiceId}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices/${invoiceId}`, {
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${token}`,
+@@ -38,7 +38,7 @@ const QrPayment = () => {
+       if (invoice.paymentStatus === "PAID") {
+         isPaidRef.current = true;
+         clearInterval(interval.current);
+-        await fetch(`http://localhost:8080/orders/status/${orderId}`, {
++        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${orderId}`, {
+           method: "PUT",
+           headers: {
+             "Content-Type": "application/json",
+@@ -77,7 +77,7 @@ const QrPayment = () => {
+ 
+   const handleSimulatePayment = async () => {
+     try {
+-      const response = await fetch("http://localhost:8080/api/v1/payment/sepay-callback", {
++      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1/payment/sepay-callback`, {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+diff --git a/kredoshop-fe/src/pages/Register.jsx b/kredoshop-fe/src/pages/Register.jsx
+index 9c85de2..5737e7b 100644
+--- a/kredoshop-fe/src/pages/Register.jsx
++++ b/kredoshop-fe/src/pages/Register.jsx
+@@ -83,7 +83,7 @@ const Register = () => {
+     };
+ 
+     try {
+-      const response = await fetch("http://localhost:8080/accounts", {
++      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(accountData),
+diff --git a/kredoshop-fe/src/pages/ResetPassword.jsx b/kredoshop-fe/src/pages/ResetPassword.jsx
+index 67e56c0..4604dcd 100644
+--- a/kredoshop-fe/src/pages/ResetPassword.jsx
++++ b/kredoshop-fe/src/pages/ResetPassword.jsx
+@@ -29,7 +29,7 @@ const ResetPassword = () => {
+         const loadingToast = toast.loading("Đang thiết lập mật khẩu mới...");
+ 
+         try {
+-            const response = await fetch("http://localhost:8080/auth/reset-password", {
++            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/auth/reset-password`, {
+                 method: "POST",
+                 headers: { "Content-Type": "application/json" },
+                 body: JSON.stringify({
+diff --git a/kredoshop-fe/src/pages/WishList.jsx b/kredoshop-fe/src/pages/WishList.jsx
+index 0482d7b..fba521e 100644
+--- a/kredoshop-fe/src/pages/WishList.jsx
++++ b/kredoshop-fe/src/pages/WishList.jsx
+@@ -6,7 +6,7 @@ import { toast } from "sonner";
+ import ChatBot from "../components/ChatBot";
+ import Contact from "../components/Contact";
+ 
+-const API_BASE = "http://localhost:8080";
++const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+ 
+ const api = {
+   async request(url, options = {}) {
+diff --git a/kredoshop-fe/src/pages/WishListDetail.jsx b/kredoshop-fe/src/pages/WishListDetail.jsx
+index 91dd55b..ba79da7 100644
+--- a/kredoshop-fe/src/pages/WishListDetail.jsx
++++ b/kredoshop-fe/src/pages/WishListDetail.jsx
+@@ -7,7 +7,7 @@ import ProductCard from "../components/ProductCard";
+ import ChatBot from "../components/ChatBot";
+ import Contact from "../components/Contact";
+ 
+-const API_BASE = "http://localhost:8080";
++const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+ 
+ const api = {
+   async request(url, options = {}) {
+diff --git a/kredoshop-fe/src/pages/admin/Customers.jsx b/kredoshop-fe/src/pages/admin/Customers.jsx
+index 0357158..eaa7439 100644
+--- a/kredoshop-fe/src/pages/admin/Customers.jsx
++++ b/kredoshop-fe/src/pages/admin/Customers.jsx
+@@ -29,7 +29,7 @@ export default function Customers() {
+       if (searchName) params.append("name", searchName);
+       if (statusFilter) params.append("status", statusFilter);
+       params.append("role", "USER");
+-      const res = await fetch(`http://localhost:8080/accounts?${params.toString()}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts?${params.toString()}`, {
+         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+       });
+       if (!res.ok) throw new Error("Failed to load accounts");
+@@ -69,7 +69,7 @@ export default function Customers() {
+     if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
+     try {
+       setLoading(true);
+-      const url = editingAccount ? `http://localhost:8080/accounts/admin/update/${editingAccount.id}` : `http://localhost:8080/accounts/admin/add`;
++      const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
+       const method = editingAccount ? "PUT" : "POST";
+       const res = await fetch(url, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
+       if (!res.ok) throw new Error(`Failed: ${res.status}`);
+@@ -82,7 +82,7 @@ export default function Customers() {
+     try {
+       setLoading(true);
+       const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
+-      const res = await fetch(`http://localhost:8080/accounts/admin/update/${account.id}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${account.id}`, {
+         method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+         body: JSON.stringify({ ...account, statusLogin: newStatus, customer: account.customer }),
+       });
+@@ -94,7 +94,7 @@ export default function Customers() {
+ 
+   const sendEmail = async () => {
+     try {
+-      const res = await fetch(`http://localhost:8080/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+       if (res.ok) { const data = await res.json(); alert(data.result); }
+       else alert("Lỗi khi gọi API: " + res.status);
+     } catch (error) { alert("Lỗi kết nối: " + error); }
+diff --git a/kredoshop-fe/src/pages/admin/Dashboard.jsx b/kredoshop-fe/src/pages/admin/Dashboard.jsx
+index 1974dbd..cac5407 100644
+--- a/kredoshop-fe/src/pages/admin/Dashboard.jsx
++++ b/kredoshop-fe/src/pages/admin/Dashboard.jsx
+@@ -27,7 +27,7 @@ const Dashboard = () => {
+     const fetchStats = async () => {
+       try {
+         const res = await fetch(
+-          `http://localhost:8080/orders/daily?start=${dateRange.start}&end=${dateRange.end}`,
++          `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/daily?start=${dateRange.start}&end=${dateRange.end}`,
+           {
+             headers: { Authorization: `Bearer ${token}` }
+           }
+@@ -48,7 +48,7 @@ const Dashboard = () => {
+   // -------------------------
+   const fetchTimeSlotData = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/orders/time-slots", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/time-slots`, {
+         headers: { Authorization: `Bearer ${token}` }
+       });
+       setTimeSlotData(await res.json());
+@@ -59,7 +59,7 @@ const Dashboard = () => {
+ 
+   const fetchDetailedOrders = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/orders/detailed-orders", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/detailed-orders`, {
+         headers: { Authorization: `Bearer ${token}` }
+       });
+       setDetailedOrders(await res.json());
+@@ -70,7 +70,7 @@ const Dashboard = () => {
+ 
+   const fetchRegionData = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/customer-trading/regions", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customer-trading/regions`, {
+         headers: { Authorization: `Bearer ${token}` }
+       });
+       setRegionData(await res.json());
+@@ -81,7 +81,7 @@ const Dashboard = () => {
+ 
+   const fetchPaymentData = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/invoices/payment", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices/payment`, {
+         headers: { Authorization: `Bearer ${token}` }
+       });
+       setPaymentData(await res.json());
+diff --git a/kredoshop-fe/src/pages/admin/Employees.jsx b/kredoshop-fe/src/pages/admin/Employees.jsx
+index 1afcc9b..9e4841f 100644
+--- a/kredoshop-fe/src/pages/admin/Employees.jsx
++++ b/kredoshop-fe/src/pages/admin/Employees.jsx
+@@ -30,7 +30,7 @@ export default function Employees() {
+       if (searchName) params.append("name", searchName);
+       if (statusFilter) params.append("status", statusFilter);
+       params.append("role", "STAFF");
+-      const res = await fetch(`http://localhost:8080/accounts?${params.toString()}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts?${params.toString()}`, {
+         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+       });
+       if (!res.ok) throw new Error("Failed");
+@@ -70,7 +70,7 @@ export default function Employees() {
+     if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
+     try {
+       setLoading(true);
+-      const url = editingAccount ? `http://localhost:8080/accounts/admin/update/${editingAccount.id}` : `http://localhost:8080/accounts/admin/add`;
++      const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
+       const res = await fetch(url, { method: editingAccount ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
+       if (!res.ok) throw new Error(`Failed: ${res.status}`);
+       await loadEmployees(); setShowCreate(false); setEditingAccount(null);
+@@ -82,7 +82,7 @@ export default function Employees() {
+     try {
+       setLoading(true);
+       const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
+-      const res = await fetch(`http://localhost:8080/accounts/admin/update/${account.id}`, {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${account.id}`, {
+         method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+         body: JSON.stringify({ ...account, statusLogin: newStatus, customer: account.customer }),
+       });
+@@ -95,7 +95,7 @@ export default function Employees() {
+   const handleCreateMeeting = async (values) => {
+     try {
+       setLoading(true);
+-      const res = await fetch("http://localhost:8080/accounts/meetings/create", {
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/meetings/create`, {
+         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+         body: JSON.stringify(values),
+       });
+diff --git a/kredoshop-fe/src/pages/admin/ProductDashboard.jsx b/kredoshop-fe/src/pages/admin/ProductDashboard.jsx
+index 1501517..fd4cee7 100644
+--- a/kredoshop-fe/src/pages/admin/ProductDashboard.jsx
++++ b/kredoshop-fe/src/pages/admin/ProductDashboard.jsx
+@@ -50,7 +50,7 @@ const ProductDashboard = ({ onNavigate }) => {
+ 
+   const getCategoryRevenue = async () => {
+     try {
+-      const res  = await fetch('http://localhost:8080/categories/category-revenue', {
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories/category-revenue`, {
+         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+       });
+       if (!res.ok) throw new Error('Failed');
+@@ -67,7 +67,7 @@ const ProductDashboard = ({ onNavigate }) => {
+ 
+   const fetchTopProducts = async () => {
+     try {
+-      const res  = await fetch(`http://localhost:8080/products/top-trending?type=${type}`);
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/top-trending?type=${type}`);
+       const data = await res.json();
+       setTopProducts(data);
+     } catch { setTopProducts([]); }
+@@ -75,7 +75,7 @@ const ProductDashboard = ({ onNavigate }) => {
+ 
+   const fetchSetData = async () => {
+     try {
+-      const res  = await fetch('http://localhost:8080/products/stats', {
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/stats`, {
+         headers: { Authorization: `Bearer ${token}` },
+       });
+       const data = await res.json();
+@@ -89,7 +89,7 @@ const ProductDashboard = ({ onNavigate }) => {
+ 
+   const fetchProfit = async (filter) => {
+     try {
+-      const res  = await fetch(`http://localhost:8080/invoices/${filter}`);
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices/${filter}`);
+       const data = await res.json();
+       const mapDay = (d) => ({ MONDAY: 'T2', TUESDAY: 'T3', WEDNESDAY: 'T4', THURSDAY: 'T5', FRIDAY: 'T6', SATURDAY: 'T7', SUNDAY: 'CN' }[d] || d);
+       setChartData(data.map((item) => {
+diff --git a/kredoshop-fe/src/pages/admin/ProductReport.jsx b/kredoshop-fe/src/pages/admin/ProductReport.jsx
+index fac7045..8d1e9a3 100644
+--- a/kredoshop-fe/src/pages/admin/ProductReport.jsx
++++ b/kredoshop-fe/src/pages/admin/ProductReport.jsx
+@@ -33,7 +33,7 @@ export default function ProductReport() {
+     setLoading(true);
+     setError(null);
+     try {
+-      const url = buildQuery("http://localhost:8080/reports/products/best-seller", {
++      const url = buildQuery(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/best-seller`, {
+         limit: 10,
+         start,
+         end,
+@@ -53,7 +53,7 @@ export default function ProductReport() {
+ 
+   const loadInventory = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/reports/products/inventory");
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/inventory`);
+       if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
+       const data = await res.json();
+       setInventory(data.result || data || []);
+@@ -65,7 +65,7 @@ export default function ProductReport() {
+   const loadSalesHistory = async (id, start = startDate, end = endDate) => {
+     if (!id) return setSalesHistory([]);
+     try {
+-      const url = buildQuery(`http://localhost:8080/reports/products/${id}/sales`, { days: 30, start, end });
++      const url = buildQuery(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/${id}/sales`, { days: 30, start, end });
+       const res = await fetch(url);
+       if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
+       const data = await res.json();
+diff --git a/kredoshop-fe/src/pages/admin/Products.jsx b/kredoshop-fe/src/pages/admin/Products.jsx
+index 1d27460..62a16d8 100644
+--- a/kredoshop-fe/src/pages/admin/Products.jsx
++++ b/kredoshop-fe/src/pages/admin/Products.jsx
+@@ -26,7 +26,7 @@ export default function Products({ initialFilter = 'ALL' }) {
+ 
+   const loadProducts = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/products");
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`);
+       const data = await res.json();
+       setProducts(data?.result || []);
+     } catch (err) { console.log(err); }
+@@ -34,7 +34,7 @@ export default function Products({ initialFilter = 'ALL' }) {
+ 
+   const loadCategories = async () => {
+     try {
+-      const res = await fetch("http://localhost:8080/categories");
++      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`);
+       const data = await res.json();
+       setCategories(data?.result || []);
+     } catch (err) { console.log(err); }
+@@ -77,7 +77,7 @@ export default function Products({ initialFilter = 'ALL' }) {
+     const token = localStorage.getItem("accessToken");
+     if (!token) { alert("Vui lòng đăng nhập lại!"); return; }
+     const method = editingProduct ? "PUT" : "POST";
+-    const url = editingProduct ? `http://localhost:8080/products/${editingProduct.id}` : "http://localhost:8080/products";
++    const url = editingProduct ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${editingProduct.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`;
+     const selectedCategory = categories.find(c => c.id == formData.categoryId);
+     const payload = { id: editingProduct ? editingProduct.id : 0, name: formData.name, description: formData.description, price: Number(formData.price), unit: formData.unit, quantity: Number(formData.quantity), imageUrlFront: formData.imageUrlFront, imageUrlBack: formData.imageUrlBack, discountAmount: Number(formData.discountAmount), material: formData.material, form: formData.form, categoryRequest: selectedCategory ? { name: selectedCategory.name, description: selectedCategory.description || "", imageUrl: selectedCategory.imageUrl || "", display_order: selectedCategory.display_order || 1, isActive: true } : null, sizeDetailRequests: formData.sizeDetails.map(item => ({ quantity: Number(item.quantity), sizeRequest: { nameSize: item.nameSize } })) };
+     try {
+@@ -90,7 +90,7 @@ export default function Products({ initialFilter = 'ALL' }) {
+   const deleteProduct = async (id) => {
+     const token = localStorage.getItem("accessToken");
+     if (!window.confirm("Bạn có chắc muốn xóa?")) return;
+-    await fetch(`http://localhost:8080/products/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
++    await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+     loadProducts();
+   };
+ 
+diff --git a/kredoshop-fe/src/pages/staff/Invoices.jsx b/kredoshop-fe/src/pages/staff/Invoices.jsx
+index 6f8a143..0566ba5 100644
+--- a/kredoshop-fe/src/pages/staff/Invoices.jsx
++++ b/kredoshop-fe/src/pages/staff/Invoices.jsx
+@@ -53,7 +53,7 @@ export default function Invoices() {
+   const loadInvoices = async () => {
+     try {
+       setLoading(true);
+-      const res  = await fetch('http://localhost:8080/invoices');
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`);
+       const data = await res.json();
+       setInvoices(Array.isArray(data) ? data : data?.result || []);
+     } catch { toast.error('Không thể tải danh sách hoá đơn'); }
+diff --git a/kredoshop-fe/src/pages/staff/Orders.jsx b/kredoshop-fe/src/pages/staff/Orders.jsx
+index 3993b1f..a8b07c5 100644
+--- a/kredoshop-fe/src/pages/staff/Orders.jsx
++++ b/kredoshop-fe/src/pages/staff/Orders.jsx
+@@ -51,7 +51,7 @@ export default function Orders() {
+   const loadOrders = async () => {
+     try {
+       setLoading(true);
+-      const res  = await fetch('http://localhost:8080/orders');
++      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders`);
+       const data = await res.json();
+       setOrders(Array.isArray(data) ? data : data?.result || []);
+     } catch { toast.error('Không thể tải đơn hàng'); }
+@@ -60,7 +60,7 @@ export default function Orders() {
+ 
+   const createInvoice = async (orderId) => {
+     const token = localStorage.getItem('accessToken');
+-    const res = await fetch('http://localhost:8080/invoices', {
++    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+       body: JSON.stringify({ orderId, paymentMethod: 'CASH', paymentStatus: 'UNPAID' }),
+@@ -75,7 +75,7 @@ export default function Orders() {
+     try {
+       setConfirming(orderId);
+       const token = localStorage.getItem('accessToken');
+-      const statusRes = await fetch(`http://localhost:8080/orders/status/${orderId}`, {
++      const statusRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${orderId}`, {
+         method: 'PUT',
+         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+         body: JSON.stringify({ statusOrder: 'CONFIRMED' }),
+@@ -83,7 +83,7 @@ export default function Orders() {
+       if (!statusRes.ok) throw new Error('Confirm failed');
+ 
+       try {
+-        await fetch(`http://localhost:8080/customers/email/notification/${order.account?.id}/${orderId}`, {
++        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/email/notification/${order.account?.id}/${orderId}`, {
+           method: 'POST', headers: { Authorization: `Bearer ${token}` },
+         });
+       } catch {}
