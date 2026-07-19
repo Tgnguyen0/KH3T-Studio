@@ -67,7 +67,7 @@ const ChatBot = () => {
   try {
     const token = localStorage.getItem("accessToken");
 
-    const res = await fetch("http://localhost:8080/chat/ask", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/chat/ask`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

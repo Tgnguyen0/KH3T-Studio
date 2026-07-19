@@ -29,7 +29,7 @@ export default function Customers() {
       if (searchName) params.append("name", searchName);
       if (statusFilter) params.append("status", statusFilter);
       params.append("role", "USER");
-      const res = await fetch(`http://localhost:8080/accounts?${params.toString()}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error("Failed to load accounts");
@@ -69,7 +69,7 @@ export default function Customers() {
     if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
     try {
       setLoading(true);
-      const url = editingAccount ? `http://localhost:8080/accounts/admin/update/${editingAccount.id}` : `http://localhost:8080/accounts/admin/add`;
+      const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
       const method = editingAccount ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
@@ -82,7 +82,7 @@ export default function Customers() {
     try {
       setLoading(true);
       const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
-      const res = await fetch(`http://localhost:8080/accounts/admin/update/${account.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${account.id}`, {
         method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ ...account, statusLogin: newStatus, customer: account.customer }),
       });
@@ -94,7 +94,7 @@ export default function Customers() {
 
   const sendEmail = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) { const data = await res.json(); alert(data.result); }
       else alert("Lỗi khi gọi API: " + res.status);
     } catch (error) { alert("Lỗi kết nối: " + error); }

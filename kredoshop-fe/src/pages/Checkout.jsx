@@ -76,7 +76,7 @@ const Checkout = () => {
     const fetchAddresses = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await fetch(`http://localhost:8080/addresses/${userId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/${userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -106,7 +106,7 @@ const Checkout = () => {
   useEffect(() => {
     const handleFetchCustomer = async () => {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/customers/${userId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/${userId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -251,7 +251,7 @@ const Checkout = () => {
       }
 
       const res = await fetch(
-        "http://localhost:8080/customer-trading/create",
+        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customer-trading/create`,
         {
           method: "POST",
           headers: {
@@ -283,7 +283,7 @@ const Checkout = () => {
         };
       }
 
-      const orderRes = await fetch("http://localhost:8080/orders/create", {
+      const orderRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -300,7 +300,7 @@ const Checkout = () => {
         toast.success("Đặt hàng thành công!!");
       }
       if (product) {
-        await fetch(`http://localhost:8080/order-details/create`, {
+        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/order-details/create`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -318,7 +318,7 @@ const Checkout = () => {
       } else {
         let cartId = null;
         try {
-          const cartRes = await fetch(`http://localhost:8080/carts/account/${userId}`, {
+          const cartRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -333,7 +333,7 @@ const Checkout = () => {
 
         for (const item of selectedCartItems) {
           // Create order detail
-          await fetch(`http://localhost:8080/order-details/create`, {
+          await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/order-details/create`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -350,7 +350,7 @@ const Checkout = () => {
           });
 
           // DELETE from backend cart
-          await fetch(`http://localhost:8080/cart-details/delete/${item.id}`, {
+          await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/delete/${item.id}`, {
             method: "DELETE",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -359,7 +359,7 @@ const Checkout = () => {
 
           // Update cart totals on backend
           if (cartId) {
-            await fetch(`http://localhost:8080/carts/update/${cartId}/delete`, {
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cartId}/delete`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -380,7 +380,7 @@ const Checkout = () => {
           paymentMethod: "BANK_TRANSFER",
           paymentStatus: "UNPAID",
         };
-        const res = await fetch("http://localhost:8080/invoices", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -428,7 +428,7 @@ const Checkout = () => {
         delivery_address: finalDeliveryAddress,
         delivery_note: formAddress.delivery_note,
       };
-      const res = await fetch(`http://localhost:8080/addresses/add`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -452,7 +452,7 @@ const Checkout = () => {
 
         // Fetch updated address list
         const resAddress = await fetch(
-          `http://localhost:8080/addresses/${userId}`,
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/addresses/${userId}`,
           {
             headers: {
               "Content-Type": "application/json",

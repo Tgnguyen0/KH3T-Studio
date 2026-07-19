@@ -51,7 +51,7 @@ export default function Orders() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const res  = await fetch('http://localhost:8080/orders');
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders`);
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : data?.result || []);
     } catch { toast.error('Không thể tải đơn hàng'); }
@@ -60,7 +60,7 @@ export default function Orders() {
 
   const createInvoice = async (orderId) => {
     const token = localStorage.getItem('accessToken');
-    const res = await fetch('http://localhost:8080/invoices', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ orderId, paymentMethod: 'CASH', paymentStatus: 'UNPAID' }),
@@ -75,7 +75,7 @@ export default function Orders() {
     try {
       setConfirming(orderId);
       const token = localStorage.getItem('accessToken');
-      const statusRes = await fetch(`http://localhost:8080/orders/status/${orderId}`, {
+      const statusRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ statusOrder: 'CONFIRMED' }),
@@ -83,7 +83,7 @@ export default function Orders() {
       if (!statusRes.ok) throw new Error('Confirm failed');
 
       try {
-        await fetch(`http://localhost:8080/customers/email/notification/${order.account?.id}/${orderId}`, {
+        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/email/notification/${order.account?.id}/${orderId}`, {
           method: 'POST', headers: { Authorization: `Bearer ${token}` },
         });
       } catch {}

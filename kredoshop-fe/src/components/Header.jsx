@@ -45,7 +45,7 @@ const Header = () => {
         return;
       }
       try {
-        const response = await fetch("http://localhost:8080/accounts/myinfor", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -74,7 +74,7 @@ const Header = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:8080/categories");
+        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`);
         if (response.ok) {
           const data = await response.json();
           setCategories(data.result || []);
@@ -94,7 +94,7 @@ const Header = () => {
       }
       try {
         const response = await fetch(
-          `http://localhost:8080/carts/account/${account.id}`
+          `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${account.id}`
         );
         if (response.ok) {
           const data = await response.json();

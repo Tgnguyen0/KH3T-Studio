@@ -53,7 +53,7 @@ export default function Invoices() {
   const loadInvoices = async () => {
     try {
       setLoading(true);
-      const res  = await fetch('http://localhost:8080/invoices');
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices`);
       const data = await res.json();
       setInvoices(Array.isArray(data) ? data : data?.result || []);
     } catch { toast.error('Không thể tải danh sách hoá đơn'); }

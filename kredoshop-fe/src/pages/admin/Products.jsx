@@ -26,7 +26,7 @@ export default function Products({ initialFilter = 'ALL' }) {
 
   const loadProducts = async () => {
     try {
-      const res = await fetch("http://localhost:8080/products");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`);
       const data = await res.json();
       setProducts(data?.result || []);
     } catch (err) { console.log(err); }
@@ -34,7 +34,7 @@ export default function Products({ initialFilter = 'ALL' }) {
 
   const loadCategories = async () => {
     try {
-      const res = await fetch("http://localhost:8080/categories");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`);
       const data = await res.json();
       setCategories(data?.result || []);
     } catch (err) { console.log(err); }
@@ -77,7 +77,7 @@ export default function Products({ initialFilter = 'ALL' }) {
     const token = localStorage.getItem("accessToken");
     if (!token) { alert("Vui lòng đăng nhập lại!"); return; }
     const method = editingProduct ? "PUT" : "POST";
-    const url = editingProduct ? `http://localhost:8080/products/${editingProduct.id}` : "http://localhost:8080/products";
+    const url = editingProduct ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${editingProduct.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`;
     const selectedCategory = categories.find(c => c.id == formData.categoryId);
     const payload = { id: editingProduct ? editingProduct.id : 0, name: formData.name, description: formData.description, price: Number(formData.price), unit: formData.unit, quantity: Number(formData.quantity), imageUrlFront: formData.imageUrlFront, imageUrlBack: formData.imageUrlBack, discountAmount: Number(formData.discountAmount), material: formData.material, form: formData.form, categoryRequest: selectedCategory ? { name: selectedCategory.name, description: selectedCategory.description || "", imageUrl: selectedCategory.imageUrl || "", display_order: selectedCategory.display_order || 1, isActive: true } : null, sizeDetailRequests: formData.sizeDetails.map(item => ({ quantity: Number(item.quantity), sizeRequest: { nameSize: item.nameSize } })) };
     try {
@@ -90,7 +90,7 @@ export default function Products({ initialFilter = 'ALL' }) {
   const deleteProduct = async (id) => {
     const token = localStorage.getItem("accessToken");
     if (!window.confirm("Bạn có chắc muốn xóa?")) return;
-    await fetch(`http://localhost:8080/products/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+    await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
     loadProducts();
   };
 

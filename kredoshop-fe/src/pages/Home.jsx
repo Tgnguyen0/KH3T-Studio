@@ -31,8 +31,8 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [prodRes, catRes] = await Promise.all([
-          fetch("http://localhost:8080/products"),
-          fetch("http://localhost:8080/categories")
+          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`),
+          fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories`)
         ]);
 
         let allProducts = [];

@@ -44,7 +44,7 @@ const ProductDetail = () => {
     try {
       const token = localStorage.getItem("accessToken");
 
-      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const ProductDetail = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await fetch(
-        `http://localhost:8080/carts/account/${user.id}`,
+        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${user.id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -99,7 +99,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/products/${id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${id}`);
         if (response.ok) {
           const data = await response.json();
           // Dữ liệu SoldQuantity được lấy trực tiếp từ data.result (ProductResponse)
@@ -120,7 +120,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchOtherProducts = async () => {
       try {
-        const response = await fetch("http://localhost:8080/products");
+        const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`);
         if (response.ok) {
           const data = await response.json();
           let products = data.result || [];
@@ -213,7 +213,7 @@ const ProductDetail = () => {
       };
 
       const res = await fetch(
-        `http://localhost:8080/cart-details/add-to-cart`,
+        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/add-to-cart`,
         {
           method: "POST",
           headers: {
@@ -231,7 +231,7 @@ const ProductDetail = () => {
       };
 
       const resCart = await fetch(
-        `http://localhost:8080/carts/update/${cart.id}`,
+        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}`,
         {
           method: "PUT",
           headers: {

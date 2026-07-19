@@ -40,7 +40,7 @@ const Cart = () => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/accounts/myinfor`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -57,7 +57,7 @@ const Cart = () => {
   const fetchCart = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/carts/account/${user.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/account/${user.id}`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -70,7 +70,7 @@ const Cart = () => {
   const hanldeFetchCart = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/cart-details/cart/${cart.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/cart/${cart.id}`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -90,7 +90,7 @@ const Cart = () => {
     setCartItems(updatedItems);
     try {
       const token = localStorage.getItem("accessToken");
-      await fetch(`http://localhost:8080/cart-details/${cartDetailId}/select`, {
+      await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/select`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ selected: updatedItems.find((i) => i.id === cartDetailId).selected }),
@@ -103,13 +103,13 @@ const Cart = () => {
   const handleToggleIncrease = async (cartDetailId, priceAtTime) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/cart-details/${cartDetailId}/increase-quantity`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/increase-quantity`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       setCartItems((prev) => prev.map((item) => item.id === cartDetailId ? { ...item, ...data } : item));
-      const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/increase`, {
+      const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/increase`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ price: priceAtTime }),
@@ -121,7 +121,7 @@ const Cart = () => {
   const handleToggleDecrease = async (cartDetailId, priceAtTime) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/cart-details/${cartDetailId}/decrease-quantity`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/${cartDetailId}/decrease-quantity`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
@@ -131,7 +131,7 @@ const Cart = () => {
       } else {
         setCartItems((prev) => prev.map((item) => item.id === cartDetailId ? { ...item, ...data } : item));
       }
-      const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/decrease`, {
+      const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/decrease`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ price: priceAtTime }),
@@ -143,13 +143,13 @@ const Cart = () => {
   const handleDelete = async (cartDetailId, quantity, subtotal) => {
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/cart-details/delete/${cartDetailId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/cart-details/delete/${cartDetailId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         setCartItems(cartItems.filter((item) => item.id !== cartDetailId));
-        const resCart = await fetch(`http://localhost:8080/carts/update/${cart.id}/delete`, {
+        const resCart = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/carts/update/${cart.id}/delete`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ price: subtotal, quantity }),

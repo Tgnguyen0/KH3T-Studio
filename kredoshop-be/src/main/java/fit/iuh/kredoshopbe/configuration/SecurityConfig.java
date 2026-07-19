@@ -1,5 +1,6 @@
 package fit.iuh.kredoshopbe.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -60,11 +61,13 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
-    // Giữ nguyên CorsConfigurationSource của bạn
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private String allowedOrigins;
+
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); 
+        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
@@ -84,12 +87,12 @@ public class SecurityConfig {
         return authenticationConverter;
     }
 
-    private static final String SIGNER_KEY =
-            "c8e09fddda9e192d16c485affabc61c9f4bca77a60c19d448f3a6e8475b9f0a4e0d1f69bca8d21f1123b8f0f8a0b8d12";
+    @Value("${jwt.signer.key}")
+    private String signerKey;
 
     @Bean
     JwtDecoder jwtDecoder() {
-        SecretKeySpec keySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
+        SecretKeySpec keySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
         return NimbusJwtDecoder
                 .withSecretKey(keySpec)
                 .macAlgorithm(MacAlgorithm.HS512)

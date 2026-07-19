@@ -30,7 +30,7 @@ export default function Employees() {
       if (searchName) params.append("name", searchName);
       if (statusFilter) params.append("status", statusFilter);
       params.append("role", "STAFF");
-      const res = await fetch(`http://localhost:8080/accounts?${params.toString()}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       if (!res.ok) throw new Error("Failed");
@@ -70,7 +70,7 @@ export default function Employees() {
     if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
     try {
       setLoading(true);
-      const url = editingAccount ? `http://localhost:8080/accounts/admin/update/${editingAccount.id}` : `http://localhost:8080/accounts/admin/add`;
+      const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
       const res = await fetch(url, { method: editingAccount ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadEmployees(); setShowCreate(false); setEditingAccount(null);
@@ -82,7 +82,7 @@ export default function Employees() {
     try {
       setLoading(true);
       const newStatus = account.statusLogin === "ACTIVE" ? "LOCKED" : "ACTIVE";
-      const res = await fetch(`http://localhost:8080/accounts/admin/update/${account.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${account.id}`, {
         method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ ...account, statusLogin: newStatus, customer: account.customer }),
       });
@@ -95,7 +95,7 @@ export default function Employees() {
   const handleCreateMeeting = async (values) => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8080/accounts/meetings/create", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/meetings/create`, {
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(values),
       });

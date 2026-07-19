@@ -33,7 +33,7 @@ export default function ProductReport() {
     setLoading(true);
     setError(null);
     try {
-      const url = buildQuery("http://localhost:8080/reports/products/best-seller", {
+      const url = buildQuery(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/best-seller`, {
         limit: 10,
         start,
         end,
@@ -53,7 +53,7 @@ export default function ProductReport() {
 
   const loadInventory = async () => {
     try {
-      const res = await fetch("http://localhost:8080/reports/products/inventory");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/inventory`);
       if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
       const data = await res.json();
       setInventory(data.result || data || []);
@@ -65,7 +65,7 @@ export default function ProductReport() {
   const loadSalesHistory = async (id, start = startDate, end = endDate) => {
     if (!id) return setSalesHistory([]);
     try {
-      const url = buildQuery(`http://localhost:8080/reports/products/${id}/sales`, { days: 30, start, end });
+      const url = buildQuery(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/reports/products/${id}/sales`, { days: 30, start, end });
       const res = await fetch(url);
       if (!res.ok) throw new Error(`API lỗi: ${res.status}`);
       const data = await res.json();

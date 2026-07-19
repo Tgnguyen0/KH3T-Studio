@@ -25,7 +25,7 @@ const Order = () => {
 
       let currentUserId = localStorage.getItem("userId");
       if (!currentUserId) {
-        const userRes = await fetch("http://localhost:8080/accounts/myinfor", {
+        const userRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/myinfor`, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
         if (userRes.ok) {
@@ -43,7 +43,7 @@ const Order = () => {
         return;
       }
 
-      const res = await fetch(`http://localhost:8080/orders/account/${currentUserId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/account/${currentUserId}`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -112,7 +112,7 @@ const Order = () => {
                 toast.dismiss(t);
                 try {
                   const token = localStorage.getItem("accessToken");
-                  await fetch(`http://localhost:8080/orders/status/${id}`, {
+                  await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                     body: JSON.stringify({ statusOrder: "CANCELLED" }),

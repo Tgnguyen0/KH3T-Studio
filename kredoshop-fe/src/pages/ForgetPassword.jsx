@@ -19,7 +19,7 @@ const ForgotPassword = () => {
     const loadingToast = toast.loading("Đang gửi yêu cầu...");
 
     try {
-      const response = await fetch("http://localhost:8080/auth/forgot-password", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

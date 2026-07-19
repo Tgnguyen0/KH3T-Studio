@@ -26,7 +26,7 @@ const QrPayment = () => {
     if (isPaidRef.current) return;
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`http://localhost:8080/invoices/${invoiceId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices/${invoiceId}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ const QrPayment = () => {
       if (invoice.paymentStatus === "PAID") {
         isPaidRef.current = true;
         clearInterval(interval.current);
-        await fetch(`http://localhost:8080/orders/status/${orderId}`, {
+        await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/orders/status/${orderId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -77,7 +77,7 @@ const QrPayment = () => {
 
   const handleSimulatePayment = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/payment/sepay-callback", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1/payment/sepay-callback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

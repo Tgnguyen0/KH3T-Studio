@@ -50,7 +50,7 @@ const ProductDashboard = ({ onNavigate }) => {
 
   const getCategoryRevenue = async () => {
     try {
-      const res  = await fetch('http://localhost:8080/categories/category-revenue', {
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/categories/category-revenue`, {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed');
@@ -67,7 +67,7 @@ const ProductDashboard = ({ onNavigate }) => {
 
   const fetchTopProducts = async () => {
     try {
-      const res  = await fetch(`http://localhost:8080/products/top-trending?type=${type}`);
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/top-trending?type=${type}`);
       const data = await res.json();
       setTopProducts(data);
     } catch { setTopProducts([]); }
@@ -75,7 +75,7 @@ const ProductDashboard = ({ onNavigate }) => {
 
   const fetchSetData = async () => {
     try {
-      const res  = await fetch('http://localhost:8080/products/stats', {
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -89,7 +89,7 @@ const ProductDashboard = ({ onNavigate }) => {
 
   const fetchProfit = async (filter) => {
     try {
-      const res  = await fetch(`http://localhost:8080/invoices/${filter}`);
+      const res  = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/invoices/${filter}`);
       const data = await res.json();
       const mapDay = (d) => ({ MONDAY: 'T2', TUESDAY: 'T3', WEDNESDAY: 'T4', THURSDAY: 'T5', FRIDAY: 'T6', SATURDAY: 'T7', SUNDAY: 'CN' }[d] || d);
       setChartData(data.map((item) => {
