@@ -40,10 +40,10 @@ const Contact = () => {
       {/* DROPDOWN */}
       <div className={`absolute bottom-20 right-0 flex flex-col gap-3 transition-all duration-300 origin-bottom-right ${isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"}`}>
         {/* Messenger */}
-        <a href="https://www.facebook.com/profile.php?id=61584287818988" target="_blank" rel="noopener noreferrer"
+        <a href="" target="_blank" rel="noopener noreferrer"
           className="group/item relative" onClick={() => setIsOpen(false)}>
           <div className="w-14 h-14 rounded-full shadow-xl hover:scale-110 transition-all overflow-hidden ring-4 ring-white/60 bg-white">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" className="w-full h-full object-cover" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Facebook_Messenger_logo_2025.svg/960px-Facebook_Messenger_logo_2025.svg.png" alt="Messenger" className="w-full h-full object-cover" />
           </div>
           <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-black text-white text-xs font-medium px-3 py-2 rounded-lg opacity-0 group-hover/item:opacity-100 transition pointer-events-none whitespace-nowrap shadow-lg">
             Chat Messenger
@@ -51,7 +51,7 @@ const Contact = () => {
         </a>
 
         {/* Zalo */}
-        <a href="https://zalo.me/0337300592" target="_blank" rel="noopener noreferrer"
+        <a href="" target="_blank" rel="noopener noreferrer"
           className="group/item relative" onClick={() => setIsOpen(false)}>
           <div className="w-14 h-14 rounded-full shadow-xl hover:scale-110 transition-all overflow-hidden ring-4 ring-white/60 bg-white">
             <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Zalo-Arc.png" alt="Zalo" className="w-full h-full object-cover" />
