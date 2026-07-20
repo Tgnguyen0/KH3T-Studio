@@ -1,6 +1,8 @@
 package fit.iuh.kredoshopbe.exception;
 
 import fit.iuh.kredoshopbe.dto.response.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,16 +11,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // bất kì runtime exception nào xảy ra trong ứng dụng đều sẽ được xử lý ở đây
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+        log.error("Unhandled RuntimeException: ", ex); // <-- thêm dòng này
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.UnknownError.getCode());
         apiResponse.setMessage(ErrorCode.UnknownError.getMessage());
         return ResponseEntity
-                .badRequest() // lỗi 400
+                .badRequest()
                 .body(apiResponse);
     }
     @ExceptionHandler(value = AppException.class)
