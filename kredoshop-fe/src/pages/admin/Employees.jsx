@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Users, Plus, Eye, Edit2, Ban, Check, Video, RefreshCw, Search } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import toast from "react-hot-toast";
 
 export default function Employees() {
   const [accounts, setAccounts]             = useState([]);
@@ -99,9 +100,9 @@ export default function Employees() {
         method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(values),
       });
-      if (res.ok) { alert("Tạo cuộc họp thành công!"); setShowMeeting(false); }
+      if (res.ok) { toast.success("Tạo Google Meet thành công!"); }
       else throw new Error(`Lỗi ${res.status}`);
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast.error(err.message || "Đã xảy ra lỗi!"); }
     finally { setLoading(false); }
   };
 
