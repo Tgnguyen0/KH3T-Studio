@@ -96,14 +96,30 @@ export default function Employees() {
   const handleCreateMeeting = async (values) => {
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/meetings/create`, {
-        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(values),
-      });
-      if (res.ok) { toast.success("Tạo Google Meet thành công!"); }
-      else throw new Error(`Lỗi ${res.status}`);
-    } catch (err) { toast.error(err.message || "Đã xảy ra lỗi!"); }
-    finally { setLoading(false); }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/meetings/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Lỗi ${res.status}`);
+      }
+
+      toast.success("Tạo Google Meet thành công!");
+      setShowMeeting(false); // Đóng modal
+    } catch (err) {
+      toast.error(err.message || "Đã xảy ra lỗi!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const MeetingSchema = Yup.object().shape({
