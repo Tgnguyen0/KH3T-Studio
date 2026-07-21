@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Users, Plus, Eye, Edit2, Ban, Check, Video, RefreshCw, Search } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export default function Employees() {
   const [accounts, setAccounts]             = useState([]);
