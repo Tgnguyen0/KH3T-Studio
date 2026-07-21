@@ -2,6 +2,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "sonner";
 
 const UserOnlyRoute = ({ children }) => {
     const token = localStorage.getItem("accessToken");
@@ -17,7 +18,7 @@ const UserOnlyRoute = ({ children }) => {
 
         // Chặn Admin truy cập vào các trang dành cho người dùng thường
         if (role === "ADMIN") {
-            alert("Access denied. Administrators cannot access user pages.");
+            toast.error("Access denied. Administrators cannot access user pages.");
             return <Navigate to="/admin" replace />;
         }
 
@@ -28,7 +29,7 @@ const UserOnlyRoute = ({ children }) => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
         localStorage.removeItem("user");
-        alert("Your session has expired or is invalid. Please log in again.");
+        toast.error("Your session has expired or is invalid. Please log in again.");
         return <Navigate to="/login" replace />;
     }
 };

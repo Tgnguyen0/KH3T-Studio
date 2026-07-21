@@ -37,7 +37,7 @@ export default function Employees() {
       if (!res.ok) throw new Error("Failed");
       const data = await res.json();
       setAccounts(data.result);
-    } catch { alert("Lỗi khi tải danh sách nhân viên"); }
+    } catch { toast.error("Lỗi khi tải danh sách nhân viên"); }
     finally { setLoading(false); }
   };
 
@@ -68,14 +68,14 @@ export default function Employees() {
   };
 
   const submitForm = async () => {
-    if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
+    if (!form.customer.fullName || !form.customer.email) { toast.error("Vui lòng nhập đầy đủ họ tên và email"); return; }
     try {
       setLoading(true);
       const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
       const res = await fetch(url, { method: editingAccount ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadEmployees(); setShowCreate(false); setEditingAccount(null);
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast.error(err.message); }
     finally { setLoading(false); }
   };
 
@@ -89,7 +89,7 @@ export default function Employees() {
       });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadEmployees();
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast.error(err.message); }
     finally { setLoading(false); }
   };
 

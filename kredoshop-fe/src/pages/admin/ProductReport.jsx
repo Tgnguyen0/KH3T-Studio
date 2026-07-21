@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {BarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer,PieChart,Pie,Cell,LineChart,Line,} from "recharts";
+import { toast } from "sonner";
 
 // Product Report Page with time filter, export CSV, and product selector for sales line chart
 export default function ProductReport() {
@@ -97,7 +98,7 @@ export default function ProductReport() {
 
   const exportCSV = (rows, filename = "report.csv") => {
     if (!rows || rows.length === 0) {
-      alert("Không có dữ liệu để xuất");
+      toast.error("Không có dữ liệu để xuất");
       return;
     }
     // get headers from first object

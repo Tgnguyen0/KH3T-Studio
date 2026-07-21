@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; // npm install jwt-decode
+import { toast } from "sonner";
 
 /**
  * StaffRoute - Only allows users with STAFF role to access
@@ -10,7 +11,7 @@ const StaffRoute = ({ children }) => {
 
   // 1. No token → Redirect to login
   if (!token) {
-    alert("You must log in to access the staff area.");
+    toast.error("You must log in to access the staff area.");
     return <Navigate to="/login" replace />;
   }
 
@@ -32,7 +33,7 @@ const StaffRoute = ({ children }) => {
     );
 
     if (!isStaff) {
-      alert("You do not have permission to access this area. Staff only.");
+      toast.error("You do not have permission to access this area. Staff only.");
       return <Navigate to="/" replace />;
     }
 
@@ -40,7 +41,7 @@ const StaffRoute = ({ children }) => {
 
   } catch (error) {
     console.error("Invalid or expired token:", error);
-    alert("Your session is invalid or has expired. Please log in again.");
+    toast.error("Your session is invalid or has expired. Please log in again.");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("user");

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Package, Plus, Eye, Edit2, Trash2, Download, RefreshCw, Search, Filter } from "lucide-react";
 import AdminChatBot from '../../components/AdminChatBot';
+import { toast } from "sonner";
 
 export default function Products({ initialFilter = 'ALL' }) {
   const [products, setProducts] = useState([]);
@@ -75,7 +76,7 @@ export default function Products({ initialFilter = 'ALL' }) {
 
   const saveProduct = async () => {
     const token = localStorage.getItem("accessToken");
-    if (!token) { alert("Vui lòng đăng nhập lại!"); return; }
+    if (!token) { toast.error("Vui lòng đăng nhập lại!"); return; }
     const method = editingProduct ? "PUT" : "POST";
     const url = editingProduct ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products/${editingProduct.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/products`;
     const selectedCategory = categories.find(c => c.id == formData.categoryId);
@@ -83,8 +84,8 @@ export default function Products({ initialFilter = 'ALL' }) {
     try {
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) });
       if (res.ok) { setShowModal(false); loadProducts(); }
-      else { const errorData = await res.json(); alert(`Lỗi: ${errorData.message || "Không thể lưu sản phẩm"}`); }
-    } catch (error) { alert("Lỗi kết nối"); }
+      else { const errorData = await res.json(); toast.error(`Lỗi: ${errorData.message || "Không thể lưu sản phẩm"}`); }
+    } catch (error) { toast.error("Lỗi kết nối"); }
   };
 
   const deleteProduct = async (id) => {

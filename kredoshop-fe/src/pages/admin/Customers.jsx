@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Users, Plus, Eye, Edit2, Ban, Check, Mail, RefreshCw, Search } from "lucide-react";
 import AdminChatBot from '../../components/AdminChatBot';
+import { toast } from "sonner";
 
 export default function Customers() {
   const [accounts, setAccounts]           = useState([]);
@@ -35,7 +36,7 @@ export default function Customers() {
       if (!res.ok) throw new Error("Failed to load accounts");
       const data = await res.json();
       setAccounts(data.result);
-    } catch (err) { alert("Lỗi khi tải danh sách tài khoản"); }
+    } catch (err) { toast.error("Lỗi khi tải danh sách tài khoản"); }
     finally { setLoading(false); }
   };
 
@@ -66,7 +67,7 @@ export default function Customers() {
   };
 
   const submitForm = async () => {
-    if (!form.customer.fullName || !form.customer.email) { alert("Vui lòng nhập đầy đủ họ tên và email"); return; }
+    if (!form.customer.fullName || !form.customer.email) { toast.error("Vui lòng nhập đầy đủ họ tên và email"); return; }
     try {
       setLoading(true);
       const url = editingAccount ? `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/update/${editingAccount.id}` : `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/accounts/admin/add`;
@@ -74,7 +75,7 @@ export default function Customers() {
       const res = await fetch(url, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(form) });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadCustomers(); setShowCreate(false); setEditingAccount(null);
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast.error(err.message); }
     finally { setLoading(false); }
   };
 
@@ -88,16 +89,16 @@ export default function Customers() {
       });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
       await loadCustomers();
-    } catch (err) { alert(err.message); }
+    } catch (err) { toast.error(err.message); }
     finally { setLoading(false); }
   };
 
   const sendEmail = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/customers/email/sale/all`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) { const data = await res.json(); alert(data.result); }
-      else alert("Lỗi khi gọi API: " + res.status);
-    } catch (error) { alert("Lỗi kết nối: " + error); }
+      if (res.ok) { const data = await res.json(); toast.error(data.result); }
+      else toast.error("Lỗi khi gọi API: " + res.status);
+    } catch (error) { toast.error("Lỗi kết nối: " + error); }
   };
 
   const activeCount = accounts.filter(a => a.statusLogin === "ACTIVE").length;

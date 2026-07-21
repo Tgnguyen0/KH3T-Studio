@@ -2,6 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Calendar, DollarSign, ShoppingCart, Users, Package, Download, TrendingUp, TrendingDown, Clock, MapPin, CreditCard } from 'lucide-react';
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const token = localStorage.getItem("accessToken");
@@ -237,7 +238,7 @@ const Dashboard = () => {
     });
 
     if (rows.length === 0) {
-      alert("Không có dữ liệu phát sinh trong khoảng thời gian này để xuất file.");
+      toast.error("Không có dữ liệu phát sinh trong khoảng thời gian này để xuất file.");
       return;
     }
 
